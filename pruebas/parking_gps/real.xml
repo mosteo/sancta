@@ -1,0 +1,86 @@
+<expres>
+   <agent id="Ced" kind="robot" goal_dist="1.0">
+      <log>.expres.robot_plugin.aligner</log>
+      <log>expres.simplebot2</log>
+      <log>.expres.traderbot</log>
+
+      <plugin name="core" address="127.0.0.1" port="6665" enabled="true">
+         <provides data="is_connected"   as="is_connected"   type="boolean"/>
+      </plugin>
+
+      <plugin name="move" enabled="true">
+         <requires data="goal_action"    as="goal_action"    type="robot_plugin.goal_action"/>
+         <requires data="emergency_stop" as="emergency_stop" type="boolean"/>
+      </plugin>
+
+      <plugin name="odometry" enabled="true">
+         <provides data="odom_pose"     as="odom_pose"        type="types.pose"/>
+         <provides data="velocity"      as="current_velocity" type="types.pose"/>
+      </plugin>
+
+      <plugin name="laser" enabled="true">
+          <requires data="loc_pose"      as="current_pose"  type="types.pose"/>
+
+          <provides data="scan_id"       as="laser_scan_id" type="integer"/>
+          <provides data="scan"          as="raw_scan"      type="datastore.posed_range_scan"/>
+          <provides data="pose_on_robot" as="pose_on_robot" type="types.pose"/>
+      </plugin>
+
+      <plugin name="manual_pose_correction" enabled="true">
+          <requires data="in_pose"      as="odom_pose"   type="types.pose"/>
+          <requires data="new_pose"     as="manual_pose"  type="types.pose"/>
+
+          <provides data="out_pose"     as="odom+man_pose" type="types.pose"/>
+      </plugin>
+
+      <plugin name="mbicp" out_of_range="31.0" enabled="true">
+          <requires data="odom_pose"           as="odom+man_pose"     types="types.pose"/>
+          <requires data="scan"                as="raw_scan"      types="datastore.posed_range_scan"/>
+          <requires data="laser_pose_on_robot" as="pose_on_robot" type="types.pose"/>
+
+          <provides data="improved_pose" as="sm_pose"      types="types.pose"/>
+          <provides data="improved_scan" as="sm_scan"   types="datastore.posed_range_scan"/>
+      </plugin>
+
+      <plugin name="aligner" 
+              out_of_range="31.0" 
+              tolerance="0.17" 
+              guides="1.570796"
+              samples="10"
+              enabled="true">
+          <requires data="in_pose"          as="sm_pose"      types="types.pose"/>
+          <requires data="in_scan"          as="sm_scan"     types="datastore.posed_range_scan"/>
+
+          <provides data="out_pose"         as="current_pose"   types="types.pose"/>
+          <provides data="out_scan"         as="laser_scan"   types="datastore.posed_range_scan"/>
+      </plugin>
+
+      <plugin name="logger_montesano" 
+              filename="lasergps.txt" 
+              immediate="true" 
+              use_laser_pose="true"
+              enabled="false">
+          <requires data="pose" as="odom_pose" type="types.pose"/>
+          <requires data="scan" as="laser_scan" type="datastore.posed_range_scan"/>
+      </plugin>
+ 
+      <udp address="192.168.1.20" port="5001"/>
+
+      <channel name="emergency" subscribe="true"/>
+      <channel name="traderbot" subscribe="true"/>
+   </agent>
+
+   <agent id="Zen" kind="gui" laser_scans="3" draw_grid="false" mission="/home/jano/prog/expres/pruebas/parking_gps/mission.txt">
+      <udp address="192.168.1.69" port="5505"/>
+      <channel name="gui"       subscribe="true"/>
+      <channel name="emergency" subscribe="true"/>
+      <channel name="management" subscribe="true"/>
+
+      <log>expres.types.operations</log>
+   </agent>
+
+   <!-- Here we specify details about the global traderbot policies. -->
+   <!-- local_cost, full_cost -->
+   <traderbot cost_policy="full_cost"/>
+
+</expres>

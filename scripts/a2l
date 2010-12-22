@@ -1,0 +1,3 @@
+#!/bin/bash
+
+addr2line $* 2>&1 | grep -v BFD

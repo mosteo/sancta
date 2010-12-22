@@ -1,0 +1,17 @@
+experimento=`basename $0 | cut -f 1 -d .`
+
+ari() { [ -f $HOME/${experimento}/ari ]; }
+ben() { [ -f $HOME/${experimento}/ben ]; }
+ced() { [ -f $HOME/${experimento}/ced ]; }
+dan() { [ -f $HOME/${experimento}/dan ]; }
+
+# ensure folder exists
+ari && ssh mosteo@ari "mkdir -p ${experimento}"
+ben && ssh mosteo@ben "mkdir -p ${experimento}"
+ced && ssh mosteo@ced "mkdir -p ${experimento}"
+dan && ssh mosteo@dan "mkdir -p ${experimento}"
+
+ari && scp $HOME/prog/expres/obj/expresbot mosteo@ari:${experimento}
+ben && scp $HOME/prog/expres/obj/expresbot mosteo@ben:${experimento}
+ced && scp $HOME/prog/expres/obj/expresbot mosteo@ced:${experimento}
+dan && scp $HOME/prog/expres/obj/expresbot mosteo@dan:${experimento}

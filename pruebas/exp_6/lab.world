@@ -1,0 +1,56 @@
+resolution     0.02
+interval_sim   100
+interval_real  100
+
+include "../types.inc"
+
+# The GUI
+window
+(
+   scale 0.025
+   size [1024 700]
+)
+
+# The map
+map
+(
+   bitmap "lab.png"
+   size [20 16]
+   pose [0 0 0]
+)
+
+# Ari
+pioneer_with_laser_and_vision
+(
+   name "Ari"
+   color "red"
+   pose [-8.0 -7.0  0.0]
+   odom [-8.0 -7.0  0.0]
+)
+
+# Ben
+pioneer_with_laser_and_vision
+(
+   name "Ben"
+   color "green"
+   pose [-8.0 -6.0  0.0]
+   odom [-8.0 -6.0  0.0]
+)
+
+# Ced
+pioneer_with_laser_and_vision
+(
+   name "Ced"
+   color "blue"
+   pose [-9.0 -7.0  0.0]
+   odom [-9.0 -7.0  0.0]
+)
+
+# Dan
+pioneer_with_laser_and_vision
+(
+   name "Dan"
+   color "yellow"
+   pose [-9.0 -6.0  0.0]
+   odom [-9.0 -6.0  0.0]
+)

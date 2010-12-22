@@ -1,0 +1,41 @@
+#!/bin/bash
+
+experimento=`basename $0 | cut -f 1 -d .`
+bot=expresbot
+prefix="env LD_LIBRARY_PATH=/home/roplab/jano/local/lib $experimento/$bot --id"
+
+. ${experimento}.stop
+. ${experimento}.common
+
+echo Lanzando $experimento...
+
+( ari && echo "Ari is active" ) || echo "Ari is inactive"
+( ben && echo "Ben is active" ) || echo "Ben is inactive"
+( ced && echo "Ced is active" ) || echo "Ced is inactive"
+( dan && echo "Dan is active" ) || echo "Dan is inactive"
+
+# SYNCHRONIZE ROBOT CONFIGS
+ari && scp $HOME/${experimento}/simrem.xml jano@$arihost:${experimento}
+ben && scp $HOME/${experimento}/simrem.xml jano@$benhost:${experimento}
+ced && scp $HOME/${experimento}/simrem.xml jano@$cedhost:${experimento}
+dan && scp $HOME/${experimento}/simrem.xml jano@$danhost:${experimento}
+
+# DELETE OLD LOGS
+rm -f visor*log
+ari && ssh jano@$arihost 'rm -f *.log'
+ben && ssh jano@$benhost 'rm -f *.log'
+ced && ssh jano@$cedhost 'rm -f *.log'
+dan && ssh jano@$danhost 'rm -f *.log'
+
+# LAUNCH BOTS
+ari && xterm -title ARI -geom 80x25+0+0     -e ssh jano@$arihost "$prefix Ari --config $experimento/simrem.xml" &
+ari && sleep 2s
+ben && xterm -title BEN -geom 82x25+519+0   -e ssh jano@$benhost "$prefix Ben --config $experimento/simrem.xml" &
+ben && sleep 2s
+ced && xterm -title CED -geom 80x25+0+356   -e ssh jano@$cedhost "$prefix Ced --config $experimento/simrem.xml" &
+ced && sleep 2s
+dan && xterm -title DAN -geom 82x25+519+356 -e ssh jano@$danhost "$prefix Dan --config $experimento/simrem.xml" &
+dan && sleep 2s
+
+# VISOR
+$HOME/prog/expres/obj/visor --id Zen --config $HOME/${experimento}/simrem.xml &

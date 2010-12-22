@@ -1,0 +1,48 @@
+<!-- This file contains example configuration for SANCTA -->
+
+<sancta>
+
+   <!-- Constants are to be declared at top level: -->
+   <!-- They must include the $ sign! -->
+   <!-- Then they can be used everywere as an ATTRIBUTE only (not key) -->
+   <!-- An special construct in the attribute can be used: "$var=val" to get a true/false string (this is case-insensitive) -->
+   <constant name="$period" value="0.1" />
+   <!-- Alternative, a value can be got from a command-line option -->
+   <constant name="$period" option="--period" />
+
+   <!-- Global options can be declared at top level. They influence the global vars in sancta-options.ads 
+        They can also have, instead of value, an option attribute to take it from command line...
+   -->
+   <global name="concurrent_events"                   value="true" />
+   <global name="concurrent_events"                  option="--concurrency" />
+   <global name="max_component_creation_time"         value="5.0" />
+   <global name="max_component_running_time_per_call" value="1.0" />
+
+   <!-- Groups are sets of common components to be instantiated by interested agents.
+         Nothing is created at this point -->
+   <group id="name">
+      <!-- * ORDER in components specifies the instantiation order.
+             Components without order will be instantiated in appearance order, with an
+             implicit order that starts at 6976.
+             Order permits to have group/specific components that depend on each other
+             be defined separatedly without losing the advantage of groups 
+           * ENABLED allows selective deactivation.
+      -->
+      <!--  A special attribute can be used anywhere to signify the current node id: $id -->
+      <component name="name" order="" enabled="true" options="" replaced="$id" />
+
+      <!--  These log sections will be honored by every agent belonging to the group -->
+      <log>sections</log>
+   </group>
+
+   <agent id="name">
+      <!-- Group membership causes the creation of the group's components in this agent. -->
+      <group>name</group>
+
+      <component name="name" order="" options="" />
+
+      <log>sections</log>
+   </agent>
+
+   <!--  Details of options/requires/provides for each component can be found in its spec file -->
+</sancta>

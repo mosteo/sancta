@@ -1,0 +1,58 @@
+<t001>
+
+   <group id="network">
+      <component name="network" kind="udp" order="1" enabled="false">
+         <provides data="link" as="link" />
+         <node id="zak" address="192.168.1.30:7774" />
+         <node id="ari" address="192.168.1.16:7770" />
+         <!--
+         -->
+      </component>
+
+      <component name="network" kind="udp" order="1" enabled="false">
+         <provides data="link" as="link" />
+         <node id="zak" address="127.0.0.1:7774" />
+         <node id="ari" address="127.0.0.1:7770" />
+         <!--
+         <node id="ben" address="127.0.0.1:7771" />
+         <node id="ced" address="127.0.0.1:7772" />
+         <node id="dan" address="127.0.0.1:7773" />
+         -->
+      </component>
+
+      <component name="network_rtwmp" order="1" enabled="true">
+         <node id="zak" address="0" />
+         <node id="ari" address="1" />
+         <!--
+         <node id="ben" address="2" />
+         <node id="ced" address="3" />
+         <node id="dan" address="4" />
+         -->
+         <provides data="link" as="link"/>
+      </component>
+      <log>--sancta.network.layer.rtwmp</log>
+
+      <component name="helper" order="1" enabled="true">
+         <requires data="link" as="link"/>
+      </component>
+
+      <log>--sancta.netlistener</log>
+      <log>--sancta.netlistener.detail</log>
+      <log>--sancta.network</log>
+      <log>--sancta.network.layer.root</log>
+      <log>--sancta.network.layer.udp</log>
+      <log>--sancta.network.layer.tcp</log>
+   </group>
+
+   <agent id="ari" log_level="debug">
+      <group>network</group>
+      <log>sancta.config</log>
+   </agent>
+
+   <agent id="zak" log_level="debug">
+      <component name="spawn" command="sleep 6s" wait="true" order="0" />
+      <group>network</group>
+      <log>sancta.config</log>
+   </agent>
+
+</t001>

@@ -1,0 +1,26 @@
+#!/bin/bash
+
+#1 : mapa
+#2 : minmax
+#3 : minsum
+#4 : first half of assig name
+#5 : second half. For example: plano.run13_fin.ass requires $4=plano.run $5=_fin.ass
+
+total=$((0))
+acum=$((0))
+
+for i in `ls $4*$5`
+do
+	total=$(($total + 1))
+	tmp=`eval_assignment $1 $i $2 $3`
+	acum=`echo $acum + $tmp | bc`
+	echo $total $tmp $acum
+done
+
+echo Avg: `echo "scale=2; $acum / $total" | bc`
+
+#  This will simply enumerate the given files
+#for i in `ls $4*$5`
+#do
+#	echo $i : `eval_assignment $1 $i $2 $3`
+#done

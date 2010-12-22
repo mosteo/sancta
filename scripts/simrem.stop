@@ -1,0 +1,12 @@
+#!/bin/bash
+
+experimento=`basename $0 | cut -f 1 -d .`
+
+. ${experimento}.common
+
+killall visor
+
+ari && ssh jano@$arihost "killall expresbot"
+ben && ssh jano@$benhost "killall expresbot"
+ced && ssh jano@$cedhost "killall expresbot"
+dan && ssh jano@$danhost "killall expresbot"

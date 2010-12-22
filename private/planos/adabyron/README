@@ -1,0 +1,3 @@
+COOKED: the ones manually cleaned and edited, ready for use (though downsampling may be necessary). Expected to improve over time with submaps for rooms.
+FULL: The long walk I did which mapper3 cannot properly map; waiting for some in-house mapper to make it good.
+CORRIDORS: Short take, only main corridors, mapper3 did good with this one. Used as base for current COOKED.

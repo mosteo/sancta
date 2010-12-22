@@ -1,0 +1,31 @@
+#!/bin/bash
+
+ids="dan zak"
+ids_enabled="dan zak"
+ids_poweroff="x"
+
+pcommon="--config sancta.xml --base zak --nodes dan.zak"
+params="$pcommon" 	# DAN
+params+=",$pcommon" 	# ZAK
+
+master=.
+remotes="dan zak"
+
+exes="node node"
+modes="x x x x x"
+excludes="x x"
+
+xterm_profile="" #"--window-with-profile Default"
+gp="--geometry="
+gs="80x24"
+geoms="$gp$gs+0+0 $gp$gs+665+0 $gp$gs+0+462 $gp$gs+665+462 $gp$gs+615+505"
+
+environment="PATH=$HOME/local/bin:.:$PATH ; ulimit -s unlimited ; export LD_LIBRARY_PATH=$HOME/local/lib:$LD_LIBRARY_PATH"
+procs="node node_gtk gnome-terminal sleep player"
+
+laplogins="jano@192.168.0.124 jano@localhost"
+lapports="22 22"
+laplisten="2224 2225"
+botlogins="10.3.28.24 localhost"
+botports="22 22"
+

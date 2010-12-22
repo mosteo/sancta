@@ -1,0 +1,102 @@
+Here we describe all defined packets exchanged between robots:
+
+-----------------------
+-- EMERGENCY CHANNEL --
+-----------------------
+
+/ADDTASK
+   task forcefully assigned
+   no payload.
+   /DESCR
+      payload: Tasks.Object'Class.Serialize.
+
+/INCLUDETASK
+   /JOB: Tasks.Object'Class
+Insert this task in the best point of your plan
+
+/HELLO: Announce aliveness
+
+/CLEARTASKS: Remove all tasks from your list!
+
+/SETTASKS: Override all current tasks and set this list.
+   /JOBS: Tasks.Lists.List
+
+/SETPOSE: Override current odometry pose with a new one
+   /POSE: Types.Pose
+
+/SHUTDOWN
+   request for clean shutdown.
+   no payload.
+
+/STOP
+   clear all tasks and stop bot.
+   no payload.
+
+/TASKDONE: A task has been sucessfully executed by someone.
+   /ID: Agpl.Htn.Tasks.Task_Id
+
+-----------------
+-- GUI CHANNEL --
+-----------------
+
+/NETWORK_UPDATE
+
+/TRACE: A log message
+   /TEXT: Ustring
+   /LEVEL: Agpl.Trace.Levels
+   /SECTION: Section of code originating this message
+
+/LASER
+   /TIMESTAMP: Calendar.Time (Time when snapshot was taken)
+   /POSE: Types.Pose (Robot pose at the time of scan taking)
+   /RANGE_SCAN_XY: Types.Range_Scan_Xy
+
+------------------------
+-- MANAGEMENT CHANNEL --
+------------------------
+
+/PROPOSE_TASK: Introduce a new task
+   /JOB: Agpl.Htn.Tasks.Handle.Object
+
+This plan should be received by some planner (only one in the system!),
+expanded and the tasks introduced for execution to robots.
+
+Obviously, two planners unaware one of the other and presenting the same
+tasks twofold would be incorrect.
+
+-----------------------
+-- TRADERBOT CHANNEL --
+-----------------------
+
+/OFFER 
+   some robot is offering a task in auction.
+   may cause a /BID to be answered.
+   no payload.
+   /DESCR 
+      description of the job.
+      payload: Tasks.Object'Class.Serialize.
+   /DURATION
+      (optional) how long the auction will last
+   /COST
+      (optional) best known bid till date (or auctioner cost).
+   /FULLCOST
+
+/BID 
+   answer to some /OFFER.
+   no payload.
+   /ID 
+      id of the task being auctioned.
+      payload: Task_Id'Image.
+   /COST 
+      local cost incurred for the bidding robot.
+      payload: Costs'Image.
+   /FULLCOST
+      total cost in the bidding robot plan.
+      payload: Costs'Image.
+
+/AWARD
+   asignation of task to winner of bid.
+   no payload.
+   /DESCR
+      description of the job.
+      payload: Tasks.Object'Class.Serialize.

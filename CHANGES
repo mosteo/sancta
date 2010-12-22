@@ -1,0 +1,12 @@
+2007 12 17
+==========
+[+] ascii_to_png
+
+2005 04 07
+==========
+Justo antes de comenzar el cambio de tipos en las tareas para no usar classwide
+smart pointers. Realmente prefiero tener los tipos bien en las tareas y tener
+más callback handlers, es mucho más limpio.
+
+En realidad ya he tocado expres-tasks-pursuit.ad? porque no me he acordado de
+guardar la versión antes, pero todo lo demás está bien.

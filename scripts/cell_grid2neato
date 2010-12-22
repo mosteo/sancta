@@ -1,0 +1,3 @@
+# How to generate a pdf from a grid, using neato
+
+cell_dot plano.txt | ssh jano@deepsix.homeip.net "neato -Tps | epstopdf -f -o /home/jano/doctorado/icra06/grid.pdf"

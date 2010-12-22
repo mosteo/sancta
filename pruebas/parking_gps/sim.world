@@ -1,0 +1,70 @@
+# World parameters
+
+resolution     0.02
+interval_sim   200
+interval_real  200
+size [100 60]
+
+include "../cars.inc"
+include "../types.inc"
+include "../PioneerRobotModels.inc"
+
+# The GUI
+window
+(
+   scale 0.11
+   size [800 600]
+)
+
+# The boundary 
+#map
+#(
+#   bitmap "aparcamiento.png"
+#   color "black"
+#   size [100 60]
+#)
+
+# Ari
+p3dx
+(
+   name "Ari"
+   color "red"
+   localization "gps"
+   pose [0.0 0.0 0.0]
+   pose [40.0 -24.0 180.0]
+   localization_origin [0 0 0]
+   odom_error [0.05 0.05 0.1]
+)
+
+# Ben
+p3at
+(
+   name "Ben"
+   color "green"
+   localization "gps"
+   pose [40.0 -23.0 180.0]
+   localization_origin [0 0 0]
+)
+
+# Ced
+p3at
+(
+   name "Ced"
+   color "blue"
+   localization "gps"
+   pose [40.0 -22.0 180.0]
+   localization_origin [0 0 0]
+)
+
+# Dan
+p3at
+(
+   name "Dan"
+   color "pink"
+   localization "gps"
+   pose [40.0 -21.0 180.0]
+   localization_origin [0 0 0]
+)
+
+# CARS
+include "coches.inc"

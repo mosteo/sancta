@@ -1,0 +1,11 @@
+. `dirname $0`/defs.common
+
+for bot in $botnames; do
+	$bot && [ "$bot" != "zak" ] && (
+		ssh mosteo@$bot "sudo killall -q $processes; sleep 1s; sudo killall -9 -q $processes"
+		#ssh mosteo@$bot "sudo route del ari; sudo route del ben; sudo route del ced; sudo route del dan; sudo route del zak"
+	)
+done
+
+sudo killall -q $processes; sleep 1s; sudo killall -9 -q $processes;
+

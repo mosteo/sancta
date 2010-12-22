@@ -1,0 +1,85 @@
+# World parameters
+
+resolution     0.01
+interval_sim   100
+interval_real  100
+size [60 14]
+
+include "../cars.inc"
+include "../types.inc"
+include "../PioneerRobotModels.inc"
+
+# The GUI
+window
+(
+   scale 0.08
+   size [800 600]
+)
+
+# The boundary 
+map
+(
+   bitmap "tunel.png"
+   color "black"
+   size [60 14]
+)
+
+# Ari
+p3dx
+(
+   name "Ari"
+   color "red"
+   localization "odom"
+   pose [25.0 1.0 180.0]
+   localization_origin [25.0 1.0 180.0]
+   odom_error [0.05 0.05 0.1]
+)
+
+# Ben
+p3at
+(
+   name "Ben"
+   color "green"
+   localization "odom"
+   pose [25.0 0.0 180.0]
+   localization_origin [25.0 0.0 180.0]
+)
+
+# Ced
+p3at
+(
+   name "Ced"
+   color "blue"
+   localization "odom"
+   pose [25.0 -1.0 180.0]
+   localization_origin [25.0 -1.0 180.0]
+)
+
+# Dan
+p3at
+(
+   name "Dan"
+   color "pink"
+   localization "odom"
+   pose [25.0 -2.0 180.0]
+   localization_origin [25.0 -2.0 180.0]
+)
+
+# COCHES
+car (
+   color "red"
+   pose [15.8 -2.0 3]
+   bitmap "../../cars/car1.png"
+)
+
+car (
+   color "green"
+   pose [8.0 1.8 80]
+   bitmap "../../cars/car2.png"
+)
+
+car (
+   color "blue"
+   pose [3.8 1.0 135]
+   bitmap "../../cars/car1.png"
+)

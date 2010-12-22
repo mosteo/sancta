@@ -1,0 +1,92 @@
+<expres>
+   <agent id="Ari" kind="robot">
+      <log>agpl.task_termination</log>
+      <log>expres.expresbot</log>
+      <log>expres.plugin.player_executor</log>
+      <log>.expres.plugin.odometry</log>
+
+      <plugin name="player_client" address="127.0.0.1" port="6665" enabled="true">
+         <provides data="is_connected" as="is_connected" type="boolean"/>
+         <provides data="connection"   as="connection"   type="connection"/>
+      </plugin>
+
+      <plugin name="odometry" enabled="true">
+         <provides data="odom_pose"     as="odom_pose"      type="types.pose"/>
+         <provides data="odom_pose2"    as="odom_pose2"      type="types.pose"/>
+         <provides data="velocity"      as="current_velocity" type="types.pose"/>
+      </plugin>
+
+      <!-- This should be stacked *before* mbicp, because mbicp stamps its lasers with its pose -->
+      <plugin name="manual_pose_correction" enabled="true">
+          <requires data="in_pose"      as="odom_pose"   type="types.pose"/>
+          <requires data="new_pose"     as="manual_pose"  type="types.pose"/>
+
+          <provides data="out_pose"     as="current_pose" type="types.pose"/>
+      </plugin>
+
+      <plugin name="task_manager" enabled="true">
+         <requires data="link"      as="network_layer"/>
+
+         <provides data="task_list" as="task_list" type="agpl.htn.tasks.vectors.vector"/>
+      </plugin>
+
+      <plugin name="executor" enabled="true">
+         <requires data="task_list"  as="task_list" type="agpl.htn.tasks.vectors.vector"/>
+         <requires data="world_pose" as="current_pose" type="types.pose"/>
+
+	 <provides data="action" as="robot_action" type="robot_action"/>
+      </plugin>
+
+      <!-- Gui data redirections -->
+      <plugin name="redirect" period="0.2" on_update="false" channel="gui" enabled="true">
+	 <requires data="input"       as="current_pose"/>
+         <requires data="link"        as="network_layer"/>
+      </plugin>
+      <plugin name="redirect" period="1.0" on_update="true" channel="gui" enabled="true">
+	 <requires data="input"       as="task_list"/>
+         <requires data="link"        as="network_layer"/>
+      </plugin>
+
+      <plugin name="shared_database" enabled="false">
+	  <requires data="link"  as="network_layer" types="expres.network.layer.object"/>
+
+          <provides data="database" as="database"   types="expres.distributed.datastore.object"/>
+      </plugin>
+
+      <plugin name="elastic" acquire_poses="true" update_pose="true" enabled="false">
+          <requires data="agent"    as="robot"    types="expres.robot.object"/>
+          <requires data="database" as="database" types="expres.distributed.datastore.object"/>
+      </plugin>
+
+      <udp address="127.0.0.1" port="5001"/>
+
+      <channel name="emergency" subscribe="true"/>
+      <channel name="traderbot" subscribe="true"/>
+      <channel name="database" subscribe="true"/>
+   </agent>
+
+   <agent id="Zen" kind="gui" laser_scans="1" draw_grid="true" out_of_range="31.0">
+      <log>expres.types.operations</log>
+      <log>expres.gui.visor_general_view</log>
+      <log>.expres.distributed.datastore</log>
+      <log>.expres.distributed.datastore.detail</log>
+
+      <!--  A replicated database  -->
+      <plugin name="shared_database" enabled="true">
+	  <requires data="link"  as="network_layer" types="expres.network.layer.object"/>
+
+          <provides data="database" as="database"   types="expres.distributed.datastore.object"/>
+      </plugin>
+
+      <udp address="127.0.0.1" port="5505"/>
+      <channel name="gui"       subscribe="true"/>
+      <channel name="emergency" subscribe="true"/>
+      <channel name="management" subscribe="true"/>
+      <channel name="database" subscribe="true"/>
+   </agent>
+
+   <!-- Here we specify details about the global traderbot policies. -->
+   <!-- local_cost, full_cost -->
+   <traderbot cost_policy="full_cost"/>
+
+</expres>

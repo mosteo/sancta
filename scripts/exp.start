@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# INSTRUCTIONS
+# In the soft-linked 'master' folder, links to node & node_gtk must exist.
+# In the current folder, touching the names of the agents will cause their launch.
+# Files are synced to ${remote}, or ~/run if it's missing.
+
+# Choose preferred level of verbosity below. Silence may be needed to avoid TCP traffic in an UDP environment
+
+# NO EDITION BELOW THIS POINT
+
+. `dirname $0`/defs.common
+
+echo Lanzando nodos...
+
+briefing
+
+strip ./master/node
+
+# LAUNCH BOTS
+for bot in $botnames; do
+	$bot && (
+		xtconf="-title $bot -geom `keyvalue "$bot" "$botnames" "$geoms"`"
+
+		xterm $xtconf -e "bash -c \". ./defs.common; launch_bot $bot real $1 ; sleep 1h\""
+
+	) &
+done

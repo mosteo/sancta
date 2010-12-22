@@ -1,0 +1,6 @@
+<mission descr="PARKING HOME">
+        <task owner="Ari" kind="goto_pose" goal="40 -24 3.14" use_angle="true" />
+        <task owner="Ben" kind="goto_pose" goal="40 -23 3.14" use_angle="true" />
+        <task owner="Ced" kind="goto_pose" goal="40 -22 3.14" use_angle="true" />
+        <task owner="Dan" kind="goto_pose" goal="40 -21 3.14" use_angle="true" />
+</mission>

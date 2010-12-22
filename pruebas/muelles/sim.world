@@ -1,0 +1,78 @@
+# World parameters
+
+resolution     0.02
+interval_sim   100
+interval_real  100
+size [100 60]
+
+#include "../cars.inc"
+include "../types.inc"
+include "../PioneerRobotModels.inc"
+
+# The GUI
+window
+(
+   scale 0.11
+   size [800 600]
+)
+
+#  A dummy object at origin for global drawing
+position
+(
+   name "origin"
+   size [0 0]
+   pose [0 0 0]
+   localization_origin [0 0 0]
+)
+
+# The boundary 
+#map
+#(
+#   bitmap "aparcamiento.png"
+#   color "black"
+#   size [100 60]
+#)
+
+# Ari
+#p3dx
+omnibot
+(
+   name "Ari"
+   color "red"
+   localization "gps"
+   pose [11.0 -1.5 180]
+   localization_origin [0 0 0]
+)
+
+# Ben
+omnibot
+(
+   name "Ben"
+   color "green"
+   localization "gps"
+   pose [11.0 -0.5 180]
+   localization_origin [0 0 0]
+)
+
+# Ced
+omnibot
+(
+   name "Ced"
+   color "blue"
+   localization "gps"
+   pose [11.0 0.5 180]
+   localization_origin [0 0 0]
+)
+
+# Dan
+omnibot
+(
+   name "Dan"
+   color "pink"
+   localization "gps"
+   pose [11.0 1.5 180]
+   localization_origin [0 0 0]
+)
+
+# CARS
+#include "coches.inc"

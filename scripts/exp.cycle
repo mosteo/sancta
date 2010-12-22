@@ -1,0 +1,7 @@
+#!/bin/bash
+
+rm -f *.log
+exp.start $*
+echo Press enter to kill experiment...
+read
+exp.stop

@@ -1,0 +1,58 @@
+with Expres.Types; use type Expres.Types.Angle;
+
+with Agpl.Protected_Datastore;
+
+package Expres.Hw.Robot is
+
+   --  THIS UNIT IS NOT CURRENTLY USED BECAUSE A BUG IN GNAT.
+   --  INSTEAD, THIS INTERFACE IS IMPLEMENTED BY EXPRES.ROBOT DIRECTLY
+
+   type Object is interface;
+
+   function Get_Pose (This : in Object) return Types.Pose is abstract;
+   --  Get the best pose known (odometry, localized, etc)
+
+   function Get_Size (This : in Object) return Types.Pose is abstract;
+   --  Robot size, along X, Y axis. The angle is unused.
+
+   function Get_Top_Angular_Speed (This : in Object) return Types.Real
+     is abstract;
+
+   function Get_Top_Linear_Speed (This : in Object) return Types.Real
+     is abstract;
+
+   procedure Goto_Pose (This  : in out Object;
+                        Pose  : in     Types.Pose) is abstract;
+   --  Instruct the robot to go to a pose given in world coordinates.
+
+   function Get_Vel (This : in Object) return Types.Pose is abstract;
+   --  Get current velocities of robot.
+
+   procedure Set_Vel (This    : in out Object;
+                      X, Y, A : in     Types.Real) is abstract;
+   --  Instruct the robot to adopt given velocity in X, Y, and Angle.
+   --  Front of robot is towards X.
+
+   function Is_Connected (This : in Object) return Boolean is abstract;
+   --  If the connection is lost by external causes, this should return false.
+
+   ----------------------
+   --  LASER UTILITIES --
+   ----------------------
+
+   function Get_Closest_Obstacle
+     (This : Object;
+      From : Types.Angle := -Pi;
+      To   : Types.Angle :=  Pi) return Types.Bearing is abstract;
+   --  Says the closer reading between two given angles.
+
+   function Get_Laser_Scan
+     (This : Object;
+      From : Types.Angle := -Pi;
+      To   : Types.Angle :=  Pi) return Types.Range_Scan is abstract;
+   --  Get all the readings in a scan.
+
+   procedure Emergency_Stop (This : in out Object) is abstract;
+   --  Should stop the robot and reject any future command.
+
+end Expres.Hw.Robot;

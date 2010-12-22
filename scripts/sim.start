@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# INSTRUCTIONS
+# In the current folder there must exist the 'master' soft link, which points to the configuration folder.
+# In the master folder, links to 'node_gtk' program must exist too, with these names
+# In the current folder, touching the names of the agents will cause their launch.
+
+# In the master folder, optional 'name.options' file may exist with extra command line options
+
+. `dirname $0`/defs.common
+
+echo Lanzando simulación...
+
+briefing
+
+# SYNCH 
+echo Syncing...
+ssh localhost "mkdir -p ${remote}"
+rsync -L -r --delete --delete-excluded --ignore-errors -C --include node_gtk ./master/ localhost:${remote}
+echo Done.
+
+# LAUNCH BOTS
+for bot in $botnames; do
+	$bot && (
+		xtconf="-title $bot -geom `keyvalue "$bot" "$botnames" "$geoms"`"
+
+		xterm $xtconf -e "bash -c \". ./defs.common; launch_bot $bot simlocal $1 ; sleep 5s\""
+   	) &
+done

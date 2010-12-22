@@ -1,0 +1,108 @@
+#!/bin/bash
+
+if [ -f remote ]; then
+	remote=`cat remote`
+else
+	remote=./run
+	# remember that this is relative to ssh root; so in practice it's $HOME/./run
+fi
+
+currdir=`dirname $0`
+
+rparams="-Lrvz --checksum --delete --delete-excluded --ignore-errors --exclude node_gtk --exclude .svn -C"
+
+ari() { [ -f ${currdir}/ari ]; }
+ben() { [ -f ${currdir}/ben ]; }
+ced() { [ -f ${currdir}/ced ]; }
+dan() { [ -f ${currdir}/dan ]; }
+
+zak() { [ -f ${currdir}/zak ]; } # localhost with visor
+
+briefing() {
+	echo "¡RECUERDA QUE LOS LOGS ANTIGUOS VAN A SER ANIQUILADOS!"
+	sleep 2s
+
+	echo Carpeta master: `ls -l | grep master`
+	echo Carpeta remota: ${remote}
+
+	for i in $botnames; do
+		( $i && echo "$i is active" ) || echo "$i is inactive"
+	done
+}
+
+launch_bot() {
+	# $1 : node name
+	# $2 : either "simlocal" (all nodes in one machine), "simrem" (nodes in remote machines) or "real" (actual robots)
+	#    : Note: "simrem" is unimplemented
+	# $3 : either "--silent" or nothing
+
+	bot=$1
+
+        echo Launcher for $1 in mode $2 $3
+
+	if [ "$2" == "simlocal" ]; then
+		machine=localhost
+ 		exe=node_gtk
+		mode="--run-sim true --run-real false"
+		user=jano
+	else
+		machine=$1
+ 		exe=`keyvalue "$bot" "$botnames" "$botexecs"`
+		mode="--run-sim false --run-real true"
+		user=`keyvalue "$bot" "$botnames" "$users"`
+
+		echo Syncing $bot...
+       		ssh   $user@$machine "mkdir -p ${remote}"
+		rsync $rparams ./master/ $user@$machine:${remote}
+		if [ "$bot" == "zak" ]; then
+			scp ./master/node_gtk $user@$machine:$remote
+		fi
+		echo Done.
+	fi
+
+	launcher=launch-${bot}.sh
+      	   extra="$mode `[ -f ./master/${bot}.options ] && head -n 1 ./master/${bot}.options`"
+          params="--id $bot --config sancta.xml $extra"
+
+	# PREPARE REMOTE LAUNCHER
+	[ -f ./environment ] && cat ./environment | ssh $user@$machine "cat - > $remote/$launcher"
+	ssh $user@$machine "echo ./$exe $params >> $remote/$launcher "
+	ssh $user@$machine "chmod +x $remote/$launcher"
+
+	echo Command line: ssh $user@$machine \"cd $remote\; ./$launcher\"
+
+	if [ "$3" == "--silent" ] && [ "$bot" != "zak" ]; then
+		# NOTE: this won't work with the player GUIs, whatever the fskn cause.
+		echo Going into silent mode...
+		ssh    $user@$machine "cd $remote; nohup ./$launcher </dev/null >/dev/null 2>&1 &"
+	else
+		echo Launching in verbose mode...
+		ssh -Y $user@$machine "cd $remote; ./$launcher"
+	fi
+}
+
+botnames="ari ben ced dan zak" 
+botexecs="node node node node node_gtk"
+users="mosteo mosteo mosteo mosteo jano"
+
+processes="bot visor urusDevicesService player yarp olsrd xterm sleep node node_gtk"
+simprocesses="player bot visor yarp node node_gtk"
+
+geoms="89x25+0+0 89x25+573+0 89x25+0+356 89x25+573+356 89x25+573+0"
+
+keyvalue() {
+   key=$1
+   keys=$2
+   values=$3
+   i=1;
+   for k in $keys; do
+      # echo $i $k `echo $values | cut -d' ' -f $i`
+      [ "$k" == "$key" ] && echo $values | cut -d' ' -f $i
+      i=$((i+1))
+   done
+}
+
+arihost=her050
+benhost=her049
+cedhost=her048
+danhost=her047

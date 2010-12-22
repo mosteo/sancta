@@ -1,0 +1,26 @@
+<mission descr="PARKING EXPLORATION">
+        <task owner="any" kind="explore_segment" ini="-34.0 18.0 0.0" fin="37.0 18.0 0.0"/>
+        <task owner="any" kind="explore_segment" ini="-35.0 17.0 0.0" fin="-35.0 1.0 0.0"/>
+        <task owner="any" kind="explore_segment" ini="37.0 17.0 0.0" fin="36.0 1.0 0.0"/>
+        <task owner="any" kind="explore_segment" ini="-34.0 0.0 0.0" fin="36.0 0.0 0.0"/>
+        <task owner="any" kind="explore_segment" ini="-35.0 -1.0 0.0" fin="-35.0 -17.0 0.0"/>
+        <task owner="any" kind="explore_segment" ini="36.0 -1.0 0.0" fin="35.0 -17.0 0.0"/>
+        <task owner="any" kind="explore_segment" ini="-34.0 -18.0 0.0" fin="34.0 -18.0 0.0"/>
+
+	<task owner="any" kind="choose_entry_point">
+	   <entry_point pose="-36 -19 0"/>
+	   <entry_point pose="36 -19 0"/>
+	</task> 
+	<task owner="any" kind="choose_entry_point">
+	   <entry_point pose="-36 -19 0"/>
+	   <entry_point pose="36 -19 0"/>
+	</task> 
+	<task owner="any" kind="choose_entry_point">
+	   <entry_point pose="-36 -19 0"/>
+	   <entry_point pose="36 -19 0"/>
+	</task> 
+	<task owner="any" kind="choose_entry_point">
+	   <entry_point pose="-36 -19 0"/>
+	   <entry_point pose="36 -19 0"/>
+	</task> 
+</mission>

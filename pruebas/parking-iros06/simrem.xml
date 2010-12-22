@@ -1,0 +1,268 @@
+<expres>
+   <agent id="Ari" kind="robot">
+      <log>agpl.cr.mutable_assignment</log>
+      <log>.agpl.cr.mutable_assignment.detail</log>
+      <log>agpl.task_termination</log>
+      <log>.expres.distributed.datastore</log>
+      <log>.expres.distributed.datastore.detail</log>
+      <log>expres.expresbot</log>
+      <log>expres.robot_plugin.annealer</log>
+      <log>expres.robot_plugin.annealer.detail</log>
+      <log>.agpl.htn.plan_node.detail</log>
+
+      <plugin name="core" address="155.210.153.84" port="6665" enabled="true">
+         <provides data="is_connected"   as="is_connected"   type="boolean"/>
+      </plugin>
+
+      <plugin name="odometry" enabled="true">
+         <provides data="odom_pose"     as="odom_pose"        type="types.pose"/>
+         <provides data="velocity"      as="current_velocity" type="types.pose"/>
+      </plugin>
+
+      <plugin name="move" enabled="true">
+         <requires data="goal_action"    as="goal_action"    type="robot_plugin.goal_action"/>
+         <requires data="emergency_stop" as="emergency_stop" type="boolean"/>
+      </plugin>
+
+      <plugin name="laser" enabled="true">
+          <requires data="loc_pose"      as="current_pose"  type="types.pose"/>
+
+          <provides data="scan_id"       as="laser_scan_id" type="integer"/>
+          <provides data="scan"          as="laser_scan"      type="datastore.posed_range_scan"/>
+          <provides data="pose_on_robot" as="pose_on_robot" type="types.pose"/>
+      </plugin>
+
+      <plugin name="manual_pose_correction" enabled="true">
+          <requires data="in_pose"      as="odom_pose"   type="types.pose"/>
+          <requires data="new_pose"     as="manual_pose"  type="types.pose"/>
+
+          <provides data="out_pose"     as="current_pose" type="types.pose"/>
+      </plugin>
+
+      <plugin name="logger_montesano" 
+              filename="laser.txt" 
+              immediate="true" 
+              use_laser_pose="true"
+              enabled="true">
+          <requires data="pose" as="man_pose" type="types.pose"/>
+          <requires data="scan" as="raw_scan" type="datastore.posed_range_scan"/>
+      </plugin>
+
+      <plugin name="shared_database" enabled="true">
+	  <requires data="link"  as="network_layer" types="expres.network.layer.object"/>
+          <provides data="database" as="database"   types="expres.distributed.datastore.object"/>
+      </plugin>
+
+      <plugin name="annealer" criterion="1 0.01" execute="true" log="true" enabled="true">
+          <requires data="agent"    as="robot"      types="expres.robot.object"/>
+          <requires data="database" as="database"   types="expres.distributed.datastore.object"/>
+      </plugin>
+
+      <udp address="155.210.153.90" port="5001"/>
+
+      <channel name="emergency" subscribe="true"/>
+      <channel name="traderbot" subscribe="true"/>
+      <channel name="database" subscribe="true"/>
+   </agent>
+
+   <agent id="Ben" kind="robot">
+      <log>.agpl.cr.mutable_assignment</log>
+      <log>.agpl.cr.mutable_assignment.detail</log>
+      <log>agpl.task_termination</log>
+      <log>.expres.distributed.datastore</log>
+      <log>.expres.distributed.datastore.detail</log>
+      <log>expres.expresbot</log>
+      <log>.expres.robot_plugin.annealer</log>
+
+      <plugin name="core" address="155.210.153.84" port="6666" enabled="true">
+         <provides data="is_connected"   as="is_connected"   type="boolean"/>
+      </plugin>
+
+      <plugin name="odometry" enabled="true">
+         <provides data="odom_pose"     as="odom_pose"        type="types.pose"/>
+         <provides data="velocity"      as="current_velocity" type="types.pose"/>
+      </plugin>
+
+      <plugin name="move" enabled="true">
+         <requires data="goal_action"    as="goal_action"    type="robot_plugin.goal_action"/>
+         <requires data="emergency_stop" as="emergency_stop" type="boolean"/>
+      </plugin>
+
+      <plugin name="laser" enabled="true">
+          <requires data="loc_pose"      as="current_pose"  type="types.pose"/>
+
+          <provides data="scan_id"       as="laser_scan_id" type="integer"/>
+          <provides data="scan"          as="laser_scan"    type="datastore.posed_range_scan"/>
+          <provides data="pose_on_robot" as="pose_on_robot" type="types.pose"/>
+      </plugin>
+
+      <plugin name="manual_pose_correction" enabled="true">
+          <requires data="in_pose"      as="odom_pose"   type="types.pose"/>
+          <requires data="new_pose"     as="manual_pose"  type="types.pose"/>
+
+          <provides data="out_pose"     as="current_pose" type="types.pose"/>
+      </plugin>
+
+      <plugin name="shared_database" enabled="true">
+	  <requires data="link"  as="network_layer" types="expres.network.layer.object"/>
+
+          <provides data="database" as="database"   types="expres.distributed.datastore.object"/>
+      </plugin>
+
+      <plugin name="annealer" criterion="1 0.01" execute="true" enabled="true">
+          <requires data="agent"    as="robot"      types="expres.robot.object"/>
+          <requires data="database" as="database"   types="expres.distributed.datastore.object"/>
+      </plugin>
+
+      <udp address="155.210.153.89" port="5002"/>
+
+      <channel name="emergency" subscribe="true"/>
+      <channel name="traderbot" subscribe="true"/>
+      <channel name="database" subscribe="true"/>
+   </agent>
+
+   <agent id="Ced" kind="robot">
+      <log>.agpl.cr.mutable_assignment</log>
+      <log>.agpl.cr.mutable_assignment.detail</log>
+      <log>agpl.task_termination</log>
+      <log>.expres.distributed.datastore</log>
+      <log>.expres.distributed.datastore.detail</log>
+      <log>expres.expresbot</log>
+      <log>.expres.robot_plugin.annealer</log>
+
+      <plugin name="core" address="155.210.153.84" port="6667" enabled="true">
+         <provides data="is_connected"   as="is_connected"   type="boolean"/>
+      </plugin>
+
+      <plugin name="odometry" enabled="true">
+         <provides data="odom_pose"     as="odom_pose"        type="types.pose"/>
+         <provides data="velocity"      as="current_velocity" type="types.pose"/>
+      </plugin>
+
+      <plugin name="move" enabled="true">
+         <requires data="goal_action"    as="goal_action"    type="robot_plugin.goal_action"/>
+         <requires data="emergency_stop" as="emergency_stop" type="boolean"/>
+      </plugin>
+
+      <plugin name="laser" enabled="true">
+          <requires data="loc_pose"      as="current_pose"  type="types.pose"/>
+
+          <provides data="scan_id"       as="laser_scan_id" type="integer"/>
+          <provides data="scan"          as="laser_scan"      type="datastore.posed_range_scan"/>
+          <provides data="pose_on_robot" as="pose_on_robot" type="types.pose"/>
+      </plugin>
+
+      <plugin name="manual_pose_correction" enabled="true">
+          <requires data="in_pose"      as="odom_pose"   type="types.pose"/>
+          <requires data="new_pose"     as="manual_pose"  type="types.pose"/>
+
+          <provides data="out_pose"     as="current_pose" type="types.pose"/>
+      </plugin>
+
+      <plugin name="shared_database" enabled="true">
+	  <requires data="link"  as="network_layer" types="expres.network.layer.object"/>
+
+          <provides data="database" as="database"   types="expres.distributed.datastore.object"/>
+      </plugin>
+
+      <plugin name="annealer" criterion="1 0.01" execute="true" enabled="true">
+          <requires data="agent"    as="robot"      types="expres.robot.object"/>
+          <requires data="database" as="database"   types="expres.distributed.datastore.object"/>
+      </plugin>
+
+      <udp address="155.210.153.88" port="5003"/>
+
+      <channel name="emergency" subscribe="true"/>
+      <channel name="traderbot" subscribe="true"/>
+      <channel name="database" subscribe="true"/>
+   </agent>
+
+   <agent id="Dan" kind="robot">
+      <log>.agpl.cr.mutable_assignment</log>
+      <log>.agpl.cr.mutable_assignment.detail</log>
+      <log>agpl.task_termination</log>
+      <log>.expres.distributed.datastore</log>
+      <log>.expres.distributed.datastore.detail</log>
+      <log>expres.expresbot</log>
+      <log>.expres.robot_plugin.annealer</log>
+
+      <plugin name="core" address="155.210.153.84" port="6668" enabled="true">
+         <provides data="is_connected"   as="is_connected"   type="boolean"/>
+      </plugin>
+
+      <plugin name="odometry" enabled="true">
+         <provides data="odom_pose"     as="odom_pose"        type="types.pose"/>
+         <provides data="velocity"      as="current_velocity" type="types.pose"/>
+      </plugin>
+
+      <plugin name="move" enabled="true">
+         <requires data="goal_action"    as="goal_action"    type="robot_plugin.goal_action"/>
+         <requires data="emergency_stop" as="emergency_stop" type="boolean"/>
+      </plugin>
+
+      <plugin name="laser" enabled="true">
+          <requires data="loc_pose"      as="current_pose"  type="types.pose"/>
+
+          <provides data="scan_id"       as="laser_scan_id" type="integer"/>
+          <provides data="scan"          as="laser_scan"      type="datastore.posed_range_scan"/>
+          <provides data="pose_on_robot" as="pose_on_robot" type="types.pose"/>
+      </plugin>
+
+      <plugin name="manual_pose_correction" enabled="true">
+          <requires data="in_pose"      as="odom_pose"   type="types.pose"/>
+          <requires data="new_pose"     as="manual_pose"  type="types.pose"/>
+
+          <provides data="out_pose"     as="current_pose" type="types.pose"/>
+      </plugin>
+
+      <plugin name="shared_database" enabled="true">
+	  <requires data="link"  as="network_layer" types="expres.network.layer.object"/>
+
+          <provides data="database" as="database"   types="expres.distributed.datastore.object"/>
+      </plugin>
+
+      <plugin name="annealer" criterion="1 0.01" execute="true" enabled="true">
+          <requires data="agent"    as="robot"      types="expres.robot.object"/>
+          <requires data="database" as="database"   types="expres.distributed.datastore.object"/>
+      </plugin>
+
+      <udp address="155.210.153.87" port="5004"/>
+
+      <channel name="emergency" subscribe="true"/>
+      <channel name="traderbot" subscribe="true"/>
+      <channel name="database" subscribe="true"/>
+   </agent>
+
+   <agent id="Zen" kind="gui" laser_scans="1" draw_grid="true" out_of_range="31.0">
+      <log>expres.types.operations</log>
+      <log>expres.gui.visor_general_view</log>
+      <log>.expres.distributed.datastore</log>
+      <log>.expres.distributed.datastore.detail</log>
+      <log>expres.robot_plugin.random_task_generator</log>
+
+      <!--  A replicated database  -->
+      <plugin name="shared_database" enabled="true">
+	  <requires data="link"  as="network_layer" types="expres.network.layer.object"/>
+
+          <provides data="database" as="database"   types="expres.distributed.datastore.object"/>
+      </plugin>
+      
+      <plugin name="random_task_generator"
+              xmin="-10.0" xmax="10.0" ymin="-10.0" ymax="10.0"
+	      delaymin="0.0" delaymax="0.0"
+	      length="2.0"
+	      num_tasks="28"
+	      enabled="true" />
+
+      <udp address="155.210.155.101" port="5505"/>
+      <channel name="gui"       subscribe="true"/>
+      <channel name="emergency" subscribe="true"/>
+      <channel name="management" subscribe="true"/>
+      <channel name="database" subscribe="true"/>
+   </agent>
+
+   <!-- Here we specify details about the global traderbot policies. -->
+   <!-- local_cost, full_cost -->
+   <traderbot cost_policy="full_cost"/>
+
+</expres>

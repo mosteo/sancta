@@ -1,0 +1,23 @@
+EXP_1
+Un robot en una sala vacía
+
+EXP_2
+Cuatro robots juntos
+
+EXP_3
+Pruebas relacionadas con SHOP2
+
+EXP_4
+Pruebas para el GUI de EXPRES
+
+EXP_5
+Pruebas con el buscador de fronteras
+
+EXP_6
+Algoritmos de persecución
+
+EXP_7
+Pruebas generales de partes de expres
+
+EXP_APARCADA
+Experimentos de búsqueda en el aparcamiento del edificio Ada.

@@ -1,0 +1,21 @@
+# $1 = Minmax
+# $2 = Minsum
+
+condor_submit << EOF
+
+universe   = vanilla
+executable = /home/roplab/jano/prog/expres/obj/cell_anneal
+arguments  = plano.txt $1 $2 3600 true true ann
+log        = ./condor.log
+output     = ./condor.out
+error      = ./condor.err
+
+Rank         = Memory
+Requirements = Memory >= 1024 && OpSys=="LINUX" && Arch=="INTEL"
+Image_Size = 700 Meg
+
+notification = Error
+
+queue
+
+EOF

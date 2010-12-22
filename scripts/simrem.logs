@@ -1,0 +1,7 @@
+#!/bin/bash
+
+experimento=`basename $0 | cut -f 1 -d .`
+
+. ${experimento}.common
+
+ari && ssh $arihost 'cat *.log' | gvim -

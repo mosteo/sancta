@@ -1,0 +1,11 @@
+#!/bin/bash
+# $1 = last identifier (numeric)
+# $2 = map.txt
+# $3 = minmax
+# $4 = minsum
+# $5 = deadline
+
+for i in `seq 1 $1`
+do
+   cell_timed_traderbot $2 $3 $4 $5 false "run$i"
+done

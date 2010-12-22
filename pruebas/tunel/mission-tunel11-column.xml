@@ -1,0 +1,13 @@
+<mission descr="INITIAL COLUMN DEPLOYMENT">
+	<task owner="Ari" kind="speed_driving" velocity="0.0 0.0 0.0" period="30.0"/>
+	<task owner="Ari" kind="goto_pose" goal="11.0 1.0 0.0" use_angle="false"/>
+
+	<task owner="Ben" kind="speed_driving" velocity="0.0 0.0 0.0" period="20.0"/>
+	<task owner="Ben" kind="goto_pose" goal="19.0 1.0 0.0" use_angle="false"/>
+
+	<task owner="Ced" kind="speed_driving" velocity="0.0 0.0 0.0" period="10.0"/>
+	<task owner="Ced" kind="goto_pose" goal="27.0 1.0 0.0" use_angle="false"/>
+
+	<task owner="Dan" kind="speed_driving" velocity="0.0 0.0 0.0" period="0.0"/>
+	<task owner="Dan" kind="goto_pose" goal="32.0 1.0 0.0" use_angle="false"/>
+</mission>

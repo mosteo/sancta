@@ -1,0 +1,11 @@
+experimento=`basename $0 | cut -f 1 -d .`
+
+ari() { [ -f $HOME/${experimento}/ari ]; }
+ben() { [ -f $HOME/${experimento}/ben ]; }
+ced() { [ -f $HOME/${experimento}/ced ]; }
+dan() { [ -f $HOME/${experimento}/dan ]; }
+
+ari && scp $HOME/prog/expres/obj/traderbot mosteo@ari:tunel
+ben && scp $HOME/prog/expres/obj/traderbot mosteo@ben:tunel
+ced && scp $HOME/prog/expres/obj/traderbot mosteo@ced:tunel
+dan && scp $HOME/prog/expres/obj/traderbot mosteo@dan:tunel

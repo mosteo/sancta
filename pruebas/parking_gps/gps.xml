@@ -1,0 +1,27 @@
+<!-- A SINGLE GPS, WITHOUT ROBOTS -->
+<expres>
+   <agent id="Ari" kind="robot">
+      <plugin name="core" address="127.0.0.1" port="6665" enabled="true">
+         <provides data="is_connected"   as="is_connected"   type="boolean"/>
+      </plugin>
+
+      <plugin name="gps" base_pose="675_801.0 4_617_035.0 0.0" reset_mbicp="true" enabled="true">
+         <requires data="odom_pose" as="odom_pose"    type="types.pose"/>
+
+         <provides data="gps_pose"  as="gps_pose"     type="types.pose"/>
+         <provides data="mix_pose"  as="current_pose" type="types.pose"/>
+      </plugin>
+
+      <plugin name="logger_pose"
+              filename="gps-moving.txt"
+              periodic="false"
+              period="0.1"
+              remove_duplicates="false"
+              echo="true"
+              enabled="true">
+          <requires data="data" as="gps_pose" type="types.pose"/>
+      </plugin>
+
+      <udp address="127.0.0.1" port="5001"/>
+   </agent>
+</expres>

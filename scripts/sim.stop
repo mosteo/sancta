@@ -1,0 +1,7 @@
+#!/bin/bash
+
+. `dirname $0`/defs.common
+
+killall -q $simprocesses
+sleep 1s
+killall -9 -q $simprocesses

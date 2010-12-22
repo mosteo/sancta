@@ -1,0 +1,423 @@
+#!/bin/bash
+
+# $1  : config file
+# $2- : actions to be taken sequentially
+
+# OR
+
+# $0 load
+# this causes self-parsing, no actions, for remote use
+
+# DEBUGGING
+# set -x # trace
+
+# MANDATORY CONFIG TO BE PROVIDED:
+# Note: each remote is a (conceptually) laptop+bot. Connections are tunneled through 
+#   the laptop. If there's no such thing, but a bare robot, use e.g. localhost
+#   Note that the bot address must be the one seen from its laptop
+# REMEMBER: you must setup the tunnels once, but first! [launcher tunnel]
+
+# master="/path/to/files" 							# folder with all files that have to be synced to remote nodes
+# remotes="./run_ari ./run_ben"					# relative to ssh home! MUST be different for each node, in case a machine is shared...
+# ids="ari ben ced dan zak"					   # Sancta ids to be potentially used
+# ids_enabled="ari zak"								# Sancta ids to be really used. This allows creating a single config and only changing this line!
+# ids_poweroff=""										# Ids that will be powered-off on poweroff action
+# laplogins="user1@machine1 user2@machine2"     # Machines corresponding to these ids
+# lapports="22 22 22 22"								# Ports for ssh server
+# laplisten="2222 2223 2224 2225"            # Port for listening to the redirection
+# botlogins="bot1 bot2"                      # NO USER (this goes to ssh -L)
+# botports="22 22 22 22 22"
+# exes="node node node node_gtk"					# command to be launched at each node
+# modes="nohup nohup nohup nohup x"          # say how to run each node 
+																# NOHUP: no output, totally detached 
+																# CONSOLE: in the same launching console
+																# others: in an xterm
+# geoms="" 												# geometries to be used with terms
+# params="--run yes --sim yes,--run no --sim no" # For the sancta process NOTE: comma separated!
+# excludes="node_gtk node_gkt"					# Cutrething to exclude the graphical iface not to be transferred to robots...
+# environment="export LD_CONFIG=..."         # environment to be set up in the remote host
+# procs="node yarp"									# procs to be killed on stop
+
+# OVERRIDABLES WITH DEFAULT
+xterm=gnome-terminal
+xterm_profile="--window-with-profile Default"
+xterm_exec="-x bash -c"
+
+# CONSTANTS
+
+currdir=`dirname $0`
+rparams="-ChiLPrvz --checksum --ignore-errors --exclude 'synced-*' --exclude '.svn/' "
+this=$0
+ok_tout=3
+err_tout=999
+exe_tunnel=sancta-tunnel
+
+# FUNCTIONS
+
+briefing() {
+	echo Carpeta master: `echo $master`
+	echo Carpetas remotas: `echo $remotes`
+
+	echo ' '
+	for id in $ids; do
+		echo $ids_enabled | grep -q $id && echo '-->' ON : $id || echo '   ' off: $id
+	done
+	echo ' '
+}
+
+getcreds() {
+   # creds=`keyvalue $1 "$ids" "$laplogins"`
+   # We need to be root for RT-WMP and we go through the local redirection anyway
+   creds="jano@localhost"
+   sshport=`keyvalue $1 "$ids" "$laplisten"`
+   [ "$sshport" == "" ] && sshport=22
+}
+
+ssh() {
+   [ "$sshport" == "" ] && sshport=22
+	/usr/bin/ssh -p $sshport $*
+}
+
+# Emulate hash tables by using keyvalue <key> <keylist> <valuelist> [<separator>]
+# Note that keys are ALWAYS space separated
+# Note that values are by default space separated, and can't contain spaces even if quoted.
+keyvalue() {
+   key=$1
+   keys=$2
+   values=$3
+   sep=" " 
+   [ "$4" != "" ] && sep=$4
+   i=1;
+   for k in $keys; do
+      #   echo i:$i k:$k v:`echo $values | cut -d"$sep" -f $i`
+      [ "$k" == "$key" ] && echo $values | cut -d"$sep" -f $i
+      i=$((i+1))
+   done
+}
+
+countdown() {
+   i=$1
+   while [ "$i" != "0" ]; do
+		echo -n "$i... "
+		i=$((i-1))
+		sleep 1s
+	done
+}
+
+fire_and_forget() {
+	# Launch remote command and don't wait for it; output to console
+	[ "$1" == "" ] && echo Node not supplied && exit
+	[ "$2" == "" ] && echo Command not supplied && exit
+	id=$1
+	
+   getcreds $id
+	( ssh -n -Y $creds "$2" ) &
+}
+
+watch() {
+	# Track (local or remote) command in xterm
+	[ "$1" == "" ] && echo Node not supplied && exit
+	[ "$2" == "" ] && echo Command not supplied && exit
+	id=$1
+	$xterm $xterm_profile `keyvalue $id "$ids" "$geoms"` -t "$1" \
+		$xterm_exec ". $this load; $2 && countdown $ok_tout || countdown $err_tout" &
+}
+
+watch_func() {
+	# Track (local or remote) function in xterm
+	[ "$1" == "" ] && echo Node not supplied && exit
+	[ "$2" == "" ] && echo Command not supplied && exit
+	id=$1
+	$xterm $xterm_profile `keyvalue $id "$ids" "$geoms"` -t "$1" \
+		$xterm_exec ". $this load ; $2 && countdown $ok_tout || countdown $err_tout" &
+}
+
+prepare_launcher() {
+   id=$1
+   getcreds $id
+	launcher_script=launch-${id}.sh
+	extra=`keyvalue $id "$ids" "$params" ','`
+	dest=$master/$launcher_script
+	exe=`keyvalue $id "$ids" "$exes"`
+	args="--id $id $extra"
+	# prepare remote launcher
+	echo  $environment > $dest
+	echo ./$exe $args  >> $dest
+	             chmod +x $dest
+}
+
+do_launch_node() {
+	id=$1
+
+   getcreds $id
+	launcher_script=launch-${id}.sh
+	extra=`keyvalue $id "$ids" "$params" ','`
+	exe=`keyvalue $id "$ids" "$exes"`
+	args="--id $id $extra"
+	folder=`keyvalue $id "$ids" "$remotes"`
+	dest=$folder/$launcher_script
+
+	mode=`keyvalue $id "$ids" "$modes"`
+	# if no mode... will get xterms
+
+	# echo Waiting for $id sync...
+	# wait_for_sync_node $id
+
+	echo Remote exec: $exe $args
+
+   case $mode in
+		nohup)
+			echo Launching in stealth mode...
+			cmd="ssh $creds -p $sshport \"cd $folder; nohup ./$launcher_script </dev/null >/dev/null 2>&1 &\" "
+			echo Command line: $cmd
+			ssh $creds "cd $folder; nohup ./$launcher_script </dev/null >/dev/null 2>&1 &"
+		;;
+		console)
+			echo Launching in console mode...
+			cmd="ssh -p $sshport $creds \"cd $folder; ./$launcher_script\" \&"
+			echo Command line: $cmd
+			( ssh -Y $creds "cd $folder; ./$launcher_script" ) &
+		;;
+		*)
+			echo Launching in verbose mode...
+			cmd="ssh -p $sshport -Y $creds \"cd $folder; ./$launcher_script\" "
+			echo Command line: $cmd
+			watch $id "$cmd"
+		;;
+   esac
+
+	echo Launched.
+}
+
+do_sync_node() {
+	id=$1
+   getcreds $id
+	folder=`keyvalue $id "$ids" "$remotes"`
+
+	prepare_launcher $id
+	
+	echo Syncing $id...
+  	ssh $creds "mkdir -p $folder"
+	exclude_exe=`keyvalue $id "$ids" "$excludes"`
+	[ "$exclude_exe" != "" ] && do_exclude="--exclude $exclude_exe"
+	rm -f synced-$id ; \
+		watch $id "rsync --rsh=ssh\ -p\ $sshport $rparams $do_exclude $master/ $creds:$folder && touch synced-$id "
+	echo Done.
+}
+
+wait_for_sync_node() {
+	id=$1
+
+	while true; do
+		ls -l . | grep -q synced-$id && rm -f synced-$id && return 0 || sleep 0.1s
+	done
+}
+
+do_wait_for_sync() {
+	for node in $ids_enabled; do
+		wait_for_sync_node $node
+	done
+}
+
+do_sync() {
+	#echo "¡RECUERDA QUE LOS LOGS ANTIGUOS VAN A SER ANIQUILADOS! (pulse ↵ para continuar)"
+	#read
+
+	echo Syncing...
+	for id in $ids ; do
+		prepare_launcher $id
+   done
+	for id in $ids_enabled ; do
+		do_sync_node $id
+   done
+}
+
+do_start() {
+	briefing
+
+	for id in $ids_enabled ; do
+		do_launch_node $id
+	done
+}
+
+do_stop() {
+	echo '[STOP]' Confirmación: pulse ↵ para continuar
+	read
+
+	[ "$ids_kill" == "" ] && ids_kill="$ids_enabled"
+	for id in $ids_kill ; do
+		getcreds $id
+		echo Killing at $id...
+		cmd="killall -q $procs; sleep 1s; killall -9 -q $procs"
+		fire_and_forget $id "$cmd"
+		echo Done
+	done
+}
+
+do_run() {
+	do_start
+	echo Press enter to end run...
+	read
+	do_stop
+}
+
+do_tunnels() {
+	killall -q autossh; sleep 1s; killall -9 -q autossh
+	for id in $ids_enabled ; do
+		bot=`keyvalue $id "$ids" "$botlogins"`
+		lap=`keyvalue $id "$ids" "$laplogins"`
+      lapport=`keyvalue $id "$ids" "$lapports"`
+      botport=`keyvalue $id "$ids" "$botports"`
+		redirport=`keyvalue $id "$ids" "$laplisten"`
+      if [ "$bot" != "x" ]; then
+			[ "$lapport" == "" ] && lapport=22
+			[ "$botport" == "" ] && botport=22
+			echo "Setting tunnel for $id at" $redirport:$lap:$lapport "-->" $bot:$botport
+			echo Executing autossh -M 0 -p $lapport -f -L $redirport:$bot:$botport $lap
+			autossh -M 0 -p $lapport -f -L $redirport:$bot:$botport $lap "sleep 24h"
+      else
+			echo "No tunnel needed for $id"
+		fi
+	done
+	sleep 1s # some time for tunnel stablishment
+}
+
+verify_config() {
+	[ "$ids" == "" ] 				&& echo ids array missing && exit
+	[ "$ids_enabled" == "" ] 	&& echo ids_enabled array missing && exit
+	[ "$ids_poweroff" == "" ] 	&& echo ids_poweroff array missing && exit
+	[ "$geoms" == "" ] 			&& echo geoms array missing && exit
+	[ "$master" == "" ] 			&& echo master folder with files missing && exit
+	[ "$remotes" == "" ] 		&& echo remote execution folders missing && exit
+	[ "$laplogins" == "" ] 			&& echo laptop login array missing "(laplogins)" && exit
+	[ "$lapports" == "" ] 			&& echo laptop login port array missing "(lapports)" && exit
+	[ "$laplisten" == "" ] 		&& echo laptop redirect listen array missing "(laplisten)" && exit
+	[ "$botlogins" == "" ] 	&& echo bot listen array missing "(botlogins)" && exit
+	[ "$botports" == "" ] 	&& echo bot listen port array missing "(botports)" && exit
+	[ "$exes" == "" ] 			&& echo exes array missing && exit
+	[ "$modes" == "" ] 			&& echo modes array missing && exit
+	[ "$params" == "" ] 			&& echo params array missing && exit
+	[ "$environment" == "" ] 	&& echo environment string missing && exit
+	[ "$procs" == "" ] 			&& echo procs to be killed missing && exit
+
+	return 0
+}
+
+do_poweroff() {
+	echo Shutting down: pulse ↵ para continuar
+	read
+	echo Shutting down: pulse ↵ de nuevo para continuar
+	read
+
+	for id in $ids_poweroff; do
+		getcreds $id
+		echo Shutting off at $id...
+		watch $id "ssh -p $sshport $creds \"sudo halt\""
+		echo Done
+	done
+}
+
+do_deletelogs() {
+	echo "¡LOS LOGS VAN A SER ANIQUILADOS! (pulse ↵ para continuar)"
+	read
+
+	for id in $ids_enabled ; do
+		getcreds $id
+	   folder=`keyvalue $id "$ids" "$remotes"`
+		echo Deleting logs at $id...
+		ssh $creds "find $folder -name '*.log' -delete"
+		echo Done
+	done
+}
+
+do_getlogs() {
+	for id in $ids_enabled ; do
+		getcreds $id
+	   folder=`keyvalue $id "$ids" "$remotes"`
+		echo Retrieving logs from $id...
+		scp $creds:$folder/'*.log' .
+		echo Done
+	done
+}
+
+do_clean() {
+	rm -f launch-???.sh
+}
+
+# MAIN
+
+missing='(sync|syncstart|start|stop|run|tunnel|poweroff|getlogs|deletelogs|clean)...'
+
+[ "$1" == "" ] && echo "$0 <config file> $missing" && exit;
+
+if [ "$2" != "test" ]; then
+	if [ "$1" != "load" ]; then
+	   [ "$2" == "" ] && echo "$0 <config file> $missing" && exit;
+		. $1
+		verify_config || exit
+	fi
+fi
+
+# Just in case:
+[ -f "$1" ] && . $1
+
+shift
+# If $1 was "load", then nothing else will happen, which is what we want
+
+rm -f synced
+
+while [ "$1" != "" ]; do
+
+	case "$1" in
+		sync)
+			do_sync
+			do_wait_for_sync
+		;;
+		syncstart)
+			do_sync
+			do_wait_for_sync
+			do_start
+		;;
+		start)
+			do_start
+		;;
+		stop)
+			do_stop
+		;;
+		run)
+			do_run
+		;;
+      tunnel)
+			do_tunnels
+		;;
+		poweroff)
+			do_poweroff
+		;;
+		deletelogs)
+			do_deletelogs
+		;;
+		getlogs)
+			do_getlogs
+		;;
+		clean)
+			do_clean
+		;;
+		test)
+		keys="a b c d"
+		vals="--a --a,--b --b,,--d"
+		keyvalue b "$keys" "$vals" ','
+		keyvalue c "$keys" "$vals" ','
+		keyvalue d "$keys" "$vals" ','
+		keyvalue ari "$ids" "$params" ','
+		;;
+		load)
+		# Causes this to be parsed without questions, so we can remotely use it
+		;;
+		*)
+			echo Unknown action: $1
+		;;
+	esac
+
+	shift
+
+done

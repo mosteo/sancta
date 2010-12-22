@@ -1,0 +1,716 @@
+with Expres.Debug;
+with Expres.Types.Operations;
+
+with Player.Client;
+with Player.Exceptions;
+with Player.Gps;
+with Player.Laser;
+with Player.Math;
+with Player.Position2d;
+with Player;
+
+with Agpl.Chronos;
+with Agpl.Protected_Values.Integers;
+with Agpl.Trace; use Agpl.Trace;
+use  Agpl;
+
+with Ada.Calendar; use Ada.Calendar;
+with Ada.Unchecked_Deallocation;
+
+package body Expres.Hw.Robot is
+
+   use type Types.Angle;
+
+   Command_Gap    : constant Duration := 0.1;
+
+   function "+" (X : Types.Real) return Player.Double is
+   begin
+      return Player.Double (X);
+   end "+";
+
+   function "+" (X : Player.Double) return Types.Real is
+   begin
+      return Types.Real (X);
+   end "+";
+
+   function "+" (X : Types.Angle) return Player.Double is
+   begin
+      return Player.Double (X);
+   end "+";
+
+   -----------------
+   -- Player_Safe --
+   -----------------
+   protected type Player_Safe (Parent : not null access Internal) is
+
+      procedure Connect (Address : in String; Port : in Positive);
+      procedure Connect_Localize;
+      procedure Disconnect;
+      function  Get_Laser_Scan (From : in Types.Angle := -Pi;
+                                To   : in Types.Angle :=  Pi)
+                                return    Types.Range_Scan;
+      function  Get_Laser_Scan_Id return Integer;
+      function  Get_Localized_Pose return Types.Pose;
+      function  Get_Odometric_Pose return Types.Pose;
+      function  Get_Size return Types.Pose;
+      procedure Goto_Pose (Pose : in Types.Pose; Avoid : in Boolean := True);
+      function  Get_Vel return Types.Pose;
+      procedure Set_Vel (X, Y, A : Types.Real);
+
+      procedure Check_Gps;
+      procedure Connect_Gps; -- create connection with GPS.
+
+      procedure Emergency_Stop;
+
+      procedure Poll_Player;
+
+   private
+
+      Client  : Player.Client.Connection_Type;
+      Laser   : Player.Laser.Object;
+      Loc     : Player.Position2d.Object;  --  Localize interface seen as position2d
+      Pos     : Player.Position2d.Object;  --  Obstacle avoidance driver
+      Raw     : Player.Position2d.Object;  --  Raw control
+      Gps     : Player.Gps.Object;         --  Gps feed.
+
+      Use_Map   : Boolean := False;
+      Goal      : Types.Pose := (99.0, 99.0, 99.0); -- inexistent
+
+      Pad     : Chronos.Object; -- We will issue a warning if too many data
+                                --  is feed to player in short time.
+
+      Gps_Last_Pose : Types.Pose; -- Last pose given by GPS
+      Gps_Odom_Pose : Types.Pose; -- Pose from odom last time we got a GPS update
+
+   end Player_Safe;
+   type Player_Safe_Access is access Player_Safe;
+
+   -----------------
+   -- Player_Task --
+   -----------------
+
+   task type Player_Task (Parent : not null access Internal) is
+      entry Connect;
+      entry Disconnect;
+   end Player_Task;
+   type Player_Task_Access is access Player_Task;
+
+   ----------------
+   -- Mbicp_Task --
+   ----------------
+   --  This task performs Mbicp scan matching
+   task type Mbicp_Task (Parent : not null access Internal) is
+      entry Connect;
+      entry Disconnect;
+   end Mbicp_Task;
+   type Mbicp_Task_Access is access Mbicp_Task;
+
+   --------------
+   -- Internal --
+   --------------
+
+   type Internal is limited record
+      Refs    : Protected_Values.Integers.Int.Object;
+      Reader  : Player_Task_Access;
+      Safe    : Player_Safe_Access;
+      Mbicp   : Mbicp_Task_Access;
+
+      Linked  : Boolean := False; pragma Atomic (Linked);
+      --  Indicates if connection has been lost not in our side.
+
+      Use_Gps : Boolean := False; pragma Atomic (Use_Gps);
+      --  True when we're using a gps.
+   end record;
+
+   -----------------
+   -- Player_Task --
+   -----------------
+
+   task body Player_Task is
+      Next    : Time              := Clock;
+      Period  : constant Duration := 0.01;
+      Done    : Boolean := False;
+   begin
+      select
+         accept Connect;
+      or
+         accept Disconnect do
+            Done := True;
+         end Disconnect;
+      end select;
+
+      while not Done loop
+         --  Synch with player:
+         Parent.Safe.Poll_Player;
+
+         --  Check if GPS has new information...
+         if Parent.Use_Gps then
+            Parent.Safe.Check_Gps;
+         end if;
+
+         --  Wait a bit:
+         Next := Next + Period;
+         select
+            accept Disconnect do
+               Done := True;
+            end Disconnect;
+         or
+            delay until Next;
+         end select;
+      end loop;
+   exception
+      when E : others =>
+         Log ("Hw.Robot: Player Poll task terminated by unexpected exception: " & Report (E),
+              Error);
+   end Player_Task;
+
+   task body Mbicp_Task is
+      Next    : Time              := Clock;
+      Period  : constant Duration := 0.005;
+      Done    : Boolean := False;
+   begin
+      select
+         accept Connect;
+      or
+         accept Disconnect do
+            Done := True;
+         end Disconnect;
+      end select;
+
+      while not Done loop
+         --  Do scan matching:
+         null;
+
+         --  Wait a bit:
+         Next := Next + Period;
+         select
+            accept Disconnect do
+               Done := True;
+            end Disconnect;
+         or
+            delay until Next;
+         end select;
+      end loop;
+   exception
+      when E : others =>
+         Log ("Hw.Robot: Mbicp task terminated by unexpected exception: " & Report (E),
+              Error);
+   end Mbicp_Task;
+
+   -----------------
+   -- Player_Safe --
+   -----------------
+
+   protected body Player_Safe is
+
+      -------------
+      -- Connect --
+      -------------
+
+      procedure Connect (Address : in String; Port : in Positive) is
+      begin
+         Player.Client.Create   (Client, Address, Port);
+         Player.Client.Connect  (Client);
+         Player.Client.Datamode (Client, Player.Client.Datamode_Pull);
+         Player.Client.Set_Replace_Rule
+           (Client, -1, -1, Player.Msgtype_Data, -1, True);
+         Parent.Linked := True;
+
+         Player.Position2d.Create    (Raw, Client, 0);
+         Player.Position2d.Subscribe (Raw, Player.Open_Mode);
+
+         Player.Position2d.Create    (Pos, Client, 1);
+         Player.Position2d.Subscribe (Pos, Player.Open_Mode);
+
+         --  Subscription to Localize moved to Use_Map
+
+         Player.Laser.Create       (Laser, Client);
+         Player.Laser.Subscribe    (Laser, Player.Open_Mode);
+      end Connect;
+
+      -----------------
+      -- Connect_Gps --
+      -----------------
+
+      procedure Connect_Gps is
+      begin
+         Player.Gps.Create    (Gps, Client);
+         Player.Gps.Subscribe (Gps, Player.Open_Mode);
+      end Connect_Gps;
+
+      ----------------------
+      -- Connect_Localize --
+      ----------------------
+
+      procedure Connect_Localize is
+      begin
+         Use_Map := True;
+         Player.Position2d.Create    (Loc, Client);
+         Player.Position2d.Subscribe (Loc, Player.Open_Mode);
+      end Connect_Localize;
+
+      ----------------
+      -- Disconnect --
+      ----------------
+
+      procedure Disconnect is
+      begin
+         Player.Client.Disconnect (Client);
+      end Disconnect;
+
+      --------------------
+      -- Get_Laser_Scan --
+      --------------------
+
+      function Get_Laser_Scan (From : in Types.Angle := -Pi;
+                               To   : in Types.Angle :=  Pi)
+                               return    Types.Range_Scan
+      is
+         use type Player.Double;
+         use Player.Laser;
+         Scan : Types.Range_Scan
+           (1 .. Player.Laser.Get_Scan_Count (Laser));
+         Idx  : Positive             := Scan'First;
+         Pose : Player.Pose;
+      begin
+         if Use_Map then
+            Pose := Player.Position2d.Get_Pose (Loc);
+         else
+            Pose := Player.Position2d.Get_Pose (Raw);
+         end if;
+
+--         Put_Line ("Player read scans: " & Scan'Length'Img);
+
+         for I in 1 .. Get_Scan_Count (Laser) loop
+--            Put_Line ("Bearing:" & Get_Bearing (Laser, I)'Img);
+            if Get_Bearing (Laser, I) >= +From and then
+               Get_Bearing (Laser, I) <=  +To
+            then
+               declare
+                  Scan_Pose : constant Player.Pose := Get_Point_Pose (Laser, I);
+                  --  Respect to robot.
+
+                  Scan_Opose : constant Player.Pose :=
+                                 Player.Math.Compose (Pose, Scan_Pose);
+                  --  Pass to odom frame.
+                  --  WARNING!! UNTESTED!! MAY BE WRONG.
+                  pragma Untested (Scan_Opose);
+               begin
+                  Scan (Idx) :=
+                    (A  => Types.Angle (Get_Bearing (Laser, I)),
+                     D  => + Get_Range (Laser, I),
+                     X  => + Get_Point (Laser, I) (1),
+                     Y  => + Get_Point (Laser, I) (2),
+                     Ox => + Scan_Opose (Scan_Opose'First),
+                     Oy => + Scan_Opose (Scan_Opose'First + 1));
+                  null;
+               end;
+
+               Idx := Idx + 1;
+            end if;
+         end loop;
+
+         return Scan (Scan'First .. Idx - 1);
+      end Get_Laser_Scan;
+
+      -----------------------
+      -- Get_Laser_Scan_Id --
+      -----------------------
+
+      function Get_Laser_Scan_Id return Integer is
+      begin
+         return Player.Laser.Get_Scan_Id (Laser);
+      end Get_Laser_Scan_Id;
+
+      ------------------------
+      -- Get_Odometric_Pose --
+      ------------------------
+
+      function Get_Odometric_Pose return Types.Pose is
+      begin
+         return Types.Operations.To_Pose (Player.Position2d.Get_Pose (Raw));
+      end Get_Odometric_Pose;
+
+      ------------------------
+      -- Get_Localized_Pose --
+      ------------------------
+
+      function Get_Localized_Pose return Types.Pose is
+         use Player.Position2d;
+      begin
+         if Use_Map then
+            return Types.Operations.To_Pose (Get_Pose (Loc));
+         else
+            return Types.Operations.To_Pose (Get_Pose (Raw));
+         end if;
+      end Get_Localized_Pose;
+
+      --------------
+      -- Get_Size --
+      --------------
+
+      function Get_Size return Types.Pose is
+         W, H : Player.Double;
+      begin
+         Player.Position2d.Get_Size (Pos, W, H);
+
+         return (+W, +H, 0.0);
+      end Get_Size;
+
+      ---------------
+      -- Goto_Pose --
+      ---------------
+
+      procedure Goto_Pose (Pose : in Types.Pose; Avoid : in Boolean := True) is
+         use Player.Position2d;
+         subtype D is Player.Double;
+         use type Types.Pose;
+      begin
+         if Chronos.Elapsed (Pad) < Command_Gap and then Goal /= Pose then
+            Log ("Hw.Robot.Safe.Goto_Pose: Feeding too much data to player",
+                 Warning);
+         end if;
+
+         if Goal /= Pose then
+            Goal := Pose;
+            Chronos.Reset (Pad);
+            declare
+               Dest_W : constant Player.Pose :=
+                          (Player.Double (Pose.X),
+                           Player.Double (Pose.Y),
+                           Player.Double (Pose.A));
+               Rob_W  : constant Types.Pose  := Get_Localized_Pose;
+               Dest_L : constant Player.Pose :=
+                          Player.Math.World_To_Robot
+                            (Dest_W,
+                             (D (Rob_W.X), D (Rob_W.Y), D (Rob_W.A)),
+                             Player.Position2d.Get_Pose (Raw));
+            begin
+               Trace.Log ("Going to pose " &
+                          Debug.To_String (Types.Operations.To_Pose (Dest_L)) &
+                          " from current pos. est. " & Debug.To_String (Rob_W) &
+                          " with obstacle avoidance = " & Avoid'Img,
+                          Trace.Debug);
+               if Avoid then
+                  Set_Cmd_Pose (Pos, Dest_L (1), Dest_L (2), Dest_L (3));
+               else
+                  Set_Cmd_Pose (Raw, Dest_L (1), Dest_L (2), Dest_L (3));
+               end if;
+            end;
+         end if;
+      end Goto_Pose;
+
+      -------------
+      -- Get_Vel --
+      -------------
+
+      function Get_Vel return Types.Pose is
+      begin
+         return Types.Operations.To_Pose (Player.Position2d.Get_Velocity (Pos));
+      end Get_Vel;
+
+      -------------
+      -- Set_Vel --
+      -------------
+
+      procedure Set_Vel (X, Y, A : Types.Real)
+      is
+      begin
+         Player.Position2d.Set_Cmd_Vel (Pos, +X, +Y, +A);
+      end Set_Vel;
+
+      ---------------
+      -- Check_Gps --
+      ---------------
+
+      procedure Check_Gps is
+      begin
+         null;
+      end Check_Gps;
+
+      --------------------
+      -- Emergency_Stop --
+      --------------------
+
+      procedure Emergency_Stop is
+      begin
+         Set_Vel (0.0, 0.0, 0.0);
+         Disconnect;
+      end Emergency_Stop;
+
+      -----------------
+      -- Poll_Player --
+      -----------------
+
+      procedure Poll_Player is
+         Timer : Chronos.Object;
+      begin
+         if Parent.Linked then
+            Player.Client.Read (Client);
+            if Timer.Elapsed >= 1.0 then
+               Log ("Hw.Robot.Player_Safe: " &
+                    "Anormal delay from player [too much data or others]!",
+                    Warning);
+            end if;
+         end if;
+      exception
+         when E : Player.Exceptions.Player_Error =>
+            Log ("Hw.Robot.Poll_Player: " & Report (E), Warning);
+            Parent.Linked := False;
+      end Poll_Player;
+   end Player_Safe;
+
+   -------------
+   -- Connect --
+   -------------
+
+   procedure Connect
+     (This : in out Object; Address : in String; Port : in Positive)
+   is
+   begin
+      if This.Ptr.Safe = null then
+         This.Ptr.Safe := new Player_Safe (This.Ptr);
+      end if;
+      This.Ptr.Safe.Connect (Address, Port);
+      if This.Ptr.Reader = null then
+         This.Ptr.Reader := new Player_Task (This.Ptr);
+      end if;
+      This.Ptr.Reader.Connect;
+   end Connect;
+
+   ----------------
+   -- Disconnect --
+   ----------------
+
+   procedure Disconnect (This : in out Object) is
+   begin
+      if This.Ptr.Safe /= null then
+         This.Ptr.Reader.Disconnect;
+         This.Ptr.Safe.Disconnect;
+      end if;
+   end Disconnect;
+
+   -------------
+   -- Use_Gps --
+   -------------
+
+   procedure Use_Gps (This : in out Object) is
+   begin
+      This.Ptr.Safe.Connect_Gps;
+      This.Ptr.Use_Gps := True;
+   end Use_Gps;
+
+   -------------
+   -- Use_Map --
+   -------------
+
+   procedure Use_Map (This : in out Object) is
+   begin
+      This.Ptr.Safe.Connect_Localize;
+   end Use_Map;
+
+   ---------------
+   -- Use_Mbicp --
+   ---------------
+
+   procedure Use_Mbicp (This : in out Object) is
+   begin
+      This.Ptr.Mbicp := new Mbicp_Task (This.Ptr);
+   end Use_Mbicp;
+
+   --------------------------
+   -- Get_Closest_Obstacle --
+   --------------------------
+
+   function Get_Closest_Obstacle
+     (This : Object;
+      From : Types.Angle := -Pi;
+      To   : Types.Angle :=  Pi) return Types.Bearing
+   is
+      Scan : constant Types.Range_Scan :=
+               This.Ptr.Safe.Get_Laser_Scan (From, To);
+      Ang  : Player.Double := 0.0;
+      Dist : Player.Double := Player.Double'Last;
+      use type Player.Double;
+      use type Types.Real;
+   begin
+      for I in Scan'First .. Scan'Last loop
+         if Scan (I).D <= +Dist then
+            Ang  := +Scan (I).A;
+            Dist := +Scan (I).D;
+         end if;
+      end loop;
+
+      return (A => Types.Angle (Ang), D => +Dist);
+   end Get_Closest_Obstacle;
+
+   --------------------
+   -- Get_Laser_Scan --
+   --------------------
+
+   function Get_Laser_Scan
+     (This : Object;
+      From : Types.Angle := -Pi;
+      To   : Types.Angle :=  Pi) return Types.Range_Scan
+   is
+   begin
+      return This.Ptr.Safe.Get_Laser_Scan (From, To);
+   end Get_Laser_Scan;
+
+   -----------------------
+   -- Get_Laser_Scan_Id --
+   -----------------------
+
+   function Get_Laser_Scan_Id (This : in Object) return Integer is
+   begin
+      return This.Ptr.Safe.Get_Laser_Scan_Id;
+   end Get_Laser_Scan_Id;
+
+   ------------------------
+   -- Get_Localized_Pose --
+   ------------------------
+
+   function Get_Localized_Pose (This : in Object) return Types.Pose is
+   begin
+      return This.Ptr.Safe.Get_Localized_Pose;
+   end Get_Localized_Pose;
+
+   -------------------
+   -- Get_Odom_Pose --
+   -------------------
+
+   function Get_Odometric_Pose (This : in Object) return Types.Pose is
+   begin
+      return This.Ptr.Safe.Get_Odometric_Pose;
+   end Get_Odometric_Pose;
+
+   --------------
+   -- Get_Size --
+   --------------
+
+   function Get_Size (This : in Object) return Types.Pose is
+   begin
+      return This.Ptr.Safe.Get_Size;
+   end Get_Size;
+
+   ---------------------------
+   -- Get_Top_Angular_Speed --
+   ---------------------------
+
+   function Get_Top_Angular_Speed (This : in Object) return Types.Real is
+      pragma Unreferenced (This);
+      use type Types.Real;
+   begin
+      return 0.5; -- Hardwired
+   end Get_Top_Angular_Speed;
+
+   --------------------------
+   -- Get_Top_Linear_Speed --
+   --------------------------
+
+   function Get_Top_Linear_Speed (This : in Object) return Types.Real is
+      pragma Unreferenced (This);
+   begin
+      return 0.5; -- Hardwired.
+   end Get_Top_Linear_Speed;
+
+   ---------------
+   -- Goto_Pose --
+   ---------------
+
+   procedure Goto_Pose (This  : in out Object;
+                        Pose  : in     Types.Pose;
+                        Avoid : in     Boolean := True)
+   is
+   begin
+      This.Ptr.Safe.Goto_Pose (Pose, Avoid);
+   end Goto_Pose;
+
+   -------------
+   -- Get_Vel --
+   -------------
+
+   function Get_Vel (This : in Object) return Types.Pose is
+   begin
+      return This.Ptr.Safe.Get_Vel;
+   end Get_Vel;
+
+   -------------
+   -- Set_Vel --
+   -------------
+
+   procedure Set_Vel (This    : in out Object;
+                      X, Y, A : Types.Real)
+   is
+   begin
+      This.Ptr.Safe.Set_Vel (X, Y, A);
+   end Set_Vel;
+
+   ------------------
+   -- Is_Connected --
+   ------------------
+
+   function Is_Connected (This : in Object) return Boolean is
+   begin
+      return This.Ptr.Linked;
+   end Is_Connected;
+
+   --------------------
+   -- Emergency_Stop --
+   --------------------
+
+   procedure Emergency_Stop (This : in out Object) is
+   begin
+      This.Ptr.Safe.Emergency_Stop;
+   end Emergency_Stop;
+
+   ----------------
+   -- Initialize --
+   ----------------
+
+   procedure Initialize (This : in out Object) is
+   begin
+      This.Ptr := new Internal;
+      This.Ptr.Refs.Set (1);
+   end Initialize;
+
+   ------------
+   -- Adjust --
+   ------------
+
+   procedure Adjust     (This : in out Object) is
+      Plus_1 : Protected_Values.Integers.Adder (1);
+   begin
+      This.Ptr.Refs.Operate (Plus_1);
+   end Adjust;
+
+   --------------
+   -- Finalize --
+   --------------
+
+   procedure Finalize   (This : in out Object) is
+
+      procedure Free_Internal is new Ada.Unchecked_Deallocation
+        (Internal, Internal_Access);
+      procedure Free_Safe is new Ada.Unchecked_Deallocation
+        (Player_Safe, Player_Safe_Access);
+      procedure Free_Reader is new Ada.Unchecked_Deallocation
+        (Player_Task, Player_Task_Access);
+
+      Minus_1 : Protected_Values.Integers.Adder (-1);
+   begin
+      This.Ptr.Refs.Operate (Minus_1);
+      if This.Ptr.Refs.Get = 0 then
+         if This.Ptr.Safe /= null then -- So it was connected
+            Disconnect (This);
+            while not This.Ptr.Reader'Terminated loop
+               delay 0.1;
+            end loop;
+         end if;
+         Free_Reader   (This.Ptr.Reader);
+         Free_Safe     (This.Ptr.Safe);
+         Free_Internal (This.Ptr);
+      end if;
+   end Finalize;
+
+end Expres.Hw.Robot;

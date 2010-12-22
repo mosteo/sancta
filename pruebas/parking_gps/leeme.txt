@@ -1,0 +1,1 @@
+Esta es la configuración para el experimento en el aparcamiento, en sus versiones de simulación y prueba real

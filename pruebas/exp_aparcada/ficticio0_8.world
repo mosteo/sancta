@@ -1,0 +1,92 @@
+resolution     0.1
+interval_sim   1000
+interval_real  500
+
+include "../types.inc"
+include "../cars.inc"
+
+# The GUI
+window
+(
+   scale 0.11
+   size [800 600]
+)
+
+# The boundary 
+map
+(
+   bitmap "ficticio3.png"
+   color "black"
+   size [160 120]
+)
+
+# Ari
+bigbot
+(
+   name "Ari"
+   color "red"
+   pose [0.0 0.0 90.0]
+   odom [0.0 0.0 90.0]
+)
+
+# Ben
+bigbot
+(
+   name "Ben"
+   color "green"
+   pose [0.0 0.0 90.0]
+   odom [0.0 0.0 90.0]
+)
+
+# Ced
+bigbot
+(
+   name "Ced"
+   color "red"
+   pose [0.0 0.0 90.0]
+   odom [0.0 0.0 90.0]
+)
+
+# Dan
+bigbot
+(
+   name "Dan"
+   color "red"
+   pose [0.0 0.0 90.0]
+   odom [0.0 0.0 90.0]
+)
+
+# Elo
+bigbot
+(
+   name "Elo"
+   color "red"
+   pose [0.0 0.0 90.0]
+   odom [0.0 0.0 90.0]
+)
+
+# Fab
+bigbot
+(
+   name "Fab"
+   color "red"
+   pose [0.0 0.0 90.0]
+   odom [0.0 0.0 90.0]
+)
+# Gur
+bigbot
+(
+   name "Gur"
+   color "red"
+   pose [0.0 0.0 90.0]
+   odom [0.0 0.0 90.0]
+)
+
+# Hoc
+bigbot
+(
+   name "Hoc"
+   color "red"
+   pose [0.0 0.0 90.0]
+   odom [0.0 0.0 90.0]
+)

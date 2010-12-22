@@ -1,0 +1,5 @@
+. `dirname $0`/defs.common
+
+for bot in $botnames; do
+	$bot && [ "$bot" != "zak" ] && echo "Halting $bot..." && ssh root@$bot halt
+done

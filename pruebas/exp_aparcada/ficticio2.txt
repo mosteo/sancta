@@ -1,0 +1,2 @@
+En este caso los robots parten de (0,0), porque hay una tarea
+inicial virtual de desplazamiento al punto de entrada óptimo.

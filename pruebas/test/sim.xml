@@ -1,0 +1,50 @@
+<expres>
+   <agent id="Ari" kind="robot">
+      <!-- The basic player connection -->
+      <plugin name="core" address="127.0.0.1" port="6665" enabled="true">
+         <provides data="is_connected"   as="is_connected"   type="boolean"/>
+      </plugin>
+
+      <!-- provides the raw robot odometry -->
+      <!-- provides current pose in case we're not improving it somehow -->
+      <plugin name="odometry" enabled="true">
+         <provides data="odom_pose"     as="odom_pose"        type="types.pose"/>
+         <provides data="odom_bis_pose" as="current_pose"    type="types.pose"/>
+         <provides data="velocity"      as="current_velocity" type="types.pose"/>
+      </plugin>
+
+      <!-- movement command -->
+      <plugin name="move" enabled="true">
+         <requires data="goal_action"    as="goal_action"    type="robot_plugin.goal_action"/>
+         <requires data="emergency_stop" as="emergency_stop" type="boolean"/>
+      </plugin>
+
+      <!--  Allows recording of some pose -->
+      <plugin name="logger_pose" 
+              filename="odom.txt" 
+              periodic="true" 
+              period="0.1" 
+              remove_duplicates="true"
+              enabled="true">
+          <requires data="data" as="odom_pose" type="types.pose"/>
+      </plugin>
+
+      <!-- udp element is for use by Expres.Network.Layer.Udp -->
+      <udp address="127.0.0.1" port="5001"/>
+
+      <channel name="emergency" subscribe="true"/>
+      <channel name="traderbot" subscribe="true"/>
+   </agent>
+
+   <agent id="Zen" kind="gui" laser_scans="4" draw_grid="true">
+      <udp address="127.0.0.1" port="5505"/>
+      <channel name="gui"       subscribe="true"/>
+      <channel name="emergency" subscribe="true"/>
+      <channel name="management" subscribe="true"/>
+   </agent>
+
+   <!-- Here we specify details about the global traderbot policies. -->
+   <!-- local_cost, full_cost -->
+   <traderbot cost_policy="full_cost"/>
+
+</expres>

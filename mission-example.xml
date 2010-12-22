@@ -1,0 +1,12 @@
+<!--  Examples of all parseable tasks in a mission file
+  In poses, there must be precisely a space between reals. 
+  Use "" or remove the attribute for freely assignable tasks 
+  Use auctionable="true" to mark tasks that can be auctioned (false by default)
+  -->
+
+<mission>
+
+	<task owner="" kind="explore_segment" ini="0.0 0.0 0.0" fin="10.0 10.0 1.0"/>
+	<task owner="Ari" kind="goto_pose" goal="0.0 0.0 0.0" use_angle="false"/>
+	<task owner="Ben" kind="speed_driving" velocity="1.0 0.0 0.0" period="3.0"/>
+</mission>

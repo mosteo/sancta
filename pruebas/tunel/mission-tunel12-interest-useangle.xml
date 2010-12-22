@@ -1,0 +1,9 @@
+<mission descr="CHECK INTERESTING PLACES">
+	<task owner="Ari" kind="goto_pose" goal="11.0 -0.5 5.5" use_angle="true"/>
+
+	<task owner="Ben" kind="goto_pose" goal="16.0 -0.5 3.9" use_angle="true"/>
+
+	<task owner="Ced" kind="goto_pose" goal="23.0 2.5 0.7" use_angle="true"/>
+
+	<task owner="Dan" kind="goto_pose" goal="32.0 2.5 2.3" use_angle="true"/>
+</mission>

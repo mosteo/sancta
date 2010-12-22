@@ -1,0 +1,33 @@
+<t002>
+
+   <!--  This test sends packets across two nodes and reports BW use -->
+
+   <constant name="$nodes" option="--nodes" comment="Dot separated list of nodes e.g. dan.zak" />
+   <constant name="$base"  option="--base"  comment="Some node to act as ping listener" />
+ 
+   <group id="network">
+      <component name="network_rtwmp" nodes="$nodes">
+         <provides data="link" as="link"/>
+      </component>
+
+      <component name="netstats" enable_stdout="true" dest="$base" channel="ping" >
+         <requires data="link" as="link"/>
+      </component>
+
+      <component name="redirect_listener" channel="ping">
+         <requires data="link" as="link"/>
+      </component>
+
+      <log section="sancta.config" level="debug" />
+      <log section="sancta.component.redirect_listener" level="debug" />
+   </group>
+
+   <agent id="dan">
+      <group>network</group>
+   </agent>
+
+   <agent id="zak">
+      <group>network</group>
+   </agent>
+
+</t002>

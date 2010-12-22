@@ -1,0 +1,137 @@
+<expres>
+   <agent id="Ari" kind="robot">
+      <plugin name="core" address="192.168.1.16" port="6665" enabled="true">
+         <provides data="is_connected"   as="is_connected"   type="boolean"/>
+      </plugin>
+
+      <plugin name="odometry" enabled="true">
+         <provides data="odom_pose"     as="odom_pose"        type="types.pose"/>
+         <provides data="odom_bis_pose" as="odom_pose2"       type="types.pose"/>
+         <provides data="velocity"      as="current_velocity" type="types.pose"/>
+      </plugin>
+
+      <plugin name="manual_pose_correction" enabled="true">
+          <requires data="in_pose"      as="odom_pose"        type="types.pose"/>
+          <requires data="new_pose"     as="manual_pose"      type="types.pose"/>
+
+          <provides data="out_pose"     as="odom+man_pose"    type="types.pose"/>
+      </plugin>
+
+      <plugin name="move" enabled="true">
+         <requires data="goal_action"    as="goal_action"    type="robot_plugin.goal_action"/>
+         <requires data="emergency_stop" as="emergency_stop" type="boolean"/>
+      </plugin>
+
+      <plugin name="laser" enabled="true">
+          <requires data="loc_pose"      as="current_pose"  type="types.pose"/>
+
+          <provides data="scan_id"       as="laser_scan_id" type="integer"/>
+          <provides data="scan"          as="raw_scan"      type="datastore.posed_range_scan"/>
+          <provides data="pose_on_robot" as="pose_on_robot" type="types.pose"/>
+      </plugin>
+
+      <plugin name="mbicp" out_of_range="31.0" enabled="true">
+          <requires data="odom_pose"           as="odom+man_pose"     types="types.pose"/>
+          <requires data="scan"                as="raw_scan"      types="datastore.posed_range_scan"/>
+          <requires data="laser_pose_on_robot" as="pose_on_robot" type="types.pose"/>
+
+          <provides data="improved_pose" as="current_pose"      types="types.pose"/>
+          <provides data="improved_scan" as="laser_scan"   types="datastore.posed_range_scan"/>
+      </plugin>
+
+      <plugin name="drift_reader" period="2.0" use_truth="true" enabled="false"/>
+
+      <plugin name="logger_montesano" filename="lab.txt" immediate="true" enabled="false">
+          <requires data="scan" as="laser_scan" type="datastore.posed_range_scan"/>
+      </plugin>
+
+      <udp address="127.0.0.1" port="5001"/>
+
+      <channel name="emergency" subscribe="true"/>
+      <channel name="traderbot" subscribe="true"/>
+   </agent>
+
+   <agent id="Ben" kind="robot">
+      <plugin name="core" address="192.168.1.17" port="6665" enabled="true">
+         <provides data="is_connected"   as="is_connected"   type="boolean"/>
+      </plugin>
+
+      <plugin name="odometry" enabled="true">
+         <provides data="odom_pose"     as="odom_pose"        type="types.pose"/>
+         <provides data="odom_bis_pose" as="odom_pose2"       type="types.pose"/>
+         <provides data="velocity"      as="current_velocity" type="types.pose"/>
+      </plugin>
+
+      <plugin name="manual_pose_correction" enabled="true">
+          <requires data="in_pose"      as="odom_pose"        type="types.pose"/>
+          <requires data="new_pose"     as="manual_pose"      type="types.pose"/>
+
+          <provides data="out_pose"     as="odom+man_pose"    type="types.pose"/>
+      </plugin>
+
+      <plugin name="move" enabled="true">
+         <requires data="goal_action"    as="goal_action"    type="robot_plugin.goal_action"/>
+         <requires data="emergency_stop" as="emergency_stop" type="boolean"/>
+      </plugin>
+
+      <plugin name="laser" enabled="true">
+          <requires data="loc_pose"      as="current_pose"  type="types.pose"/>
+
+          <provides data="scan_id"       as="laser_scan_id" type="integer"/>
+          <provides data="scan"          as="raw_scan"      type="datastore.posed_range_scan"/>
+          <provides data="pose_on_robot" as="pose_on_robot" type="types.pose"/>
+      </plugin>
+
+      <plugin name="mbicp" out_of_range="31.0" enabled="true">
+          <requires data="odom_pose"           as="odom+man_pose"     types="types.pose"/>
+          <requires data="scan"                as="raw_scan"      types="datastore.posed_range_scan"/>
+          <requires data="laser_pose_on_robot" as="pose_on_robot" type="types.pose"/>
+
+          <provides data="improved_pose" as="current_pose"      types="types.pose"/>
+          <provides data="improved_scan" as="laser_scan"   types="datastore.posed_range_scan"/>
+      </plugin>
+
+      <plugin name="drift_reader" period="2.0" use_truth="true" enabled="false"/>
+
+      <plugin name="logger_montesano" filename="lab.txt" immediate="true" enabled="false">
+          <requires data="scan" as="laser_scan" type="datastore.posed_range_scan"/>
+      </plugin>
+
+      <udp address="127.0.0.1" port="5002"/>
+
+      <channel name="emergency" subscribe="true"/>
+      <channel name="traderbot" subscribe="true"/>
+   </agent>
+
+   <agent id="Wei">
+      <!-- This is the task proposer -->
+      <udp address="127.0.0.1" port="5508"/>
+   </agent>
+
+   <agent id="Xyd">
+      <!--  Used for random alerts generation -->
+      <parameters period="10.0" xrange="8" yrange="6"/>
+      <udp address="127.0.0.1" port="5507"/>
+      <channel name="management" subscribe="true"/>
+   </agent>
+
+   <agent id="Yue">
+      <!-- This is the Planner_Traderbot -->
+      <udp address="127.0.0.1" port="5506"/>
+      <channel name="emergency" subscribe="true"/>
+      <channel name="management" subscribe="true"/>
+      <channel name="traderbot" subscribe="true"/>
+   </agent>
+
+   <agent id="Zen" kind="gui" laser_scans="3">
+      <udp address="127.0.0.1" port="5505"/>
+      <channel name="gui"       subscribe="true"/>
+      <channel name="emergency" subscribe="true"/>
+      <channel name="management" subscribe="true"/>
+   </agent>
+
+   <!-- Here we specify details about the global traderbot policies. -->
+   <!-- local_cost, full_cost -->
+   <traderbot cost_policy="full_cost"/>
+
+</expres>

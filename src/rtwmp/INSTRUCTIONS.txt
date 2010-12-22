@@ -1,0 +1,19 @@
+1. Set up compiling folders, all under same root:
+
+# amosteo:jano69x...
+#rt-wmp-trunk  svn://155.210.155.18/dantard/RT-WMP/trunk/rt-wmp-v6
+	This needs autoreconf, automake -a, ./configure --with-llcom=ath5k
+
+#ath5k-driver  svn://155.210.155.18/dantard/ath5k
+	Do this link within ath5k:
+		ln -s ath5k-2.6.32-rc1-linux ath5k-linux
+	This needs just make
+
+#sniffer-trunk svn://155.210.155.18/dantard/WMPSNIFFER/trunk/wmpSniffer
+
+# danilo:danisvn99
+#common        svn://155.210.155.38/danilo/common
+
+2. Check files:
+	$HOME/.rt-wmp/rt-wmp.{cfg,ll} (examples in ./config)
+	Actually the .ll file now has another name. It spits it on startup.
