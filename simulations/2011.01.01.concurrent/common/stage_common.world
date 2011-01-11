@@ -1,0 +1,60 @@
+# Explicit units
+unit_length "m"
+unit_angle  "radians"
+
+# The size of a pixel in Stage's underlying raytrace model in meters
+resolution     0.02
+
+interval_sim  100  # simulated milliseconds per update step
+interval_real 100  # real-time milliseconds per update step
+
+# defines Pioneer-like robots
+# Taken from the mobilerobots sim, should be accurate then.
+include "alexbots.inc"
+
+# defines 'map' object used for floorplans
+include "map.inc"
+
+size [135 86]
+
+gui_disable        0
+gui_interval     100
+gui_menu_interval 20
+gui_grid           0
+
+map(
+  size [135 86]
+  pose [0.000 0.000 0]
+  origin [0 0 0]
+  name "map"
+  bitmap "map-hqres.png"
+)
+
+position (
+  size [0 0]
+  pose [0 0 0]
+  name "permanent1"
+) # Used to draw non-changing elements
+position (
+  size [0 0]
+  pose [0 0 0]
+  name "permanent2"
+) # Used to draw non-changing elements
+
+position (
+  size [0 0]
+  pose [0 0 0]
+  name "transit1"
+) # Used to draw changing elements with double buffering
+position (
+  size [0 0]
+  pose [0 0 0]
+  name "transit2"
+) # Used to draw changing elements with double buffering
+
+# Override particulars:
+define robot triangle
+(
+  localization "gps"
+  quicklaser ( pose [0 0 0] )
+)

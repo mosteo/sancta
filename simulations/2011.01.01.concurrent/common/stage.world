@@ -1,0 +1,60 @@
+unit_length "m"
+unit_angle "radians"
+
+include "stage_common.world"
+
+
+
+
+
+
+
+
+
+window( 
+  size [1280.000 728.000] 
+  center [0.317 -1.394]
+  scale 0.106
+)
+
+robot
+(
+  color "red"
+  name "ari"
+  pose [-60.696 -22.700 0.000]
+)
+
+robot
+(
+  color "green"
+  name "ben"
+  pose [-61.818 -22.700 0.000]
+)
+
+robot
+(
+  color "blue"
+  name "ced"
+  pose [-62.899 -22.700 0.000]
+)
+
+robot
+(
+  color "cyan"
+  name "dan"
+  pose [-64.034 -22.700 0.000]
+)
+
+robot
+(
+  color "magenta"
+  name "epi"
+  pose [-65.366 -22.700 0.000]
+)
+
+robot
+(
+  color "orange"
+  name "fio"
+  pose [-66.587 -22.700 0.000]
+)

@@ -1,0 +1,1 @@
+../common/alexbots.inc

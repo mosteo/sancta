@@ -1,0 +1,384 @@
+<connect_tree>
+
+   <!--  Probably player requires these  -->
+   <global name="Max_Component_Creation_Time"         value="120000.0" />
+   <global name="Max_Component_Running_Time_Per_Call" value="500000.0" />
+
+   <!--  Ensure old config and no surprises...  -->
+   <global name="Concurrent_Events" value="false" />
+   <global name="Protected_Events"  value="false" />
+
+   <!--  General config  -->
+   <constant name="$player_period"  value="0.1"   />
+   <constant name="$ctree_period"   value="0.2"    />
+   <constant name="$feed_period"    value="0.5"    /> <!--  Data feeds (redirections)  -->
+   <constant name="$nodes"         option="--nodes" /> <!-- Dot separated list of live nodes -->
+   <constant name="$playerport"    option="--playerport" />
+   <constant name="$base_pose"      value="-66.6 -22.7 0.0" />
+   <constant name="$gui_node"       value="zak"    />
+
+   <!--  Connect Tree config  -->
+   <constant name="$ctree_here"        value="2.0" />
+   <constant name="$ctree_near"        value="4.0" />
+   <constant name="$ctree_loc_dist"    value="1.0" />
+   <constant name="$ctree_target_dist" value="1.0" />
+   <constant name="$ctree_threshold"   value="16" />
+   <constant name="$sim_link_length"   value="32" />
+
+   <!--  Globals (ugly) for selective drawing... -->
+   <global name="ctree_status_draw_links"     value="true" />
+   <global name="ctree_status_draw_locations" value="true" />
+   <global name="ctree_status_draw_signal"    value="true" />
+   <global name="ctree_status_draw_targets"   value="true" />
+   <global name="ctree_status_draw_tree"      value="true" />
+
+   <group id="log">
+      <log section="nerus.ctree.tree_navigator.bitmap_ordered" level="debug" />
+      <log section="nerus.ctree.utils"                         level="informative" />
+      <log section="nerus.ctree.single_distributed"            level="informative" />
+      <log section="nerus.ctree.single_distributed.detail"     level="warning" />
+      <log section="nerus.comp.tree_ordered"                   level="informative" />
+      <log section="sancta.component.player_client"            level="informative" />
+      <log section="sancta.component.root"                     level="warning" />
+      <log section="sancta.config"                             level="informative" />
+      <log section="sancta.events"                             level="informative" />
+      <log section="sancta.map.qtree"                          level="debug" />
+   </group>
+
+   <!-- NETWORK -->
+   <group id="network">
+      <component name="network" kind="tcp" order="0" nodes="$nodes">
+         <provides data="link" as="link" />
+         <node id="ari" address="127.0.0.1:9990" />
+         <node id="ben" address="127.0.0.1:9991" />
+         <node id="ced" address="127.0.0.1:9992" />
+         <node id="dan" address="127.0.0.1:9993" />
+         <node id="epi" address="127.0.0.1:9994" />
+         <node id="fio" address="127.0.0.1:9995" />
+         <node id="zak" address="127.0.0.1:9996" />
+      </component>
+
+      <component name="netstats" enable_ping="true" dest="$gui_node" channel="console_local" enabled="true">
+         <requires data="link" as="link"/>
+         <provides data="stats" as="netstats"/>
+      </component>
+      <component name="redirect" destination="$gui_node" channel="console_local" trigger="on_update">
+         <requires data="input" as="netstats"/>
+         <requires data="link"  as="link"/>
+      </component>
+
+      <!--  Signal simulators/aggregators -->
+      <component name="ctree_signal_distance" 
+               period="0.33"
+            drop_dist="$sim_link_length"
+           drop_model="$signalmodel"
+              channel="ctree" 
+              base_id="zak">
+         <requires data="base_pose" as="base_pose"  />
+         <requires data="link"      as="link"       />
+         <provides data="signal"    as="raw_signal" />
+         <provides data="full_signal" as="raw_full_signal" />
+      </component>
+      <component name="copy" >
+          <requires data="x" as="raw_signal"/>
+          <provides data="y" as="avg_signal"/>
+      </component>
+      <component name="copy" >
+          <requires data="x" as="raw_signal"/>
+          <provides data="y" as="med_signal"/>
+      </component>
+   </group>
+
+   <group id="map">
+      <component
+         name="qmap" 
+         file="./map-qtree.png"
+     vicinity="vicinity_6"
+       x_left="-67.5"
+      x_right="+67.5"
+     y_bottom="-43"
+        y_top="+43"
+     cell_min="1.0"
+     cell_max="666.0"
+  buggy_stage="false"
+      enabled="true">
+
+         <provides data="map" as="map"/>
+      </component>
+
+      <!--  Nerus initialization  -->
+      <component name="nerus_hack" enabled="true">
+         <requires data="map" as="map"/>
+      </component>
+      <log>nerus.comp.hack</log>
+
+   </group>
+
+   <group id="global">
+      <!--  base  -->
+      <component name="generator_pose" value="$base_pose">
+         <provides data="value" as="base_pose" />
+      </component>
+      <component name="generator_pose" value="$base_pose">
+         <provides data="value" as="head_pose" />
+      </component>
+   </group>
+
+   <group id="base">
+      <!--  base  -->
+      <component name="generator_pose" value="$base_pose">
+         <provides data="value" as="global_pose" />
+      </component>
+   </group>
+
+   <group id="robots">
+      <!--  player  -->
+      <component name="port_waiter"   port="$playerport" wait="true"/>
+      <component name="player_client" port="$playerport" period="$player_period" enabled="true">
+         <provides data="connection" as="conn" />
+      </component>
+      <!-- local nav -->
+      <component name="player_position2d" filter_zeros="false" index="0" period="$player_period" enabled="true">
+         <requires data="client" as="conn" />
+         <requires data="pose_goal" as="ctree_pose_goal" />
+         <requires data="velo_goal" as="ctree_velo_goal" />
+         <provides data="pose"      as="global_pose" />
+      </component>
+
+      <component name="redirect" 
+              new_key="gui_pose" destination="$gui_node" channel="gui" trigger="periodic" period="$feed_period">
+         <requires data="input" as="global_pose"/>
+         <requires data="link"  as="link"/>
+      </component>
+      <component name="redirect_listener" channel="ctree" comment="USED TO SWITCH REDIRECTORS FROM CONSOLE">
+         <requires data="link"  as="link"/>
+      </component>
+
+   </group>
+
+   <group id="ctree">
+      <component name="manual_tasks" enabled="false">
+         <task x="22" y="41" label="far-away"      enabled="true" />
+         <provides data="tasks" as="initial_tasks"/>
+      </component>
+      <component name="map_tasks" amount="15" random_seed="6978" enabled="true">
+         <requires data="map" as="map"/>
+         <provides data="tasks" as="initial_tasks"/>
+      </component>
+
+      <!--  Tree building  -->
+      <component name="y_or_else_x" enabled="true">
+         <requires data="x" as="initial_tasks" />
+         <requires data="y" as="pending_tasks"/>
+         <provides data="z" as="tasks_to_plan"/>
+      </component>
+
+      <component name="tree_ordered" creator="steiner" limit="999" enabled="true">
+         <requires data="map"         as="map"/>
+         <requires data="root_pose"   as="base_pose"/>
+         <requires data="head_pose"   as="head_pose"/>
+         <requires data="tasks"       as="tasks_to_plan"/>
+         <requires data="must_replan" as="must_replan"/>
+
+         <provides data="tree"        as="tree"/>
+         <provides data="task_order"  as="ordered_tasks"/>
+      </component>
+
+      <component name="y_or_else_x" enabled="true">
+         <requires data="x" as="ordered_tasks" />
+         <requires data="y" as="pending_tasks"/>
+         <provides data="z" as="current_tasks"/>
+      </component>
+
+      <component name="ctree_single_distributed" 
+              base_id="$gui_node" 
+            base_pose="$base_pose"
+                 pred="$pred" 
+                 succ="$succ" 
+                 here="$ctree_here"
+                 near="$ctree_near"
+             loc_dist="$ctree_loc_dist"
+          target_dist="$ctree_target_dist"
+     signal_threshold="$ctree_threshold"
+      signal_function="average"
+              rot_vel="1.0"
+               period="$ctree_period"
+              channel="ctree" 
+              enabled="true">
+         <requires data="link"          as="link"          />
+         <requires data="pose"          as="global_pose"   />
+
+         <requires data="raw_signal"    as="raw_signal"    />
+         <requires data="avg_signal"    as="avg_signal"    />
+         <requires data="med_signal"    as="med_signal"    />
+
+         <requires data="raw_full_signal" as="raw_full_signal"    />
+
+         <requires data="tasks"         as="current_tasks" />
+         <requires data="map"           as="map"           />
+         <requires data="navigator"     as="tree"          />
+
+         <provides data="in_command"    as="ctree_running" />
+         <provides data="pending_tasks" as="pending_tasks" />
+         <provides data="goal"          as="ctree_pose_goal" />
+         <provides data="velo"          as="ctree_velo_goal" />
+         <provides data="status_draw"   as="ctree_draw" /> <!-- Only used by zak -->
+         <provides data="node_status"   as="ctree_node_status" />
+      </component>
+
+      <component name="redirect" destination="$gui_node" channel="console_local" trigger="periodic" period="$feed_period">
+         <requires data="input" as="ctree_node_status"/>
+         <requires data="link"  as="link"/>
+      </component>
+
+   </group>
+
+   <agent id="ari" log_level="debug">
+      <group>log</group>
+      <group>network</group>
+      <group>map</group>
+      <group>global</group>
+      <group>robots</group>
+      <group>ctree</group>
+   </agent>
+
+   <agent id="ben" log_level="debug">
+      <group>log</group>
+      <group>network</group>
+      <group>map</group>
+      <group>global</group>
+      <group>robots</group>
+      <group>ctree</group>
+   </agent>
+
+   <agent id="ced" log_level="debug">
+      <group>log</group>
+      <group>network</group>
+      <group>map</group>
+      <group>global</group>
+      <group>robots</group>
+      <group>ctree</group>
+   </agent>
+
+   <agent id="dan" log_level="debug">
+      <group>log</group>
+      <group>network</group>
+      <group>map</group>
+      <group>global</group>
+      <group>robots</group>
+      <group>ctree</group>
+   </agent>
+
+   <agent id="epi" log_level="debug">
+      <group>log</group>
+      <group>network</group>
+      <group>map</group>
+      <group>global</group>
+      <group>robots</group>
+      <group>ctree</group>
+   </agent>
+
+   <agent id="fio" log_level="debug">
+      <group>log</group>
+      <group>network</group>
+      <group>map</group>
+      <group>global</group>
+      <group>robots</group>
+      <group>ctree</group>
+   </agent>
+
+   <agent id="zak" log_level="debug">
+      <component name="spawn" command="player -d0 ./player_stage.cfg | tee player_zak.log" wait="false" order="0" />
+      <group>log</group>
+      <group>network</group>
+      <group>map</group>
+      <group>global</group>
+      <group>base</group>
+
+      <component name="port_waiter"   port="$playerport" wait="true"/>
+      <component name="player_client" port="$playerport" period="$player_period" enabled="true">
+         <provides data="connection" as="conn" />
+      </component>
+      <component name="player_position2d" filter_zeros="false" index="0" period="$player_period" enabled="true">
+         <requires data="client" as="conn" />
+	 <!-- This useless $4¡t is necessary in order to playerc_client_read not to block! Amazing! -->
+      </component>
+      <component name="player_graphics2d" index="0" period="10.0" enabled="true">
+         <requires data="client" as="conn" />
+         <requires data="queue" as="static_queue" />
+         <requires data="queue_draw" as="g2d_static_queue" />
+         <provides data="drawer" as="g2d_static_drawer" />
+      </component>
+      <component name="player_graphics2d" index="2" period="0.5" enabled="true">
+         <requires data="client" as="conn" />
+         <requires data="queue" as="dynamic_queue" />
+         <requires data="queue_draw" as="g2d_dynamic_queue" />
+         <provides data="drawer" as="g2d_dynamic_drawer" />
+      </component>
+
+      <group>ctree</group>
+
+      <component name="visor" 
+          laser_scans="1"
+           show_poses="false"
+            draw_grid="false"
+               period="0.2" 
+              enabled="false">
+         <requires data="link"        as="link"  />
+         <provides data="drawer"      as="drawer"/>
+      </component>
+
+      <component name="ctree_console" channel="ctree" quality_threshold="$ctree_threshold" period="0.5" enabled="true">
+         <!-- Don't forget that the map view has a hardcoded gui channel -->
+         <requires data="full_signal" as="raw_full_signal" />
+         <requires data="link"        as="link"  />
+         <requires data="local_parcels"  as="local_parcels"  />
+         <requires data="global_parcels" as="global_parcels" />
+         <provides data="map_drawer"  as="drawer"/>
+      </component>
+
+      <component name="redirect_listener" channel="console_local" wrap="true">
+         <requires data="link"  as="link"/>
+         <provides data="out"   as="local_data"/>
+      </component>
+      <component name="copy" enabled="true"> <!-- For uncasted local data -->
+          <requires data="x" as="local_data"/>
+          <provides data="y" as="local_parcels"/>
+      </component>
+      <component name="ctree_node_status_to_widget" passthrough="true">
+          <requires data="in"  as="local_data" />
+          <provides data="out" as="local_parcels" />
+      </component>
+      <component name="netstats2gnetstats" passthrough="true">
+          <requires data="in"  as="local_data" />
+          <provides data="out" as="local_parcels" />
+      </component>
+
+      <component name="redirect_listener" channel="console_global" wrap="true">
+         <requires data="link"  as="link"/>
+         <provides data="out"   as="global_data"/>
+      </component>
+      <component name="copy" enabled="true"> <!-- For uncasted global data -->
+          <requires data="x" as="global_data"/>
+          <provides data="y" as="global_parcels"/>
+      </component>
+      
+      <component name="draw" label="map" enabled="true">
+         <requires data="drawer"   as="drawer"/>
+         <requires data="drawable" as="map"   />
+      </component>
+      <component name="draw" label="map" enabled="false">
+         <requires data="drawer"   as="g2d_static_drawer"/>
+         <requires data="drawable" as="map"   />
+      </component>
+
+      <component name="draw" label="ctree_draw" enabled="true">
+         <requires data="drawer"   as="drawer"/>
+         <requires data="drawable" as="ctree_draw"   />
+      </component>
+      <component name="draw" label="ctree_draw" enabled="true">
+         <requires data="drawer"   as="g2d_dynamic_drawer"/>
+         <requires data="drawable" as="ctree_draw"   />
+      </component>
+   </agent>
+</connect_tree>
