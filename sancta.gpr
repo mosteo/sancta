@@ -61,7 +61,7 @@ project Sancta is
    Include_Test  : Yes_No := External ("Sancta_Include_Test",  "Yes");
 
    case Include_Base is
-      when "Yes" => for Source_Dirs use project'Source_Dirs & ("src", "src/main");
+      when "Yes" => for Source_Dirs use project'Source_Dirs & ("src");
       when "No"  => null;
    end case;
 
