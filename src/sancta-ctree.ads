@@ -1,4 +1,5 @@
 with Ada.Containers.Ordered_Maps;
+with Ada.Containers.Doubly_Linked_Lists;
 with Sancta;
 with Sancta.Network.Qualities;
 
@@ -28,6 +29,8 @@ package Sancta.Ctree is
    --  This is a proper quality, with 0.0 being no connection and 100.0 perfect.
 
    use type Signal_Q;
+
+   package Signal_Lists is new Ada.Containers.Doubly_Linked_Lists (Signal_Q);
 
    function To_Signal_Q (F : Float) return Signal_Q;
    pragma Inline (To_Signal_Q);

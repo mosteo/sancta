@@ -346,6 +346,8 @@ package body Sancta.Ctree.Single_Distributed is
               Debug, Det_Section);
       end Set_Links_Print;
    begin
+      This.Qs (Func) := Q; -- Store full quality row
+
       if Q.Contains (This.Pred.Id) then
          This.Pred.Qs (Func) := Q.Element (This.Pred.Id);
          if This.Config.Quality_Function = Func then

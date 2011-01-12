@@ -2,10 +2,11 @@
 
 ids="ari ben ced dan epi fio zak"
 ids_enabled="ari ben ced dan epi fio zak"
-ids_enabled="ari ben ced dan epi fio zak"
+ids_enabled="ari ben zak"
 ids_poweroff="x"
 
 pcommon="--config sancta.xml --nodes ari.ben.ced.dan.epi.fio.zak "
+pcommon="--config sancta.xml --nodes ari.ben.zak "
 params="  $pcommon --playerport 7770" 	# ARI
 params+=",$pcommon --playerport 7771" 	# BEN
 params+=",$pcommon --playerport 7772" 	# CED

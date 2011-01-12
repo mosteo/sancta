@@ -96,6 +96,7 @@ package Sancta.Map is
                      Loc  : in     Location'Class;
                      Obs  : in     Observation'Class);
    --  Set/Merge information at given coords.
+   --  This default replaces the current observation
 
    not overriding
    function Nearest_Location (This : Object;

@@ -223,7 +223,12 @@ package body Sancta.Ctree.Component.Console is
       procedure Create is
          X : Glade_Xml;
       begin
-         Gtk_New (X, "/home/jano/prog/nerus/src/gtk/ctree_console_v2.glade");
+         Gtk_New (X, This.Option (Opt_Glade_Xml, Def_Glade_Xml));
+
+         if X = null then
+            raise Program_Error with "Interface definition not found";
+         end if;
+
          Agpl.Gdk.Managed.Glade_Autoconnect (X);
          User_Data.Set_Shared (X.Get_Widget ("console"), This);
          This.Gui := X;

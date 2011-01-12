@@ -56,6 +56,11 @@ package Sancta.Ctree.Component.Console is
    Opt_Period : constant Option_Attr := "period";
    Def_Period : constant Duration    := 0.2;
 
+   Opt_Glade_Xml : constant Option_Attr := "glade_xml";
+   Def_Glade_Xml : constant String :=
+     "/home/jano/prog/sancta/src/sancta-gtk/ctree_console_v2.glade";
+   --  Supply here path to definition file
+
    procedure Register;
 
 private

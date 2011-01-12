@@ -226,6 +226,7 @@ package Sancta.Ctree.Single_Distributed is
                       This : in out Object'Class);
 
    type Quality_Arrays is array (Quality_Functions) of Signal_Q;
+   type Quality_Row_Arrays is array (Quality_Functions) of Id_Q_Maps.Map;
 
    type Operator_Actions is (Go, Stop, Park, Cancel);
 
@@ -388,6 +389,8 @@ private
       Config         : Config_Type;
       Setup_Info     : Info_Vectors.Vector; -- using only during startup phase.
       Setup_Last     : Id_Vectors.Vector;   -- last ordering received
+      --  This, during execution, contains all the robot IDs from tail to head.
+      --  NOTE: IT DOES NOT CONTAIN THE BASE ID.
 
       Role           : Roles;
       Map            : Sancta.Map.Smart.Object;
@@ -425,6 +428,9 @@ private
       --  Predecesor robot (to head)
       Succ           : Neighbor_Context (Object'Access);
       --  Sucessor robot (to tail)
+
+      Qs             : Quality_Row_Arrays;
+      --  Qualities as seen from this robot.
 
       Operator_Msg   : Op_Msg_Handle.Object :=
                          Op_Msg_Handle.Set
