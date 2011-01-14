@@ -6,7 +6,7 @@ with Sancta.Ctree.Component.Nctypes;
 with Sancta.Component.Factory;
 with Sancta.Component.Network;
 
-package body Sancta.Ctree.Component.Ctree_Signal_Rtwmp is
+package body Sancta.Ctree.Component.Signal_Rtwmp is
 
    type Object_Access is access all Object;
 
@@ -166,4 +166,4 @@ package body Sancta.Ctree.Component.Ctree_Signal_Rtwmp is
       This.Period.Next (Next);
    end Run;
 
-end Sancta.Ctree.Component.Ctree_Signal_Rtwmp;
+end Sancta.Ctree.Component.Signal_Rtwmp;

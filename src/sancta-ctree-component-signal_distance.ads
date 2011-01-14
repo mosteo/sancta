@@ -9,9 +9,9 @@ private with Sancta.Netlistener;
 private with Sancta.Network.Layer;
 private with Sancta.Types;
 
-package Sancta.Ctree.Component.Ctree_Signal_Distance is
+package Sancta.Ctree.Component.Signal_Distance is
 
-   Log_Section : constant String := "Sancta.Ctree.Component.ctree_signal_distance";
+   Log_Section : constant String := "sancta.ctree.component.signal_distance";
 
    Name : aliased constant Component_Name := "ctree_signal_distance";
 
@@ -33,9 +33,24 @@ package Sancta.Ctree.Component.Ctree_Signal_Distance is
    Opt_Drop_Dist  : constant Option_Attr := "drop_dist";
    --  Distance at which signal Q is 0%
 
+   type Drop_Models is (Linear);
    Opt_Drop_Model : constant Option_Attr := "drop_model";
    Def_Drop_Model : constant String      := "linear";
    --  How to compute signal, given distance. Unused for now (it's the only one)
+
+   --  NOTE: the noises defined next are GLOBALLY INCONSISTENT. They're seen
+   --  differently by each node.
+
+   Opt_Random_Noise_Amplitude : constant Option_Attr := "rnd_noise_amp";
+   Def_Random_Noise_Amplitude : constant Float       := 5.0;
+   --  plus/minus Percent to randomly add to any generated signal
+
+   Opt_Bias_Amplitude : constant Option_Attr := "bias_amp";
+   Def_Bias_Amplitude : constant Float       := 2.0;
+   --  A time-varying bias
+   Opt_Bias_Period    : constant Option_Attr := "bias_period";
+   Def_Bias_Period    : constant Duration    := 2.0;
+   --  Minimum time needed for bias to go from -Amp to +Amp
 
    Opt_Channel     : constant Option_Attr := "channel";
    --  Channel for CTree comms.
@@ -51,6 +66,9 @@ private
 
    package Id_Pose_Maps is new Ada.Containers.Ordered_Maps
      (Node_Id, Types.Pose, "<", Sancta.Types."=");
+
+   package Id_Id_Bias_Maps is new Ada.Containers.Ordered_Maps
+     (Node_Id, Signal_Q);
 
    type Object;
 
@@ -79,6 +97,13 @@ private
       Pose       : Types.Pose; -- our pose
       Poses      : Id_Pose_Maps.Map; -- all poses
       Links      : Ctree.Id_Q_Maps.Map;
+      Noise_Amp  : Signal_Q := Signal_Q (Def_Random_Noise_Amplitude);
+      Biases     : Id_Id_Bias_Maps.Map;
+      Bias_Delta : Signal_Q := Signal_Q
+        ((Def_Bias_Amplitude * 2.0) /
+           Float (Def_Bias_Period) *
+           Float (Def_Period));
+      --  Max units per period that bias can change
 
       Period     : Agpl.Tasking.Period.Object :=
                      Agpl.Tasking.Period.Create (Def_Period);
@@ -100,4 +125,4 @@ private
    not overriding
    procedure Output_Full_Links (This : in out Object);
 
-end Sancta.Ctree.Component.Ctree_Signal_Distance;
+end Sancta.Ctree.Component.Signal_Distance;

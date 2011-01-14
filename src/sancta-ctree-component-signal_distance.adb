@@ -1,3 +1,4 @@
+with Agpl.Random;
 with Sancta.Ctree.NCTypes;
 with Sancta.Ctree.Single_Distributed;
 with Sancta.Component.Ctypes;
@@ -6,9 +7,12 @@ with Sancta.Component.Helper;
 with Sancta.Component.Network;
 with Sancta.Types.Operations;
 
-package body Sancta.Ctree.Component.Ctree_Signal_Distance is
+package body Sancta.Ctree.Component.Signal_Distance is
 
    type Object_Access is access all Object;
+
+   procedure Noisify (Links : Nctypes.Full_Links);
+   procedure Noisify (Links : Ctree.Id_Q_Maps.Map);
 
    --------------
    -- Register --
@@ -78,6 +82,15 @@ package body Sancta.Ctree.Component.Ctree_Signal_Distance is
       This.Id        := Env.Id;
       This.Drop_Dist := Types.Real'Value (This.Option (Opt_Drop_Dist));
 
+      This.Noise_Amp := Signal_Q'Value
+        (This.Option (Opt_Random_Noise_Amplitude, Def_Random_Noise_Amplitude'Img));
+
+      This.Bias_Delta := Signal_Q
+        (Float'Value (This.Option (Opt_Bias_Amplitude, Def_Bias_Amplitude'Img)) *
+           2.0 /
+             Float'Value (This.Option (Opt_Bias_Period, Def_Bias_Period'Img)) *
+           Float (This.Period.Get_Period));
+
       return Sancta.Component.Object_Access (This);
    end Create;
 
@@ -91,6 +104,7 @@ package body Sancta.Ctree.Component.Ctree_Signal_Distance is
    is
    begin
       This.Listener.Run;
+      Noisify (This.Links);
       This.Output (Provides_Signal,
                    Nctypes.Signal'(Links => This.Links));
 
@@ -152,7 +166,8 @@ package body Sancta.Ctree.Component.Ctree_Signal_Distance is
       end Outer_Loop;
    begin
       This.Poses.Iterate (Outer_Loop'Access);
+      Noisify (Full_Links);
       This.Output (Provides_Full_Signal, Full_Links);
    end Output_Full_Links;
 
-end Sancta.Ctree.Component.Ctree_Signal_Distance;
+end Sancta.Ctree.Component.Signal_Distance;

@@ -8,7 +8,7 @@ private with Sancta.Netlistener;
 private with Sancta.Network.Layer;
 private with Sancta.Types;
 
-package Sancta.Ctree.Component.Ctree_Signal_Tunnel is
+package Sancta.Ctree.Component.Signal_Tunnel is
 
    pragma Elaborate_Body;
    --  Need to build the Q table
@@ -28369,4 +28369,4 @@ private
                    (28281, 333.298180, 36.0)
                   );
 
-end Sancta.Ctree.Component.Ctree_Signal_Tunnel;
+end Sancta.Ctree.Component.Signal_Tunnel;

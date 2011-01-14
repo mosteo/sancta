@@ -6,7 +6,7 @@ private with Agpl.Tasking.Period;
 private with Sancta.Ctree;
 private with Sancta.Component.Environment;
 
-package Sancta.Ctree.Component.Ctree_Signal_Olsr is
+package Sancta.Ctree.Component.Signal_Olsr is
 
    Log_Section : constant String := "Sancta.Ctree.Component.ctree_signal_olsr";
    Det_Section : constant String := Log_Section & ".detail";
@@ -65,4 +65,4 @@ private
                        Other_Id :        Node_Id;
                        Other_Q  :        Signal_Q);
 
-end Sancta.Ctree.Component.Ctree_Signal_Olsr;
+end Sancta.Ctree.Component.Signal_Olsr;

@@ -9,7 +9,7 @@ with Gnat.Sockets;
 with Sancta.Ctree.Nctypes;
 with Sancta.Component.Factory;
 
-package body Sancta.Ctree.Component.Ctree_Signal_Olsr is
+package body Sancta.Ctree.Component.Signal_Olsr is
 
    type Object_Access is access all Object;
 
@@ -202,4 +202,4 @@ package body Sancta.Ctree.Component.Ctree_Signal_Olsr is
       This.Links.Include (Other_Id, Other_Q);
    end Add_Link;
 
-end Sancta.Ctree.Component.Ctree_Signal_Olsr;
+end Sancta.Ctree.Component.Signal_Olsr;

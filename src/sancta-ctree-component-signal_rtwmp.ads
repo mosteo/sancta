@@ -7,7 +7,7 @@ private with Agpl.Tasking.Period;
 private with Agpl.Trace.File;
 private with Sancta.Component.Environment;
 
-package Sancta.Ctree.Component.Ctree_Signal_Rtwmp is
+package Sancta.Ctree.Component.Signal_Rtwmp is
 
    Log_Section : constant String := "Sancta.Ctree.Component.ctree_signal_rtwmp";
    Det_Section : constant String := Log_Section & ".detail";
@@ -69,4 +69,4 @@ private
    procedure Run (This : in out Object;
                   Next :    out Ada.Calendar.Time);
 
-end Sancta.Ctree.Component.Ctree_Signal_Rtwmp;
+end Sancta.Ctree.Component.Signal_Rtwmp;

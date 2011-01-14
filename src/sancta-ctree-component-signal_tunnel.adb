@@ -9,7 +9,7 @@ with Sancta.Component.Helper;
 with Sancta.Component.Network;
 with Sancta.Types.Operations;
 
-package body Sancta.Ctree.Component.Ctree_Signal_Tunnel is
+package body Sancta.Ctree.Component.Signal_Tunnel is
 
    package Qmaps is new Ada.Containers.Ordered_Maps
      (Float, Signal_Q);
@@ -190,4 +190,4 @@ begin
 --        Put_Line (To_String (Float (I) / 100.0, 3) & " " &
 --                  To_String (Float (Q (Float (I) / 100.0)), 3));
 --     end loop;
-end Sancta.Ctree.Component.Ctree_Signal_Tunnel;
+end Sancta.Ctree.Component.Signal_Tunnel;
