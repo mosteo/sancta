@@ -59,4 +59,35 @@ package body Sancta is
       return To_Bounded_String ("all nodes");
    end All_Nodes;
 
+   -----------
+   -- Value --
+   -----------
+
+   function Value (Id_1, Id_2 : String) return Unordered_Node_Pair is
+   begin
+      if Id_1 < Id_2 then
+         return (Value (Id_1), Value (Id_2));
+      else
+         return (Value (Id_2), Value (Id_1));
+      end if;
+   end Value;
+
+   -----------
+   -- Value --
+   -----------
+
+   function Value (Id_1, Id_2 : Node_Id) return Unordered_Node_Pair is
+   begin
+      return Value (Image (Id_1), Image (Id_2));
+   end Value;
+
+   ---------
+   -- "<" --
+   ---------
+
+   function "<" (L, R : Unordered_Node_Pair) return Boolean is
+   begin
+      return L.L < R.L or else (L.L = R.L and then L.R < R.R);
+   end "<";
+
 end Sancta;

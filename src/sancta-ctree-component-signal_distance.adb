@@ -5,14 +5,83 @@ with Sancta.Component.Ctypes;
 with Sancta.Component.Factory;
 with Sancta.Component.Helper;
 with Sancta.Component.Network;
+with Sancta.Network.Qualities;
 with Sancta.Types.Operations;
 
 package body Sancta.Ctree.Component.Signal_Distance is
 
+   package SNC renames Sancta.Network.Qualities;
+
    type Object_Access is access all Object;
 
-   procedure Noisify (Links : Nctypes.Full_Links);
-   procedure Noisify (Links : Ctree.Id_Q_Maps.Map);
+   procedure Update_Biases (This : in out Object) is
+      procedure Update (I : Bias_Maps.Cursor) is
+         Bias : Float := Float (Bias_Maps.Element (I));
+      begin
+         Bias := Bias + Agpl.Random.Get_Float (-This.Bias_Delta, This.Bias_Delta);
+         Bias := Float'Max (Bias, -This.Bias_Amp);
+         Bias := Float'Min (Bias, This.Bias_Amp);
+         This.Biases.Include (Bias_Maps.Key (I), Bias);
+      end Update;
+   begin
+      This.Biases.Iterate (Update'Access);
+   end Update_Biases;
+
+   -------------
+   -- Noisify --
+   -------------
+
+   function Noisify (This : Object; L, R : Node_Id; S : Signal_Q) return Signal_Q
+   is
+      Q : Float := Float (S) + This.Biases.Element (Value (L, R));
+   begin
+      Q := Float'Max (0.0, Q);
+      Q := Float'Min (Float (Signal_Q'Last), Q);
+      return Signal_Q (Q);
+   end Noisify;
+
+   function Noisify (This : Object; Links : Nctypes.Full_Signal)
+                     return Nctypes.Full_Signal
+   is
+      Result : Nctypes.Full_Signal := Links;
+      Nodes  : constant SNC.Node_Vector := Links.Links.Nodes;
+   begin
+      for I in Nodes.First_Index .. Nodes.Last_Index loop
+         for J in Nodes.First_Index .. Nodes.Last_Index loop
+            if I < J or else
+              (Links.Links.Directed_Source and Links.Links.Directed_Query)
+            then
+               declare
+                  L : constant Node_Id := Value (Nodes.Element (I));
+                  R : constant Node_Id := Value (Nodes.Element (J));
+               begin
+                  Result.Links.Set
+                    (L, R, Noisify (This, L, R, Links.Links.Get (L, R)));
+               end;
+            end if;
+         end loop;
+      end loop;
+
+      return Result;
+   end Noisify;
+
+
+   function Noisify (This  : Object;
+                     Links : Ctree.Id_Q_Maps.Map) return Ctree.Id_Q_Maps.Map is
+      Result : Ctree.Id_Q_Maps.Map;
+
+      procedure Inner (I : Ctree.Id_Q_Maps.Cursor) is
+         Other : constant Node_Id := Ctree.Id_Q_Maps.Key (I);
+      begin
+         Result.Insert
+           (Other,
+            Noisify (This, This.Id, Other, Ctree.Id_Q_Maps.Element (I)));
+      end Inner;
+
+   begin
+      Links.Iterate (Inner'Access);
+      return Result;
+   end Noisify;
 
    --------------
    -- Register --
@@ -82,14 +151,16 @@ package body Sancta.Ctree.Component.Signal_Distance is
       This.Id        := Env.Id;
       This.Drop_Dist := Types.Real'Value (This.Option (Opt_Drop_Dist));
 
-      This.Noise_Amp := Signal_Q'Value
+      This.Noise_Amp := Float'Value
         (This.Option (Opt_Random_Noise_Amplitude, Def_Random_Noise_Amplitude'Img));
 
-      This.Bias_Delta := Signal_Q
-        (Float'Value (This.Option (Opt_Bias_Amplitude, Def_Bias_Amplitude'Img)) *
-           2.0 /
+      This.Bias_Amp := Float'Value
+        (This.Option (Opt_Bias_Amplitude, Def_Bias_Amplitude'Img));
+
+      This.Bias_Delta := Float'Value
+        (This.Option (Opt_Bias_Amplitude, Def_Bias_Amplitude'Img)) * 2.0 /
              Float'Value (This.Option (Opt_Bias_Period, Def_Bias_Period'Img)) *
-           Float (This.Period.Get_Period));
+           Float (This.Period.Get_Period);
 
       return Sancta.Component.Object_Access (This);
    end Create;
@@ -104,9 +175,11 @@ package body Sancta.Ctree.Component.Signal_Distance is
    is
    begin
       This.Listener.Run;
-      Noisify (This.Links);
+
+      Update_Biases (This);
+
       This.Output (Provides_Signal,
-                   Nctypes.Signal'(Links => This.Links));
+                   Nctypes.Signal'(Links => Noisify (This, This.Links)));
 
       This.Output_Full_Links;
 
@@ -166,8 +239,7 @@ package body Sancta.Ctree.Component.Signal_Distance is
       end Outer_Loop;
    begin
       This.Poses.Iterate (Outer_Loop'Access);
-      Noisify (Full_Links);
-      This.Output (Provides_Full_Signal, Full_Links);
+      This.Output (Provides_Full_Signal, Noisify (This, Full_Links));
    end Output_Full_Links;
 
 end Sancta.Ctree.Component.Signal_Distance;

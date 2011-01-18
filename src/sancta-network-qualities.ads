@@ -27,7 +27,8 @@ package Sancta.Network.Qualities is
    --  If directed source, only half-duplex info is stored.
    --  Otherwise, both directions are filled-in.
 
-   subtype Node_Vector is Agpl.Containers.String_Vectors.Vector;
+   package Node_Vectors renames Agpl.Containers.String_Vectors;
+   subtype Node_Vector is Node_Vectors.Vector;
 
    function Nodes (This : Map'Class) return Node_Vector;
 

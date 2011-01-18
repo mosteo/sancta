@@ -39,10 +39,19 @@ package Sancta is
    function No_Node return Node_Id;   pragma Inline (No_Node);
    function All_Nodes return Node_Id; pragma Inline (All_Nodes);
 
+   type Unordered_Node_Pair is private;
+   function Value (Id_1, Id_2 : String) return Unordered_Node_Pair;
+   function Value (Id_1, Id_2 : Node_Id) return Unordered_Node_Pair;
+   function "<" (L, R : Unordered_Node_Pair) return Boolean;
+
 private
 
    package Ids is new Ada.Strings.Bounded.Generic_Bounded_Length (20);
 
    type Node_Id is new Ids.Bounded_String;
+
+   type Unordered_Node_Pair is record
+      L, R : Node_Id;
+   end record;
 
 end Sancta;

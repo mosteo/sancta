@@ -67,8 +67,8 @@ private
    package Id_Pose_Maps is new Ada.Containers.Ordered_Maps
      (Node_Id, Types.Pose, "<", Sancta.Types."=");
 
-   package Id_Id_Bias_Maps is new Ada.Containers.Ordered_Maps
-     (Node_Id, Signal_Q);
+   package Bias_Maps is new Ada.Containers.Ordered_Maps
+     (Unordered_Node_Pair, Float);
 
    type Object;
 
@@ -97,12 +97,12 @@ private
       Pose       : Types.Pose; -- our pose
       Poses      : Id_Pose_Maps.Map; -- all poses
       Links      : Ctree.Id_Q_Maps.Map;
-      Noise_Amp  : Signal_Q := Signal_Q (Def_Random_Noise_Amplitude);
-      Biases     : Id_Id_Bias_Maps.Map;
-      Bias_Delta : Signal_Q := Signal_Q
-        ((Def_Bias_Amplitude * 2.0) /
-           Float (Def_Bias_Period) *
-           Float (Def_Period));
+      Noise_Amp  : Float := Def_Random_Noise_Amplitude;
+      Biases     : Bias_Maps.Map;
+      Bias_Amp   : Float := Def_Bias_Amplitude;
+      Bias_Delta : Float :=
+                     (Def_Bias_Amplitude * 2.0 / Float (Def_Bias_Period) *
+                        Float (Def_Period));
       --  Max units per period that bias can change
 
       Period     : Agpl.Tasking.Period.Object :=
