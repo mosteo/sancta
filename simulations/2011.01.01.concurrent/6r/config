@@ -16,7 +16,7 @@ params+=",$pcommon --playerport 7775" 	# FIO
 params+=",$pcommon --playerport 7780" 	# ZAK
 
 master=.
-remotes="ct.ari ct.ben ct.ced ct.dan ct.epi ct.fio ct.zak"
+remotes="ct/ari ct/ben ct/ced ct/dan ct/epi ct/fio ct/zak"
 
 exes="node_gtk node_gtk node_gtk node_gtk node_gtk node_gtk node_gtk"
 modes="x x x x x x x"

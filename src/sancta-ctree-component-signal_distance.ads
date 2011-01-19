@@ -70,7 +70,7 @@ private
    package Bias_Maps is new Ada.Containers.Ordered_Maps
      (Unordered_Node_Pair, Float);
 
-   type Object;
+   type Object is tagged;
 
    --  There's a mix of the old way, which used links from ourselves to all others,
    --  and the new way that simply stores all heard poses, and uses them to
@@ -88,7 +88,8 @@ private
    type Object (Name   : access constant String;
                 Config :                 Comp_Config;
                 Link   : access Network.Layer.Object'Class)
-   is new Root.Object (Name, Config) with record
+     is new Root.Object (Name, Config) with record
+      Self       : access Object := Object'Unchecked_Access;
       Listener   : Listener_Type (Link, Object'Access);
       Id         : Node_Id; -- ourselves
       Drop_Dist  : Types.Real;

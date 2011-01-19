@@ -71,7 +71,11 @@ package body Sancta.Ctree.Single_Distributed is
       This.Base_Id := Base;
       This.Base_Pose := Base_Pose;
 
-      This.Logger.Set_File (Name => "ctree." & Image (This.Link.Id) &
+      This.Logger_Ctree.Set_File (Name => "ctree." & Image (This.Link.Id) &
+                            Datestamp (Separator => '.') & "." &
+                                  Timestamp & ".log");
+
+      This.Logger_Signal.Set_File (Name => "signal." & Image (This.Link.Id) &
                             Datestamp (Separator => '.') & "." &
                             Timestamp & ".log");
    end Create;
@@ -103,7 +107,7 @@ package body Sancta.Ctree.Single_Distributed is
    is
    begin
       This.Run; -- Netlistener things
-      This.Data_Log;
+      This.Log_Data;
 
       if This.Update_Timer.Elapsed >= This.Config.Update_Period then
          This.Update_Timer.Reset;
@@ -1694,7 +1698,7 @@ package body Sancta.Ctree.Single_Distributed is
    -- Data_Log --
    --------------
 
-   procedure Data_Log (This : in out Object) is
+   procedure Log_Data (This : in out Object) is
       Link : Sancta.Network.Layer.Root.Object'Class renames
         Sancta.Network.Layer.Root.Object'Class (This.Link.all);
 
@@ -1712,9 +1716,9 @@ package body Sancta.Ctree.Single_Distributed is
 
       This.Stats.Update (This.To_Assignment, This.Dummy_Links, This.Jobs);
 
-      if This.First_Log then
-         This.First_Log := False;
-         This.Logger.Log
+      if This.First_Log_Data then
+         This.First_Log_Data := False;
+         This.Logger_Ctree.Log
            ("#DATA# Epoch Elapsed Stat Xi Yi Ai Dij Di0 RawQ AvgQ MedQ Q UT " &
             "BWin BWout BWsum " &
             "1-hop-PacketIn 1-hop-PacketLost 1-hop-%Lost " &
@@ -1735,7 +1739,7 @@ package body Sancta.Ctree.Single_Distributed is
          else
             Base := This.Base_Pose;
          end if;
-         This.Logger.Log
+         This.Logger_Ctree.Log
            ("#DATA# " &
             S (Float (Agpl.Chronos.Epoch.Elapsed)) & " " &
             S (Float (This.Log_Time + This.Log_Delta.Elapsed)) & " " &
@@ -1771,7 +1775,7 @@ package body Sancta.Ctree.Single_Distributed is
                Float'Max (1.0, Float (This.Jobs_Done.Length))),
             Always, Log_Section);
       end;
-   end Data_Log;
+   end Log_Data;
 
    -------------------
    -- To_Assignment --

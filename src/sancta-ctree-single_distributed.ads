@@ -453,7 +453,8 @@ private
       Last_Mission_Update : Msg_Mission_Update;
       Last_Reverse_Status : Msg_Tail_To_Head_Status;
 
-      First_Log           : Boolean := True; -- Only to print #header for logs
+      First_Log_Data      : Boolean := True; -- Only to print #header for logs
+      First_Log_Signal    : Boolean := True; -- As above
       Log_Time            : Duration := 0.0;
       Log_Delta           : Agpl.Chronos.Object;
       --  So all nodes log synced with base time
@@ -469,7 +470,8 @@ private
       --  Just to compatibilize running with other softwares
       --  True when last msg was Go/Park, false otherwise
 
-      Logger : Agpl.Trace.File.Object;
+      Logger_Ctree        : Agpl.Trace.File.Object;
+      Logger_Signal       : Agpl.Trace.File.Object;
    end record;
 
    not overriding
@@ -495,7 +497,10 @@ private
    function One_Liner_Report (This : Object) return String;
 
    not overriding
-   procedure Data_Log (This : in out Object);
+   procedure Log_Data (This : in out Object);
+
+   not overriding
+   procedure Log_Signal (This : in out Object);
 
    not overriding
    procedure Send_Update (This : in out Object);

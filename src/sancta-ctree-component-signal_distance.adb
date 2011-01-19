@@ -33,11 +33,21 @@ package body Sancta.Ctree.Component.Signal_Distance is
 
    function Noisify (This : Object; L, R : Node_Id; S : Signal_Q) return Signal_Q
    is
-      Q : Float := Float (S) + This.Biases.Element (Value (L, R));
    begin
-      Q := Float'Max (0.0, Q);
-      Q := Float'Min (Float (Signal_Q'Last), Q);
-      return Signal_Q (Q);
+      if not This.Biases.Contains (Value (L, R)) then
+         This.Self.Biases.Insert (Value (L, R), 0.0);
+      end if;
+
+      declare
+         Q : Float :=
+               Float (S) +
+               This.Biases.Element (Value (L, R)) +
+               Agpl.Random.Get_Float (-This.Noise_Amp, This.Noise_Amp);
+      begin
+         Q := Float'Max (0.0, Q);
+         Q := Float'Min (Float (Signal_Q'Last), Q);
+         return Signal_Q (Q);
+      end;
    end Noisify;
 
    function Noisify (This : Object; Links : Nctypes.Full_Signal)
