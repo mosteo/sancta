@@ -28,13 +28,27 @@ package Sancta.Ctree.Team_Tree is
    --  Itself for root.
 
    not overriding
+   function Parent (This : Object;
+                    Bot  : Node_Id) return Node_Id;
+   --  Itself for root/base
+
+   not overriding
    function Children (This : Object;
                       Bot  : String) return Ac.Lists.List;
+
+   not overriding
+   function Children (This : Object;
+                      Bot  : Node_Id) return Id_Vectors.Vector;
 
    not overriding
    procedure Set_Parent (This   : in out Object;
                          Child  :        String;
                          Parent :        String);
+
+   not overriding
+   procedure Set_Parent (This   : in out Object;
+                         Child  :        Node_Id;
+                         Parent :        Node_Id);
 
 private
 
