@@ -5,7 +5,7 @@ with Sancta.Ctree.Component.Ctree_Draw,
 --       Sancta.Ctree.Component.Signal_Rtwmp,
      Sancta.Ctree.Component.Signal_Tunnel,
      Sancta.Ctree.Component.Ctree_Single,
-     Sancta.Ctree.Component.Single_Distributed,
+     Sancta.Ctree.Component.Distributed,
      Sancta.Ctree.Component.Ctree_Tasks_Order,
      Sancta.Ctree.Component.Distance_Links,
      Sancta.Ctree.Component.Hack,
@@ -33,7 +33,7 @@ package body Sancta.Ctree.Components is
 --        Comp.Signal_Rtwmp.Register;
       Comp.Signal_Tunnel.Register;
       Comp.Ctree_Single.Register;
-      Comp.Single_Distributed.Register;
+      Comp.Distributed.Register;
       Comp.Ctree_Tasks_Order.Register;
       Comp.Distance_Links.Register;
       Comp.Hack.Register;

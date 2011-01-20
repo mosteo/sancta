@@ -20,10 +20,12 @@ private with Agpl.Chronos;
 private with Agpl.Generic_Handle;
 private with Agpl.Ustrings;
 
-package Sancta.Ctree.Single_Distributed is
+package Sancta.Ctree.Distributed is
 
-   Log_Section : constant String := "Sancta.Ctree.single_distributed";
-   Det_Section : constant String := "Sancta.Ctree.single_distributed.detail";
+   --  The ultimate CTREE implementation
+
+   Log_Section : constant String := "sancta.ctree.distributed";
+   Det_Section : constant String := "sancta.ctree.distributed.detail";
 
    package R renames Agpl.Reflection;
 
@@ -40,9 +42,8 @@ package Sancta.Ctree.Single_Distributed is
    Ctree_Status_Draw_Links : R.Booleans.Object := R.Booleans.value
      ("ctree_status_draw_links", True);
 
-   type Quality_Functions is (Raw, Average, Median);
-
    type Mobile_Link_Policies is (Ordered, Grouped);
+   pragma Unimplemented;
    --  When Ordered, each robot monitors only its sucessors.
    --  When Grouped, as long as any of the mobiles has link to the relays, all move.
    --     This is designed with fading in mind. The expected outcome is that, at
@@ -65,8 +66,6 @@ package Sancta.Ctree.Single_Distributed is
       Signal_Threshold : Signal_Q := 50.0;
       --  Stopping signal quality in the 0..100 range.
 
-      Quality_Function : Quality_Functions := Median;
-
       Fixed_Relay_Period    : Duration := 5.0;
       --  Once this time elapses in relay state, we can't leave it even if
       --  signal improves...
@@ -80,6 +79,7 @@ package Sancta.Ctree.Single_Distributed is
       --  Distance around parking point considered parking.
 
       Use_All_Relays        : Boolean := True;
+      pragma Unimplemented;
       --  When false, only the last relay is monitored.
       --  When true, if any relay provides signal, robots move on.
 
@@ -95,6 +95,7 @@ package Sancta.Ctree.Single_Distributed is
    --  Relays are stationed because of signal
    --  Waiting are stationed because of distance margings
    --  Free are free to move
+   --  This is in regard to current task, not about going up/down in tree
 
    Moving_States : constant array (States) of Boolean :=
                      (Pending_Free | Done_Free => True, others => False);
@@ -110,12 +111,12 @@ package Sancta.Ctree.Single_Distributed is
 
    type Object is new Sancta.Netlistener.Object with private;
 
-   procedure Create (This    : in out Object;
-                     Config  : Config_Type;
-                     Base    : Sancta.Node_Id;
+   procedure Create (This      : in out Object;
+                     Config    : Config_Type;
+                     Base      : Sancta.Node_Id;
                      Base_Pose : Sancta.Types.Pose;
-                     Map     : Sancta.Map.Smart.Object;
-                     Channel : Sancta.Network.Channel);
+                     Map       : Sancta.Map.Smart.Object;
+                     Channel   : Sancta.Network.Channel);
 
    not overriding
    function Get_Config (This : Object) return Config_Type;
@@ -138,8 +139,7 @@ package Sancta.Ctree.Single_Distributed is
 
    not overriding
    procedure Set_Qualities (This : in out Object;
-                            Q    :        Id_Q_Maps.Map;
-                            Func :        Quality_Functions);
+                            Q    :        Id_Q_Maps.Map);
    --  Provide quality, with a particular smoothing function applied
 
    not overriding
@@ -224,9 +224,6 @@ package Sancta.Ctree.Single_Distributed is
    procedure Process (Msg  : Msg_Robot_Global_Update;
                       From : Sancta.Network.Message_Metadata;
                       This : in out Object'Class);
-
-   type Quality_Arrays is array (Quality_Functions) of Signal_Q;
-   type Quality_Row_Arrays is array (Quality_Functions) of Id_Q_Maps.Map;
 
    type Operator_Actions is (Go, Stop, Park, Cancel);
 
@@ -373,7 +370,6 @@ private
    type Neighbor_Context (Parent : access Object) is tagged record
       Id     : Sancta.Node_Id := No_Node;
       Dist   : Types.Real     := 9999.0;
-      Qs     : Quality_Arrays := (others => Signal_Q'First);
       Q      : Signal_Q       := Signal_Q'First;
       Pose   : Types.Pose     := Types.Origin;
       Status : States         := Pending_Free;
@@ -429,7 +425,7 @@ private
       Succ           : Neighbor_Context (Object'Access);
       --  Sucessor robot (to tail)
 
-      Qs             : Quality_Row_Arrays;
+      Qs             : Id_Q_Maps.Map;
       --  Qualities as seen from this robot.
 
       Operator_Msg   : Op_Msg_Handle.Object :=
@@ -583,8 +579,8 @@ private
       Role      : Roles;
       Pose      : Types.Pose;
       Status    : States;
-      Succ_Q    : Sancta.Network.Qualities.Quality; -- To predecessor
-      Threshold : Sancta.Network.Qualities.Quality;
+      Succ_Q    : Signal_Q; -- To predecessor
+      Threshold : Signal_Q;
       Report    : Agpl.Ustrings.Ustring;
    end record;
    pragma Pack (Node_Status); -- Minimize BW? Bah...
@@ -592,4 +588,4 @@ private
    overriding
    procedure Draw (This : Node_Status; Into : in out Agpl.Drawing.Drawer'Class);
 
-end Sancta.Ctree.Single_Distributed;
+end Sancta.Ctree.Distributed;

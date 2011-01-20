@@ -33,13 +33,13 @@
    <global name="ctree_status_draw_tree"      value="true" />
 
    <group id="log">
-      <log section="nerus.ctree.tree_navigator.bitmap_ordered" level="debug" />
-      <log section="nerus.ctree.utils"                         level="informative" />
-      <log section="nerus.ctree.single_distributed"            level="informative" />
-      <log section="nerus.ctree.single_distributed.detail"     level="warning" />
-      <log section="nerus.comp.tree_ordered"                   level="informative" />
+      <log section="sancta.ctree.tree_navigator.bitmap_ordered" level="debug" />
+      <log section="sancta.ctree.utils"                         level="informative" />
+      <log section="sancta.ctree.distributed"                   level="debug" />
+      <log section="sancta.ctree.distributed.detail"            level="debug" />
+      <log section="sancta.comp.tree_ordered"                   level="informative" />
       <log section="sancta.component.player_client"            level="informative" />
-      <log section="sancta.component.root"                     level="warning" />
+      <log section="sancta.component.root"                     level="debug" />
       <log section="sancta.config"                             level="informative" />
       <log section="sancta.events"                             level="informative" />
       <log section="sancta.map.qtree"                          level="debug" />
@@ -77,15 +77,7 @@
          <requires data="base_pose" as="base_pose"  />
          <requires data="link"      as="link"       />
          <provides data="signal"    as="raw_signal" />
-         <provides data="full_signal" as="raw_full_signal" />
-      </component>
-      <component name="copy" >
-          <requires data="x" as="raw_signal"/>
-          <provides data="y" as="avg_signal"/>
-      </component>
-      <component name="copy" >
-          <requires data="x" as="raw_signal"/>
-          <provides data="y" as="med_signal"/>
+         <provides data="full_signal" as="raw_full_signal" /> <!-- Necessary by the base for showing... this should be eventually removed -->
       </component>
    </group>
 
@@ -190,7 +182,7 @@
          <provides data="z" as="current_tasks"/>
       </component>
 
-      <component name="ctree_single_distributed" 
+      <component name="ctree_distributed" 
               base_id="$gui_node" 
             base_pose="$base_pose"
                  pred="$pred" 
@@ -200,7 +192,6 @@
              loc_dist="$ctree_loc_dist"
           target_dist="$ctree_target_dist"
      signal_threshold="$ctree_threshold"
-      signal_function="average"
               rot_vel="1.0"
                period="$ctree_period"
               channel="ctree" 
@@ -209,10 +200,6 @@
          <requires data="pose"          as="global_pose"   />
 
          <requires data="raw_signal"    as="raw_signal"    />
-         <requires data="avg_signal"    as="avg_signal"    />
-         <requires data="med_signal"    as="med_signal"    />
-
-         <requires data="raw_full_signal" as="raw_full_signal"    />
 
          <requires data="tasks"         as="current_tasks" />
          <requires data="map"           as="map"           />

@@ -239,6 +239,10 @@ package body Sancta.Component.Root is
       pragma Assert (This.Parent.Prepared);
       Sem : access Agpl.Monitor.Counting_Semaphore;
    begin
+      Log ("TRG: " & This.Parent.Name.all & ": " &
+           "(Ungiven) --> " & String (Key),
+           Debug, Log_Section);
+
       if Object'Class (This.Parent.all).Requires_Mutex then
          Sem := This.Parent.Mutex'Access;
       end if;
@@ -285,6 +289,9 @@ package body Sancta.Component.Root is
                    Key  : Internal_Key) return Data'Class
    is
    begin
+      Log ("IN : " & This.Name.all & ": " &
+           String (Key) & " <-- " & String (This.Ekey (Key)),
+           Debug, Log_Section);
       return Datastore.Object (This.Env.Id).Get (String (This.Ekey (Key)));
    end Input;
 
@@ -313,6 +320,9 @@ package body Sancta.Component.Root is
    function Input (This : Object;
                    Key  : External_Key) return Data'Class is
    begin
+      Log ("IN : " & This.Name.all & ": " &
+           "(Ungiven) <-- " & String (Key),
+           Debug, Log_Section);
       return Datastore.Object (This.Env.Id).Get (String (Key));
    end Input;
 

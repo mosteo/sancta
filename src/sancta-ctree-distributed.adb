@@ -19,7 +19,7 @@ with Sancta.Tasks.Positioned;
 with Sancta.Tasks.Utils;
 with Sancta.Types.Operations;
 
-package body Sancta.Ctree.Single_Distributed is
+package body Sancta.Ctree.Distributed is
 
    package SN renames Sancta.Network;
 
@@ -57,7 +57,7 @@ package body Sancta.Ctree.Single_Distributed is
       This.Subscribe (Channel);
 
       if This.Link.Id = Base then
-         This.Role := Single_Distributed.Base;
+         This.Role := Distributed.Base;
       else
          This.Role := Relay; -- Will be fixed during setup phase
       end if;
@@ -339,8 +339,7 @@ package body Sancta.Ctree.Single_Distributed is
    -------------------
 
    procedure Set_Qualities (This : in out Object;
-                            Q    :        Id_Q_Maps.Map;
-                            Func :        Quality_Functions)
+                            Q    :        Id_Q_Maps.Map)
    is
       use Agpl.Conversions;
       use Id_Q_Maps;
@@ -350,30 +349,19 @@ package body Sancta.Ctree.Single_Distributed is
               Debug, Det_Section);
       end Set_Links_Print;
    begin
-      This.Qs (Func) := Q; -- Store full quality row
-
-      if Func = Raw then -- and log it
-         This.Log_Signal;
-      end if;
+      This.Qs := Q; -- Store full quality row
+      This.Log_Signal;
 
       if Q.Contains (This.Pred.Id) then
-         This.Pred.Qs (Func) := Q.Element (This.Pred.Id);
-         if This.Config.Quality_Function = Func then
-            This.Pred.Q := This.Pred.Qs (Func);
-            Log ("Setting Pred.Q to " & This.Pred.Q'Img & " " & Func'Img,
-                 Debug, Log_Section);
-         end if;
+         This.Pred.Q := Q.Element (This.Pred.Id);
+         Log ("Setting Pred.Q to " & This.Pred.Q'Img, Debug, Log_Section);
       end if;
       if Q.Contains (This.Succ.Id) then
-         This.Succ.Qs (Func) := Q.Element (This.Succ.Id);
-         if This.Config.Quality_Function = Func then
-            This.Succ.Q := This.Succ.Qs (Func);
-            Log ("Setting Succ.Q to " & This.Succ.Q'Img & " " & Func'Img,
-                 Debug, Log_Section);
-         end if;
+         This.Succ.Q := Q.Element (This.Succ.Id);
+            Log ("Setting Succ.Q to " & This.Succ.Q'Img, Debug, Log_Section);
       end if;
 
-      Log (Func'Img & " Qs: " & Q.Length'Img, Debug, Det_Section);
+      Log ("Qs: " & Q.Length'Img, Debug, Det_Section);
       Q.Iterate (Set_Links_Print'Access);
    end Set_Qualities;
 
@@ -1723,7 +1711,7 @@ package body Sancta.Ctree.Single_Distributed is
       if This.First_Log_Data then
          This.First_Log_Data := False;
          This.Logger_Ctree.Log
-           ("#DATA# Epoch Elapsed Stat Xi Yi Ai Dij Di0 RawQ AvgQ MedQ Q UT " &
+           ("#DATA# Epoch Elapsed Stat Xi Yi Ai Dij Di0 Q UT " &
             "BWin BWout BWsum " &
             "1-hop-PacketIn 1-hop-PacketLost 1-hop-%Lost " &
             "N-hop-PacketIn N-hop-PacketLost N-hop-%Lost " &
@@ -1738,7 +1726,7 @@ package body Sancta.Ctree.Single_Distributed is
          Bwou : constant Float := Link.Avg_Bw_Out;
          Base : Types.Pose;
       begin
-         if This.Role = Single_Distributed.Base then
+         if This.Role = Distributed.Base then
             Base := This.Pose;
          else
             Base := This.Base_Pose;
@@ -1753,9 +1741,6 @@ package body Sancta.Ctree.Single_Distributed is
             S (This.Pose.A)                        & " " &
             S (This.Succ.Dist)                     & " " &
             S (Distance (This.Pose, Base))         & " " &
-            S (This.Succ.Qs (Raw))                 & " " &
-            S (This.Succ.Qs (Average))             & " " &
-            S (This.Succ.Qs (Median))              & " " &
             S (This.Succ.Q)                        & " " &
             S (This.Config.Signal_Threshold)       & " " &
             S (Bwin)                     & " " &
@@ -1824,10 +1809,10 @@ package body Sancta.Ctree.Single_Distributed is
                   " " & S (This.Pose.Y));
 
       for I in This.Setup_Last.First_Index .. This.Setup_Last.Last_Index loop
-         if This.Qs (Raw).Contains (This.Setup_Last.Element (I)) then
+         if This.Qs.Contains (This.Setup_Last.Element (I)) then
             ASU.Append
               (Line,
-               " " & S (This.Qs (Raw).Element (This.Setup_Last.Element (I))));
+               " " & S (This.Qs.Element (This.Setup_Last.Element (I))));
          else
             ASU.Append (Line, " 0.0");
          end if;
@@ -1919,4 +1904,4 @@ package body Sancta.Ctree.Single_Distributed is
       return This.Map.Ref.Nearest_Location (This.Succ.Pose);
    end Succ_Loc;
 
-end Sancta.Ctree.Single_Distributed;
+end Sancta.Ctree.Distributed;

@@ -7,7 +7,7 @@ with Sancta.Component.Network;
 with Sancta.Convert;
 with Sancta.Network;
 
-package body Sancta.Ctree.Component.Single_Distributed is
+package body Sancta.Ctree.Component.Distributed is
 
    type Object_Access is access all Object;
 
@@ -30,7 +30,7 @@ package body Sancta.Ctree.Component.Single_Distributed is
       return Sancta.Component.Object_Access
    is
       pragma Unreferenced (Env);
-      use Ctree.Single_Distributed;
+      use Ctree.Distributed;
       This : constant Object_Access := new Object (Name'Access, Config);
       Conf :          Config_Type;
    begin
@@ -38,18 +38,13 @@ package body Sancta.Ctree.Component.Single_Distributed is
          This.Period.Set_Period (Duration'Value (This.Option (Opt_Period)));
       end if;
 
-      This.Mover := new Ctree.Single_Distributed.Object
+      This.Mover := new Ctree.Distributed.Object
         (Link => Sancta.Component.Network.Network (This.Input (Requires_Link)).Link);
 
       if This.Exists (Opt_Rot_Vel) then
          Conf.Rot_Vel := Types.Angle'Value (This.Option (Opt_Rot_Vel));
       else
          Conf.Rot_Vel := Def_Rot_Vel;
-      end if;
-
-      if This.Exists (Opt_Signal_Function) then
-         Conf.Quality_Function :=
-           Quality_Functions'Value (This.Option (Opt_Signal_Function));
       end if;
 
       Conf.Here_Dist_Threshold := Types.Real'Value (This.Option (Opt_Here));
@@ -80,7 +75,7 @@ package body Sancta.Ctree.Component.Single_Distributed is
      (This : in out Object;
       Next :    out Ada.Calendar.Time)
    is
-      use Ctree.Single_Distributed;
+      use Ctree.Distributed;
    begin
       --  INPUTS
       if This.Exists (Requires_Pose) then
@@ -89,15 +84,7 @@ package body Sancta.Ctree.Component.Single_Distributed is
 
       if This.Provided_And_Exists (Requires_Raw_Signal) then
          This.Mover.Set_qualities
-           (Nctypes.Signal (This.Input (Requires_Raw_Signal)).Links, Raw);
-      end if;
-      if This.Provided_And_Exists (Requires_Avg_Signal) then
-         This.Mover.Set_qualities
-           (Nctypes.Signal (This.Input (Requires_Avg_Signal)).Links, Average);
-      end if;
-      if This.Provided_And_Exists (Requires_Med_Signal) then
-         This.Mover.Set_qualities
-           (Nctypes.Signal (This.Input (Requires_Med_Signal)).Links, Median);
+           (Nctypes.Signal (This.Input (Requires_Raw_Signal)).Links);
       end if;
 
       if This.Exists (Requires_Tasks) then
@@ -174,4 +161,4 @@ package body Sancta.Ctree.Component.Single_Distributed is
       end if;
    end Key_Stored;
 
-end Sancta.Ctree.Component.Single_Distributed;
+end Sancta.Ctree.Component.Distributed;

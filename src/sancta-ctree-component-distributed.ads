@@ -1,4 +1,4 @@
-with Sancta.Ctree.Single_Distributed;
+with Sancta.Ctree.Distributed;
 with Sancta.Component.Root; use Sancta.Component;
 with Sancta.Types;
 
@@ -6,18 +6,15 @@ private with Ada.Calendar;
 private with Agpl.Tasking.Period;
 private with Sancta.Component.Environment;
 
-package Sancta.Ctree.Component.Single_Distributed is
+package Sancta.Ctree.Component.Distributed is
 
-   Log_Section : constant String := "Sancta.Component.Ctree_Single_Distributed";
+   Log_Section : constant String := "sancta.ctree.component.distributed";
 
-   Name : aliased constant Component_Name := "ctree_single_distributed";
+   Name : aliased constant Component_Name := "ctree_distributed";
 
    Requires_Link       : constant Internal_Key := "link";
    Requires_Pose       : constant Internal_Key := "pose";
    Requires_Raw_Signal : constant Internal_Key := "raw_signal"; -- nctypes.signal
-   Requires_Avg_Signal : constant Internal_Key := "avg_signal"; -- nctypes.signal
-   Requires_Med_Signal : constant Internal_Key := "med_signal"; -- nctypes.signal
-   Requires_Raw_Full_Signal : constant Internal_Key := "raw_full_signal"; -- nctypes.full_signal
    Requires_Tasks      : constant Internal_Key := "tasks";
    Requires_Map        : constant Internal_Key := "map";
    Requires_Navigator  : constant Internal_Key := "navigator";
@@ -41,9 +38,6 @@ package Sancta.Ctree.Component.Single_Distributed is
    Opt_Near    : constant Option_Attr := "near"; -- min dist among moving bots
 
    Opt_Signal_Threshold : constant Option_Attr := "signal_threshold";
-   Opt_Signal_Function  : constant Option_Attr := "median";
-   Def_Signal_Function  : constant Ctree.Single_Distributed.Quality_Functions :=
-                            Ctree.Single_Distributed.Median;
 
    Opt_Loc_Dist    : constant Option_Attr := "loc_dist";
    Opt_Target_Dist : constant Option_Attr := "target_dist";
@@ -60,11 +54,13 @@ private
 
    use Sancta;
 
+   type Inner_Access is access all Ctree.Distributed.Object;
+
    type Object is new Root.Object with record
       Period : Agpl.Tasking.Period.Object :=
                  Agpl.Tasking.Period.Create (Def_Period);
 
-      Mover  : access Ctree.Single_Distributed.Object;
+      Mover  : Inner_Access;
    end record;
 
    function Create (Config : Comp_Config;
@@ -80,4 +76,4 @@ private
                          Key   : in     Internal_Key;
                          Value : in     Data'Class);
 
-end Sancta.Ctree.Component.Single_Distributed;
+end Sancta.Ctree.Component.Distributed;

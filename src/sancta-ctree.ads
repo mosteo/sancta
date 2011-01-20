@@ -30,6 +30,8 @@ package Sancta.Ctree is
 
    use type Signal_Q;
 
+   type Smoothing_Functions is (Raw, Average, Median);
+
    package Signal_Lists is new Ada.Containers.Doubly_Linked_Lists (Signal_Q);
 
    function To_Signal_Q (F : Float) return Signal_Q;
