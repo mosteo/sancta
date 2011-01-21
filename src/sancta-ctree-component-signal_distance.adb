@@ -1,6 +1,6 @@
 with Agpl.Random;
 with Sancta.Ctree.NCTypes;
-with Sancta.Ctree.Single_Distributed;
+with Sancta.Ctree.Distributed;
 with Sancta.Component.Ctypes;
 with Sancta.Component.Factory;
 with Sancta.Component.Helper;
@@ -112,7 +112,7 @@ package body Sancta.Ctree.Component.Signal_Distance is
       Meta : in     Sancta.Network.Message_Metadata)
    is
       pragma Unreferenced (Meta);
-      use Sancta.Ctree.Single_Distributed;
+      use Sancta.Ctree.Distributed;
    begin
       if M in Msg_Robot_Global_Update then
          declare

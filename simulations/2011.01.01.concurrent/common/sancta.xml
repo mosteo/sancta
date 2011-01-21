@@ -35,14 +35,14 @@
    <group id="log">
       <log section="sancta.ctree.tree_navigator.bitmap_ordered" level="debug" />
       <log section="sancta.ctree.utils"                         level="informative" />
-      <log section="sancta.ctree.distributed"                   level="debug" />
-      <log section="sancta.ctree.distributed.detail"            level="debug" />
+      <log section="sancta.ctree.distributed"                   level="informative" />
+      <log section="sancta.ctree.distributed.detail"            level="informative" />
       <log section="sancta.comp.tree_ordered"                   level="informative" />
-      <log section="sancta.component.player_client"            level="informative" />
-      <log section="sancta.component.root"                     level="debug" />
-      <log section="sancta.config"                             level="informative" />
-      <log section="sancta.events"                             level="informative" />
-      <log section="sancta.map.qtree"                          level="debug" />
+      <log section="sancta.component.player_client"             level="informative" />
+      <log section="sancta.component.root"                      level="informative" />
+      <log section="sancta.config"                              level="informative" />
+      <log section="sancta.events"                              level="informative" />
+      <log section="sancta.map.qtree"                           level="debug" />
    </group>
 
    <!-- NETWORK -->
@@ -93,13 +93,14 @@
      cell_min="1.0"
      cell_max="666.0"
   buggy_stage="false"
-      enabled="true">
+      enabled="true"
+        order="0">
 
          <provides data="map" as="map"/>
       </component>
 
       <!--  Nerus initialization  -->
-      <component name="nerus_hack" enabled="true">
+      <component name="nerus_hack" enabled="true" order="1">
          <requires data="map" as="map"/>
       </component>
       <log>nerus.comp.hack</log>

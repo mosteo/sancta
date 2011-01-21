@@ -134,7 +134,7 @@ package body Sancta.Gtk.Ctree_Node_Status is
    ----------
 
    function Cast
-     (From : Sancta.Ctree.Single_Distributed.Node_Status)
+     (From : Sancta.Ctree.Distributed.Node_Status)
       return Object
    is
    begin

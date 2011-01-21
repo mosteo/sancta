@@ -16,7 +16,7 @@ with Gtk.Handlers;
 with Gtk.Table;               use Gtk.Table;
 with Gtk.Toggle_Button;       use Gtk.Toggle_Button;
 with Gtk.Widget;              use Gtk.Widget;
-with Sancta.Ctree.Single_Distributed;
+with Sancta.Ctree.Distributed;
 with Sancta.Ctree.CTypes;
 with Sancta.Component.Factory;
 with Sancta.Component.Network;
@@ -126,7 +126,7 @@ package body Sancta.Ctree.Component.Console is
    ------------------------------
 
    procedure Ctree_Console_Go_Clicked (Widget : Gobject_Ptr) is
-      use Ctree.Single_Distributed;
+      use Ctree.Distributed;
       Button : constant Gtk_Toggle_Button := Proxy (Widget);
       This   : constant Object_Access     := User_Data.Get_Shared (Button);
    begin
@@ -141,7 +141,7 @@ package body Sancta.Ctree.Component.Console is
    --------------------------------
 
    procedure Ctree_Console_Stop_Clicked (Widget : Gobject_Ptr) is
-      use Ctree.Single_Distributed;
+      use Ctree.Distributed;
       Button : constant Gtk_Toggle_Button := Proxy (Widget);
       This   : constant Object_Access     := User_Data.Get_Shared (Button);
    begin
@@ -156,7 +156,7 @@ package body Sancta.Ctree.Component.Console is
    --------------------------------
 
    procedure Ctree_Console_Park_Clicked (Widget : Gobject_Ptr) is
-      use Ctree.Single_Distributed;
+      use Ctree.Distributed;
       Button : constant Gtk_Toggle_Button := Proxy (Widget);
       This   : constant Object_Access     := User_Data.Get_Shared (Button);
    begin
@@ -171,7 +171,7 @@ package body Sancta.Ctree.Component.Console is
    ----------------------------------
 
    procedure Ctree_Console_Cancel_Clicked (Widget : Gobject_Ptr) is
-      use Ctree.Single_Distributed;
+      use Ctree.Distributed;
       Button : constant Gtk_Button := Proxy (Widget);
       This   : constant Object_Access     := User_Data.Get_Shared (Button);
    begin

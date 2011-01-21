@@ -13,6 +13,9 @@ package Sancta.Ctree.Component.Signal_Tunnel is
    pragma Elaborate_Body;
    --  Need to build the Q table
 
+   pragma Wrong ("This was written thinking that the zeroes were teh fadings");
+   pragma Wrong ("While in reality, they're the sinusoid long-period component");
+
    Log_Section : constant String := "Sancta.Ctree.Component.ctree_signal_tunnel";
 
    Name : aliased constant Component_Name := "ctree_signal_tunnel";

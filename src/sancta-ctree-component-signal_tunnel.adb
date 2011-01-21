@@ -2,7 +2,7 @@ with Ada.Containers.Ordered_Maps;
 with Ada.Text_IO; use Ada.Text_IO;
 with Agpl.Strings; use Agpl.Strings;
 with Sancta.Ctree.Nctypes;
-with Sancta.Ctree.Single_Distributed;
+with Sancta.Ctree.Distributed;
 with Sancta.Component.Ctypes;
 with Sancta.Component.Factory;
 with Sancta.Component.Helper;
@@ -36,7 +36,7 @@ package body Sancta.Ctree.Component.Signal_Tunnel is
       M    : in     Sancta.Network.Message'Class;
       Meta : in     Sancta.Network.Message_Metadata)
    is
-      use Sancta.Ctree.Single_Distributed;
+      use Sancta.Ctree.Distributed;
    begin
       if M in Msg_Robot_Local_Update then
          declare
@@ -184,7 +184,7 @@ begin
       Qmap.Include (Tunel_Data (I).Dist, Tunel_Data (I).RSSI);
    end loop;
 
-   Fading_Report;
+   --  Fading_Report;
 
 --     for I in 0 .. 35000 loop
 --        Put_Line (To_String (Float (I) / 100.0, 3) & " " &

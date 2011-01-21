@@ -2,7 +2,7 @@ with Agpl.Gdk.Custom_Widget;
 with Agpl.Gdk.Widget_Bundle;
 with Sancta.Component;
 with Sancta.Component.Cast;
-with Sancta.Ctree.Single_Distributed;
+with Sancta.Ctree.Distributed;
 
 package Sancta.Gtk.Ctree_Node_Status is
 
@@ -11,7 +11,7 @@ package Sancta.Gtk.Ctree_Node_Status is
    Component_Name : constant String := "ctree_node_status_to_widget";
 
    type Object is
-     new Sancta.Ctree.Single_Distributed.Node_Status
+     new Sancta.Ctree.Distributed.Node_Status
      and Agpl.Gdk.Custom_Widget.Remote with null record;
 
    overriding
@@ -21,12 +21,12 @@ package Sancta.Gtk.Ctree_Node_Status is
    procedure Update (This : in out Object;
                      Guts : in out Agpl.Gdk.Widget_Bundle.Object);
 
-   function Cast (From : Sancta.Ctree.Single_Distributed.Node_Status)
+   function Cast (From : Sancta.Ctree.Distributed.Node_Status)
                   return Object;
 
    package Ctree_Node_Status_To_Widget is
      new Sancta.Component.Cast (Component_Name,
-                                Ctree.Single_Distributed.Node_Status,
+                                Ctree.Distributed.Node_Status,
                                 Object,
                                 Cast);
 
