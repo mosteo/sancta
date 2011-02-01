@@ -3,18 +3,21 @@ with Sancta.Map.Qtree;
 
 package Sancta.Ctree.Signal_Maps is
 
-   type Observation is new Sancta.Map.Observation with private;
+   type Map_Family is tagged limited private;
+   --  This type holds all observations made by a single robot, of quality in
+   --  regard to other robots.
+   --  It can be queried to ascertain how many observations were made from some
+   --    location.
+   --  Once a reference location is set, the observations to/fro this reference
+   --    location become available.
 
-   overriding
-   function Is_Traversable (This : Observation) return Boolean;
-
-   subtype Map is Sancta.Map.Qtree.Object;
-   --  Not a new type, but operations for signals in this kind of map.
+   procedure Add_Observation (This  : in out Map_Family;
+                              Pos_1 :        Types.Pose;
+                              Pos_2 :        Types.Pose;
+                              Q     :        Signal_Q);
 
 private
 
-   type Observation is new Sancta.Map.Observation with record
-      Samples : Sancta.Ctree.Signal_Lists.List;
-   end record;
+   type Map_Family is tagged limited null record;
 
 end Sancta.Ctree.Signal_Maps;
