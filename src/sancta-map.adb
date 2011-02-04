@@ -389,6 +389,12 @@ package body Sancta.Map is
       pragma Warnings (On);
    end Nearest_Location;
 
+   function Nearest_Location (This : Object'Class;
+                              P    : Types.Point) return Location'Class is
+   begin
+      return This.Nearest_Location ((P.X, P.Y, 0.0));
+   end Nearest_Location;
+
    ------------------
    -- Nearest_Pose --
    ------------------

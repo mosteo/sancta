@@ -19,6 +19,15 @@ package body Sancta.Types is
       return Angle (Normalize_Zero (A));
    end To_Angle;
 
+   --------------
+   -- To_Point --
+   --------------
+
+   function To_Point (P : Pose) return Point is
+   begin
+      return (X => P.X, Y => P.Y);
+   end To_Point;
+
    ------------------------
    -- Normalize_Positive --
    ------------------------
