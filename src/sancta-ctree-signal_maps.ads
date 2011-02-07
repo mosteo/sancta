@@ -2,11 +2,15 @@ private with Ada.Containers.Doubly_Linked_Lists;
 private with Ada.Containers.Indefinite_Ordered_Maps;
 private with Ada.Containers.Indefinite_Ordered_Sets;
 
+with Agpl.Drawing;
+
 with Sancta.Map;
 with Sancta.Map.Smart;
 with Sancta.Types;
 
 package Sancta.Ctree.Signal_Maps is
+
+   Log_Section : constant String := "sancta.ctree.signal_maps";
 
    type Map_Family is tagged limited private;
    --  This type holds all observations made by a single robot, of quality in
@@ -24,12 +28,35 @@ package Sancta.Ctree.Signal_Maps is
                               Pos_2 :        Types.Point;
                               Q     :        Signal_Q);
 
+   procedure Print (This : Map_Family);
+   --  Debug dump info to logfile
+
+   type Density_View is new Agpl.Drawing.Drawable with private;
+
+   function Create (From : Map_Family'Class) return Density_View;
+
+   type Quality_View is new Agpl.Drawing.Drawable with private;
+
+   function Create (From : Map_Family'Class) return Quality_View;
+
+   procedure Set_Reference_Location (This : in out Quality_View;
+                                     Loc  :        Map.Location'Class);
+   --  Quality map as seen from this location static relay
+
 private
+
+   procedure Draw (This :        Density_View;
+                   D    : in out Agpl.Drawing.Drawer'Class);
+
+   procedure Draw (This :        Quality_View;
+                   D    : in out Agpl.Drawing.Drawer'Class);
 
    package Loc_Sets is new Ada.Containers.Indefinite_Ordered_Sets
      (Map.Location'Class, Map.Less_Than, Map."=");
 
    type Location_Pair is new Loc_Sets.Set with null record;
+
+   function Image (Pair : Location_Pair) return String;
 
    function Pair (L, R : Map.Location'Class) return Location_Pair;
    pragma Postcondition (Natural (Pair'Result.Length) = 2);
@@ -69,6 +96,20 @@ private
       Samples : Location_Samples.Map;
       --  Indexed by any of the two involved locations.
       --  This is needed for later quick drawing.
+
+      Most_Sampled_Loc  : Natural := 0;
+      Most_Sampled_Pair : Natural := 0;
+      --  Cached values for quick access
+   end record;
+
+   type Map_Family_Access is access Map_Family;
+
+   type Density_View is new Agpl.Drawing.Drawable with record
+      Parent : Map_Family_Access;
+   end record;
+
+   type Quality_View is new Agpl.Drawing.Drawable with record
+      Parent : Map_Family_Access;
    end record;
 
 end Sancta.Ctree.Signal_Maps;

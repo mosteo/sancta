@@ -75,11 +75,11 @@ package body Sancta.Ctree.Distributed is
       This.Bot_Init (This.Base_Id);
       This.Bot_Ptr  (This.Base_Id).Pose := This.Base_Pose;
 
-      This.Logger_Ctree.Set_File (Name => "ctree." & Image (This.Link.Id) &
+      This.Logger_Ctree.Set_File (Name => "ctree." & Image (This.Link.Id) & "." &
                             Datestamp (Separator => '.') & "." &
                                   Timestamp & ".log");
 
-      This.Logger_Signal.Set_File (Name => "signal." & Image (This.Link.Id) &
+      This.Logger_Signal.Set_File (Name => "signal." & Image (This.Link.Id) & "." &
                             Datestamp (Separator => '.') & "." &
                             Timestamp & ".log");
    end Create;
@@ -377,6 +377,7 @@ package body Sancta.Ctree.Distributed is
       end if;
 
       Q.Iterate (Store_Into_Map'Access);
+--        This.Q_Map.Print;
 
       Log ("Qs: " & Q.Length'Img, Debug, Det_Section);
       Q.Iterate (Set_Links_Print'Access);
