@@ -868,4 +868,16 @@ package body Sancta.Map.Qtree is
          This.Cell.Qmap.Nearest_Pose (This));
    end Write;
 
+   ------------
+   -- Coords --
+   ------------
+
+   function Coords (L : Location) return Cell_Coords is
+   begin
+      return (Xl => L.Cell.Xl,
+              Xr => L.Cell.Xr,
+              Yb => L.Cell.Yb,
+              Yt => L.Cell.Yt);
+   end Coords;
+
 end Sancta.Map.Qtree;

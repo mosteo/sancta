@@ -30,6 +30,11 @@ package Sancta.Map.Qtree is
 
    type Terrains is (Free, Mixed, Obstacle);
 
+   type Cell_Coords is record
+      Xl, Xr : X_Real;
+      Yb, Yt : Y_Real;
+   end record;
+
    --  CREATOR
    --  See child package Qtree.Builder for some predefined instances
    generic
@@ -59,6 +64,9 @@ package Sancta.Map.Qtree is
    --  Here we refer to the cell sizes we want (minimums and maximums)
 
    type Location is new Map.Location and Agpl.Drawing.Drawable with private;
+
+   not overriding
+   function Coords (L : Location) return Cell_Coords;
 
    overriding
    function "=" (L, R : Location) return Boolean;

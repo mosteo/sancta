@@ -1,4 +1,122 @@
+with Agpl.Scaling;
+
+with Sancta.Map.Qtree;
+
 package body Sancta.Ctree.Signal_Maps is
+
+   ---------------------
+   -- Map_Family_Safe --
+   ---------------------
+
+   protected body Map_Family_Safe is
+
+      procedure Create (Over : Sancta.Map.Smart.Object)
+      is
+      begin
+         The_Map := Over;
+      end Create;
+
+      procedure Add_Observation
+        (Pos_1 :        Types.Point;
+         Pos_2 :        Types.Point;
+         Q     :        Signal_Q)
+      is
+         use Sancta.Map;
+
+         Loc_1 : constant Map.Location'Class :=
+                   Nearest_Location (The_Map.Ref.all, Pos_1);
+         Loc_2 : constant Map.Location'Class :=
+                   Nearest_Location (The_Map.Ref.all, Pos_2);
+
+         procedure Increment (At_Loc : Map.Location'Class) is
+         begin
+            if not Count.Contains (At_Loc) then
+               Count.Insert (At_Loc, 0);
+            end if;
+
+            declare
+               C : constant Natural := Count.Element (At_Loc);
+            begin
+               Count.Include (At_Loc, C + 1);
+               Most_Sampled_Loc := Natural'Max (Most_Sampled_Loc, C + 1);
+            end;
+         end Increment;
+
+         procedure Store (Loc_1, Loc_2 : Map.Location'Class; Q : Signal_Q) is
+            use Location_Samples;
+            I_1 : constant Cursor := Samples.Find (Loc_1);
+            I_2 : constant Cursor := Samples.Find (Loc_2);
+
+            Sample : Pair_Sample_Access;
+         begin
+            Log ("Adding sample to Pair Loc_1:Loc_2: " &
+                 Pair (Loc_1, Loc_2).Image, Always);
+
+            if Has_Element (I_1) and then Element (I_1).Contains (Loc_2) then
+               --  Easy, go ahead -- efficiently
+               Sample := Element (I_1).Element (Loc_2);
+            else
+               Sample := new Pair_Sample'(Pair (Loc_1, Loc_2), Q_Lists.Empty_List);
+
+               --  Someone is missing, fill them both completely
+               declare
+                  L_1_2 : Pair_Samples_Map_Access;
+               begin
+                  if Has_Element (I_1) then
+                     Log ("Reusing Loc_1.Loc_2.Map", Always);
+                     L_1_2 := Element (I_1);
+                  else
+                     Log ("Adding Loc_1.Loc_2.Map", Always);
+                     L_1_2 := new Pair_Samples.Map;
+                     Samples.Insert (Loc_1, L_1_2);
+                  end if;
+
+                  L_1_2.Insert (Loc_2, Sample);
+               end;
+
+               --  Symmetric access:
+               declare
+                  L_2_1 : Pair_Samples_Map_Access;
+               begin
+                  if Has_Element (I_2) then
+                     Log ("Reusing Loc_2.Loc_1.Map", Always);
+                     L_2_1 := Element (I_2);
+                  else
+                     Log ("Adding Loc_2.Loc_1.Map", Always);
+                     L_2_1 := new Pair_Samples.Map;
+                     Samples.Insert (Loc_2, L_2_1);
+                  end if;
+
+                  L_2_1.Insert (Loc_1, Sample);
+               end;
+
+               pragma Assert (Samples.Element (Loc_1).Element (Loc_2) =
+                              Samples.Element (Loc_2).Element (Loc_1),
+                              "Improper insertion in signal map");
+            end if;
+
+            pragma Assert (Sample /= null);
+            --  At this point, it points to a valid sample list shared by both locs.
+            pragma Assert (Sample.Pair = Pair (Loc_1, Loc_2));
+
+            Sample.Samples.Append (Q);
+            Most_Sampled_Pair := Natural'Max
+              (Most_Sampled_Pair, Natural (Sample.Samples.Length));
+
+         end Store;
+
+      begin
+         if Loc_1 = Loc_2 then
+            return;
+         end if;
+
+         Increment (Loc_1);
+         Increment (Loc_2);
+
+         Store (Loc_1, Loc_2, Q);
+      end Add_Observation;
+
+   end Map_Family_Safe;
 
    ------------
    -- Create --
@@ -9,7 +127,7 @@ package body Sancta.Ctree.Signal_Maps is
       Over : Sancta.Map.Smart.Object)
    is
    begin
-      This.Map := Over;
+      This.Safe.Create (Over);
    end Create;
 
    ---------------------
@@ -22,100 +140,8 @@ package body Sancta.Ctree.Signal_Maps is
       Pos_2 :        Types.Point;
       Q     :        Signal_Q)
    is
-      use Sancta.Map;
-
-      Loc_1 : constant Map.Location'Class :=
-                Nearest_Location (This.Map.Ref.all, Pos_1);
-      Loc_2 : constant Map.Location'Class :=
-                Nearest_Location (This.Map.Ref.all, Pos_2);
-
-      procedure Increment (At_Loc : Map.Location'Class) is
-      begin
-         if not This.Count.Contains (At_Loc) then
-            This.Count.Insert (At_Loc, 0);
-         end if;
-
-         declare
-            Count : constant Natural := This.Count.Element (At_Loc);
-         begin
-            This.Count.Include (At_Loc, Count + 1);
-            This.Most_Sampled_Loc :=
-              Natural'Max (This.Most_Sampled_Loc, Count + 1);
-         end;
-      end Increment;
-
-      procedure Store (Loc_1, Loc_2 : Map.Location'Class; Q : Signal_Q) is
-         use Location_Samples;
-         I_1 : constant Cursor := This.Samples.Find (Loc_1);
-         I_2 : constant Cursor := This.Samples.Find (Loc_2);
-
-         Samples : Pair_Sample_Access;
-      begin
-         Log ("Adding sample to Pair Loc_1:Loc_2: " &
-              Pair (Loc_1, Loc_2).Image, Always);
-
-         if Has_Element (I_1) and then Element (I_1).Contains (Loc_2) then
-            --  Easy, go ahead -- efficiently
-            Samples := Element (I_1).Element (Loc_2);
-         else
-            Samples := new Pair_Sample'(Pair (Loc_1, Loc_2), Q_Lists.Empty_List);
-
-            --  Someone is missing, fill them both completely
-            declare
-               L_1_2 : Pair_Samples_Map_Access;
-            begin
-               if Has_Element (I_1) then
-                  Log ("Reusing Loc_1.Loc_2.Map", Always);
-                  L_1_2 := Element (I_1);
-               else
-                  Log ("Adding Loc_1.Loc_2.Map", Always);
-                  L_1_2 := new Pair_Samples.Map;
-                  This.Samples.Insert (Loc_1, L_1_2);
-               end if;
-
-               L_1_2.Insert (Loc_2, Samples);
-            end;
-
-            --  Symmetric access:
-            declare
-               L_2_1 : Pair_Samples_Map_Access;
-            begin
-               if Has_Element (I_2) then
-                  Log ("Reusing Loc_2.Loc_1.Map", Always);
-                  L_2_1 := Element (I_2);
-               else
-                  Log ("Adding Loc_2.Loc_1.Map", Always);
-                  L_2_1 := new Pair_Samples.Map;
-                  This.Samples.Insert (Loc_2, L_2_1);
-               end if;
-
-               L_2_1.Insert (Loc_1, Samples);
-            end;
-
-            pragma Assert (This.Samples.Element (Loc_1).Element (Loc_2) =
-                             This.Samples.Element (Loc_2).Element (Loc_1),
-                           "Improper insertion in signal map");
-         end if;
-
-         pragma Assert (Samples /= null);
-         --  At this point, it points to a valid sample list shared by both locs.
-         pragma Assert (Samples.Pair = Pair (Loc_1, Loc_2));
-
-         Samples.Samples.Append (Q);
-         This.Most_Sampled_Pair := Natural'Max
-           (This.Most_Sampled_Pair, Natural (Samples.Samples.Length));
-
-      end Store;
-
    begin
-      if Loc_1 = Loc_2 then
-         return;
-      end if;
-
-      Increment (Loc_1);
-      Increment (Loc_2);
-
-      Store (Loc_1, Loc_2, Q);
+      This.Safe.Add_Observation (Pos_1, Pos_2, Q);
    end Add_Observation;
 
    ----------
@@ -139,47 +165,33 @@ package body Sancta.Ctree.Signal_Maps is
       return "PAIR: " & Pair.First_Element.Image & "::" & Pair.Last_Element.Image;
    end Image;
 
-   ---------
-   -- "<" --
-   ---------
-
---     function "<" (L, R : Location_Pair) return Boolean is
---        use type Map.Location'Class;
---        function "<" (L, R : Map.Location'Class) return Boolean
---                      renames Map.Less_Than;
---     begin
---        return L.First_Element < R.First_Element or else
---          (L.First_Element = R.First_Element and then
---           L.Last_Element < R.Last_Element);
---     end "<";
-
-   procedure Print (This : Map_Family) is
-      Pairs_Count : Natural := 0;
-      use Location_Samples;
-      procedure Count (I : Cursor) is
-      begin
-         Pairs_Count := Pairs_Count + Natural (Element (I).Length);
-      end Count;
-   begin
-      This.Samples.Iterate (Count'Access);
-      Pairs_Count := Pairs_Count / 2;
-
-      Log ("MAP FAMILY DEBUG DUMP START ********************",              Always, Log_Section);
-      Log ("Locations with samples:" & This.Count.Length'Img,               Always, Log_Section);
-      Log ("Location pairs:" & Pairs_Count'Img,                             Always, Log_Section);
-      Log ("Samples at most sampled location:" & This.Most_Sampled_Loc'Img, Always, Log_Section);
-      Log ("Samples at most sampled pair:" & This.Most_Sampled_Pair'Img,    Always, Log_Section);
-      Log ("MAP FAMILY DEBUG DUMP END   ********************", Always);
-   end Print;
-
    ----------
    -- Draw --
    ----------
 
    procedure Draw (This :        Density_View;
-                   D    : in out Agpl.Drawing.Drawer'Class) is
+                   D    : in out Agpl.Drawing.Drawer'Class)
+   is
+      package Scale is new Agpl.Scaling1d (Float);
+
+      Gradient : constant Scale.Object := Scale.Set_Equivalence
+        (0.0, Float (This.Parent.Most_Sampled_Loc),
+         255.0, 0.0);
+
+      use Agpl.Constants;
+      use Location_Count_Maps;
+      procedure Draw (I : Cursor) is
+         Coords : constant Map.Qtree.Cell_Coords :=
+                    Map.Qtree.Location (Key (I)).Coords;
+         Count  : constant Natural := Element (I);
+      begin
+            D.Set_Color (Soft_Green, Alpha_Opaque);
+            D.Draw_Rectangle
+              (Float (Cell.Xl), Float (Cell.Yb),
+               Float (Cell.Xr), Float (Cell.Yt));
+      end Draw;
    begin
-      null;
+      This.Parent.Count.Iterate (Draw'Access);
    end Draw;
 
    ----------
@@ -189,7 +201,7 @@ package body Sancta.Ctree.Signal_Maps is
    procedure Draw (This :        Quality_View;
                    D    : in out Agpl.Drawing.Drawer'Class) is
    begin
-      null;
+      raise Program_Error;
    end Draw;
 
 end Sancta.Ctree.Signal_Maps;

@@ -28,9 +28,6 @@ package Sancta.Ctree.Signal_Maps is
                               Pos_2 :        Types.Point;
                               Q     :        Signal_Q);
 
-   procedure Print (This : Map_Family);
-   --  Debug dump info to logfile
-
    type Density_View is new Agpl.Drawing.Drawable with private;
 
    function Create (From : Map_Family'Class) return Density_View;
@@ -89,8 +86,17 @@ private
    --  Since this should live all the way to program exit,
    --    I'll not worry about leaks here.
 
-   type Map_Family is tagged limited record
-      Map   : Sancta.Map.Smart.Object;
+   protected type Map_Family_Safe is
+
+      procedure Add_Observation (Pos_1 :        Types.Point;
+                                 Pos_2 :        Types.Point;
+                                 Q     :        Signal_Q);
+
+      procedure Create (Over : Map.Smart.Object);
+
+   private
+
+      The_Map : Sancta.Map.Smart.Object;
 
       Count   : Location_Count_Maps.Map;
       Samples : Location_Samples.Map;
@@ -100,6 +106,11 @@ private
       Most_Sampled_Loc  : Natural := 0;
       Most_Sampled_Pair : Natural := 0;
       --  Cached values for quick access
+
+   end Map_Family_Safe;
+
+   type Map_Family is tagged limited record
+      Safe : Map_Family_Safe;
    end record;
 
    type Map_Family_Access is access Map_Family;
