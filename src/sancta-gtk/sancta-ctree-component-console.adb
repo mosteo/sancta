@@ -4,6 +4,7 @@ with Agpl.Gdk.Palette;
 with Agpl.Gtk.User_Data;
 with Agpl.Gtk.Widget_Factory; use Agpl.Gtk.Widget_Factory;
 with Agpl.Strings;
+
 with Glade.Xml;               use Glade.Xml;
 with Glib;
 with Glib.Properties;
@@ -13,9 +14,12 @@ with Gtk.Check_Button;        use Gtk.Check_Button;
 with Gtk.Enums;               use Gtk.Enums;
 with Gtk.Frame;               use Gtk.Frame;
 with Gtk.Handlers;
+with Gtk.Label;               use Gtk.Label;
+with Gtk.Notebook;            use Gtk.Notebook;
 with Gtk.Table;               use Gtk.Table;
 with Gtk.Toggle_Button;       use Gtk.Toggle_Button;
 with Gtk.Widget;              use Gtk.Widget;
+
 with Sancta.Ctree.Distributed;
 with Sancta.Ctree.CTypes;
 with Sancta.Component.Factory;
@@ -180,6 +184,17 @@ package body Sancta.Ctree.Component.Console is
       This.Send (Msg_Operator_Control'(Action => Cancel));
    end Ctree_Console_Cancel_Clicked;
 
+   ---------------
+   -- New_Label --
+   ---------------
+
+   function New_Label (S : String) return Gtk_Label is
+      L : Gtk_Label;
+   begin
+      Gtk_New (L, S);
+      return L;
+   end New_Label;
+
    ----------
    -- Send --
    ----------
@@ -247,7 +262,8 @@ package body Sancta.Ctree.Component.Console is
 
             This.General_View := This.Visor.Create_Widget
               (null, Gui.Visor_General_View.View_Name);
-            Gtk_Frame (This.Gui.Get_Widget ("map")).Add (This.General_View.Area);
+            Gtk_Notebook (This.Gui.Get_Widget ("maptabs")).
+              Append_Page (This.General_View.Area, New_Label ("Grid"));
             This.General_View.Area.Show_All;
          end;
       end Create;
@@ -367,6 +383,7 @@ package body Sancta.Ctree.Component.Console is
       This.Subscribe (Requires_Full_Signal);
       This.Subscribe (Requires_Local_Parcels);
       This.Subscribe (Requires_Global_Parcels);
+      This.Subscribe (Requires_Tabs);
 
       This.Map_Drawer := Gui.Visor_Data.Drawer (This.Visor.Get_Data);
       This.Output
@@ -403,7 +420,6 @@ package body Sancta.Ctree.Component.Console is
                   Gtk_Table (This.Gui.Get_Widget ("instant_signal"));
             use Glib;
             use Glib.Properties;
-            use Standard.Gtk.Label;
 
             --------------------
             -- Recreate_Table --
@@ -644,6 +660,28 @@ package body Sancta.Ctree.Component.Console is
                   +Parcel.Label,
                   Agpl.Gdk.Custom_Widget.Remote'Class (Parcel.Datum.Ref.all));
             end if;
+         end;
+      elsif Key = Requires_Tabs then
+         declare
+            Parcel : Data_Parcel'Class renames Data_Parcel'Class (Value);
+            Handle : Agpl.Gdk.Managed.Drawing_Area.Handle;
+            procedure Attach (W : Gtk_Widget) is
+            begin
+               Gtk_Notebook (This.Gui.Get_Widget ("maptabs")).
+                 Append_Page (W, New_Label (+Parcel.Label));
+               W.Show_All;
+               Log ("APPENDED TAB: " & (+Parcel.Label), Always);
+               Log ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", Always);
+            end Attach;
+         begin
+            if not This.Tabs.Contains (+Parcel.Label) then
+               Handle := Agpl.Gdk.Managed.Drawing_Area.Show (Attach'Access);
+               This.Tabs.Insert (+Parcel.Label, Handle);
+            else
+               Handle := This.Tabs.Element (+Parcel.Label);
+            end if;
+
+            Handle.Draw (Agpl.Drawing.Drawable'Class (Parcel.Datum.Ref.all));
          end;
       end if;
    end Key_Stored;

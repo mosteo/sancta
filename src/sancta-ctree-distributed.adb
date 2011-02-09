@@ -1965,4 +1965,13 @@ package body Sancta.Ctree.Distributed is
       end if;
    end Bot_Init;
 
+   -----------------
+   -- Density_Map --
+   -----------------
+
+   function Density_Map (This : Object) return Signal_Maps.Density_View is
+   begin
+      return Signal_Maps.Create (From => This.Q_Map);
+   end Density_Map;
+
 end Sancta.Ctree.Distributed;

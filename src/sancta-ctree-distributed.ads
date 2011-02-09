@@ -266,6 +266,9 @@ package Sancta.Ctree.Distributed is
    --  Says if the robot must be commanded.
    --  Always false for the Base node.
 
+   not overriding
+   function Density_Map (This : Object) return Signal_Maps.Density_View;
+
 private
 
    use Sancta;

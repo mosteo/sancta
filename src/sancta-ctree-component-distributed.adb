@@ -139,6 +139,12 @@ package body Sancta.Ctree.Component.Distributed is
                       Ctypes.Task_List'(Tasks => This.Mover.Pending_Tasks));
       end if;
 
+      if This.Provided (Provides_Density_Draw) and then This.Timer_Density.Elapsed >= 1.0 then
+         This.Output (Provides_Density_Draw,
+                      Wrap (This.Mover.Density_Map, "Density", This.Get_Id));
+         This.Timer_Density.Reset;
+      end if;
+
 --        if This.Mover.Status = Mission_Completed then
 --           This.Output (Provides_Finished, Ctypes.Bool'(Value => True));
 --        end if;

@@ -4,6 +4,7 @@ private with Ada.Containers.Indefinite_Ordered_Sets;
 
 with Agpl.Drawing;
 
+with Sancta.Component;
 with Sancta.Map;
 with Sancta.Map.Smart;
 with Sancta.Types;
@@ -28,11 +29,11 @@ package Sancta.Ctree.Signal_Maps is
                               Pos_2 :        Types.Point;
                               Q     :        Signal_Q);
 
-   type Density_View is new Agpl.Drawing.Drawable with private;
+   type Density_View is new Component.Data and Agpl.Drawing.Drawable with private;
 
    function Create (From : Map_Family'Class) return Density_View;
 
-   type Quality_View is new Agpl.Drawing.Drawable with private;
+   type Quality_View is new Component.Data and Agpl.Drawing.Drawable with private;
 
    function Create (From : Map_Family'Class) return Quality_View;
 
@@ -94,6 +95,10 @@ private
 
       procedure Create (Over : Map.Smart.Object);
 
+      procedure Draw_Density (Into : in out Agpl.Drawing.Drawer'Class);
+      procedure Draw_Quality (From :        Map.Location'Class;
+                              Into : in out Agpl.Drawing.Drawer'Class);
+
    private
 
       The_Map : Sancta.Map.Smart.Object;
@@ -109,18 +114,20 @@ private
 
    end Map_Family_Safe;
 
+   type Map_Family_Access is access all Map_Family;
+
    type Map_Family is tagged limited record
+      Self : Map_Family_Access := Map_Family'Unchecked_Access;
       Safe : Map_Family_Safe;
    end record;
 
-   type Map_Family_Access is access Map_Family;
-
-   type Density_View is new Agpl.Drawing.Drawable with record
+   type Density_View is new Component.Data and Agpl.Drawing.Drawable with record
       Parent : Map_Family_Access;
    end record;
 
-   type Quality_View is new Agpl.Drawing.Drawable with record
+   type Quality_View is new Component.Data and Agpl.Drawing.Drawable with record
       Parent : Map_Family_Access;
+      Refloc : Map.Location_Handle.Object;
    end record;
 
 end Sancta.Ctree.Signal_Maps;
