@@ -172,9 +172,92 @@ package body Sancta.Ctree.Signal_Maps is
       procedure Draw_Quality (From :        Map.Location'Class;
                               Into : in out Agpl.Drawing.Drawer'Class)
       is
+         pragma Precondition (Ref_Loc.Is_Valid);
+
+         use Agpl.Constants;
+         use Agpl.Types;
+
+         package Scale is new Agpl.Scaling1d (Float);
+         Gradient_Red : constant Scale.Object := Scale.Set_Equivalence
+           (0.0, Float (Parent.Threshold),
+            32.0, 255.0);
+         Gradient_Green : constant Scale.Object := Scale.Set_Equivalence
+           (Float (Parent.Threshold), Float (Signal_Q'Last),
+            255.0, 32.0);
+
+         use Pair_Samples;
+         procedure Draw (I : Cursor) is
+            Cell   : constant Map.Qtree.Cell_Coords :=
+                       Map.Qtree.Location (Key (I)).Coords;
+            Sample : constant Pair_Sample_Access := Element (I);
+            Tint   : Unsigned_8;
+            Value  : constant Signal_Q := Sample.Samples.Last_Element;
+            --  This has to be changed to the average or so.
+         begin
+            if Value < Parent.Threshold then
+               Tint := Unsigned_8 (Gradient_Red.Scale (Float (Value)));
+               Into.Set_Color ((Tint, 255, 255), Alpha_Opaque);
+            else
+               Tint := Unsigned_8 (Gradient_Green.Scale (Float (Value)));
+               Into.Set_Color ((200, Tint, 200), Alpha_Opaque);
+            end if;
+            Into.Fill_Rectangle
+              (Float (Cell.Xl), Float (Cell.Yb),
+               Float (Cell.Xr), Float (Cell.Yt));
+            Into.Set_Color (Black, Alpha_Opaque);
+            Into.Draw_Rectangle
+              (Float (Cell.Xl), Float (Cell.Yb),
+               Float (Cell.Xr), Float (Cell.Yt));
+         end Draw;
+
       begin
-         raise Program_Error;
+         if Samples.Contains (Ref_Loc.Get) then
+            Samples.Element (Ref_Loc.Get).Iterate (Draw'Access);
+         else
+            Into.Set_Color (Black, Alpha_Opaque);
+            Into.Draw_Rectangle (0.0, 0.0, 1.0, 1.0);
+            Into.Draw_Line (0.0, 0.0, 1.0, 1.0);
+            Into.Draw_Line (0.0, 1.0, 1.0, 0.0);
+         end if;
       end Draw_Quality;
+
+      -----------------
+      -- Draw_Decide --
+      -----------------
+
+      procedure Draw_Decide  (Into : in out Agpl.Drawing.Drawer'Class) is
+      begin
+         if Ref_Loc.Is_Valid then
+            Draw_Quality (From => Ref_Loc.Ref.all, Into => Into);
+         else
+            Draw_Density (Into);
+         end if;
+      end Draw_Decide;
+
+      -------------
+      -- Clicked --
+      -------------
+
+      procedure Clicked (P : Types.Point) is
+      begin
+         declare
+            use type Map.Location'Class;
+            Loc : constant Map.Location'Class := The_Map.Ref.Nearest_Location (P);
+         begin
+            if Ref_Loc.Is_Valid and then Loc = Ref_Loc.Get then
+               Ref_Loc.Clear;
+               Log ("Clearing reference location: " & Loc.Image,
+                    Informative, Log_Section);
+            else
+               Ref_Loc.Set (Loc);
+               Log ("Setting new reference location: " & Loc.Image,
+                    Informative, Log_Section);
+            end if;
+         end;
+      exception
+         when E : others =>
+            Log ("Cannot find clicked location: " & Report (E), Warning);
+      end Clicked;
 
    end Map_Family_Safe;
 
@@ -184,10 +267,12 @@ package body Sancta.Ctree.Signal_Maps is
 
    procedure Create
      (This : in out Map_Family;
-      Over : Sancta.Map.Smart.Object)
+      Over : Sancta.Map.Smart.Object;
+      Q_T  :        Signal_Q)
    is
    begin
       This.Safe.Create (Over);
+      This.Threshold := Q_T;
    end Create;
 
    ---------------------
@@ -229,31 +314,11 @@ package body Sancta.Ctree.Signal_Maps is
    -- Draw --
    ----------
 
-   procedure Draw (This :        Density_View;
-                   D    : in out Agpl.Drawing.Drawer'Class)
-   is
-   begin
-      This.Parent.Safe.Draw_Density (Into => D);
-   end Draw;
-
-   ----------
-   -- Draw --
-   ----------
-
    procedure Draw (This :        Quality_View;
                    D    : in out Agpl.Drawing.Drawer'Class) is
    begin
-      raise Program_Error;
+      This.Parent.Safe.Draw_Decide (Into => D);
    end Draw;
-
-   ------------
-   -- Create --
-   ------------
-
-   function Create (From : Map_Family'Class) return Density_View is
-   begin
-      return (Parent => From.Self);
-   end Create;
 
    ------------
    -- Create --
@@ -261,17 +326,19 @@ package body Sancta.Ctree.Signal_Maps is
 
    function Create (From : Map_Family'Class) return Quality_View is
    begin
-      return (Parent => From.Self, Refloc => Map.Location_Handle.Null_Object);
+      return (Parent => From.Self);
    end Create;
 
-   ----------------------------
-   -- Set_Reference_Location --
-   ----------------------------
+   ---------------
+   -- Triggered --
+   ---------------
 
-   procedure Set_Reference_Location (This : in out Quality_View;
-                                     Loc  :        Map.Location'Class) is
+   procedure Triggered (Handler : in out Quality_View; E : Agpl.Gui.Event'Class)
+   is
+      use Sancta.Types;
+      Click : Agpl.Gui.Clicked'Class renames Agpl.Gui.Clicked'Class (E);
    begin
-      This.Refloc.Set (Loc);
-   end Set_Reference_Location;
+       Handler.Parent.Safe.Clicked ((+Click.Data_X, +Click.Data_Y));
+   end Triggered;
 
 end Sancta.Ctree.Signal_Maps;

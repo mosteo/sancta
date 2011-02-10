@@ -155,29 +155,29 @@ package body Sancta.Ctree.Component.Signal_Tunnel is
    -- Fading_Report --
    -------------------
 
-   procedure Fading_Report is
-      Fading_Start : Positive := Tunel_Data'First;
-   begin
-      --  Report fading sizes:
-      for I in Tunel_Data'Range loop
-         if I > Tunel_Data'First then
-            if Tunel_Data (I - 1).RSSI > 0.0 and then Tunel_Data (I).RSSI = 0.0 then
-               Fading_Start := I;
-            end if;
-
-            if Tunel_Data (I).RSSI = 0.0 and then Tunel_Data (I + 1).RSSI > 0.0 then
-               Put_Line
-                 ("Fading from " &
-                  Rpad (To_String (Tunel_Data (Fading_Start).Dist, 3), 7) & " to " &
-                  Rpad (To_String (Tunel_Data (I).Dist, 3), 7) & ", " &
-                  "size (]: " & Rpad (To_String (Tunel_Data (I + 1).Dist - Tunel_Data (Fading_Start).Dist, 3), 5) &
-                  " [): " & Rpad (To_String (Tunel_Data (I).Dist - Tunel_Data (Fading_Start - 1).Dist, 3), 5) &
-                  " []: " & Rpad (To_String (Tunel_Data (I + 1).Dist - Tunel_Data (Fading_Start - 1).Dist, 3), 5) &
-                  " (): " & Rpad (To_String (Tunel_Data (I).Dist - Tunel_Data (Fading_Start).Dist, 3), 5));
-            end if;
-         end if;
-      end loop;
-   end Fading_Report;
+--     procedure Fading_Report is
+--        Fading_Start : Positive := Tunel_Data'First;
+--     begin
+--        --  Report fading sizes:
+--        for I in Tunel_Data'Range loop
+--           if I > Tunel_Data'First then
+--              if Tunel_Data (I - 1).RSSI > 0.0 and then Tunel_Data (I).RSSI = 0.0 then
+--                 Fading_Start := I;
+--              end if;
+--
+--              if Tunel_Data (I).RSSI = 0.0 and then Tunel_Data (I + 1).RSSI > 0.0 then
+--                 Put_Line
+--                   ("Fading from " &
+--                    Rpad (To_String (Tunel_Data (Fading_Start).Dist, 3), 7) & " to " &
+--                    Rpad (To_String (Tunel_Data (I).Dist, 3), 7) & ", " &
+--                    "size (]: " & Rpad (To_String (Tunel_Data (I + 1).Dist - Tunel_Data (Fading_Start).Dist, 3), 5) &
+--                    " [): " & Rpad (To_String (Tunel_Data (I).Dist - Tunel_Data (Fading_Start - 1).Dist, 3), 5) &
+--                    " []: " & Rpad (To_String (Tunel_Data (I + 1).Dist - Tunel_Data (Fading_Start - 1).Dist, 3), 5) &
+--                    " (): " & Rpad (To_String (Tunel_Data (I).Dist - Tunel_Data (Fading_Start).Dist, 3), 5));
+--              end if;
+--           end if;
+--        end loop;
+--     end Fading_Report;
 
 begin
    for I in Tunel_Data'Range loop

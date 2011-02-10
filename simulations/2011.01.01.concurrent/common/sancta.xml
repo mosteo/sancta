@@ -37,6 +37,7 @@
       <log section="sancta.ctree.utils"                         level="informative" />
       <log section="sancta.ctree.distributed"                   level="informative" />
       <log section="sancta.ctree.distributed.detail"            level="informative" />
+      <log section="sancta.ctree.signal_maps"                   level="informative" />
       <log section="sancta.comp.tree_ordered"                   level="informative" />
       <log section="sancta.component.player_client"             level="informative" />
       <log section="sancta.component.root"                      level="informative" />

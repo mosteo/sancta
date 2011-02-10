@@ -3,6 +3,7 @@ with Agpl.Gdk.Managed;
 with Agpl.Gdk.Palette;
 with Agpl.Gtk.User_Data;
 with Agpl.Gtk.Widget_Factory; use Agpl.Gtk.Widget_Factory;
+with Agpl.Gui;
 with Agpl.Strings;
 
 with Glade.Xml;               use Glade.Xml;
@@ -670,13 +671,16 @@ package body Sancta.Ctree.Component.Console is
                Gtk_Notebook (This.Gui.Get_Widget ("maptabs")).
                  Append_Page (W, New_Label (+Parcel.Label));
                W.Show_All;
-               Log ("APPENDED TAB: " & (+Parcel.Label), Always);
-               Log ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", Always);
             end Attach;
          begin
             if not This.Tabs.Contains (+Parcel.Label) then
                Handle := Agpl.Gdk.Managed.Drawing_Area.Show (Attach'Access);
                This.Tabs.Insert (+Parcel.Label, Handle);
+
+               if Parcel.Datum.Ref.all in Agpl.Gui.Event_Handler'Class then
+                  Handle.Attach
+                    (Agpl.Gui.Event_Handler'Class (Parcel.Datum.Ref.all));
+               end if;
             else
                Handle := This.Tabs.Element (+Parcel.Label);
             end if;

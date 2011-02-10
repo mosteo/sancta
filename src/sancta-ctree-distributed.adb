@@ -68,7 +68,7 @@ package body Sancta.Ctree.Distributed is
       This.Pred.Id := Sancta.No_Node;
       This.Succ.Id := Sancta.No_Node;
       This.Map     := Map;
-      This.Q_Map.Create (Map);
+      This.Q_Map.Create (Map, Config.Signal_Threshold);
       This.Base_Id := Base;
       This.Base_Pose := Base_Pose;
 
@@ -1969,9 +1969,9 @@ package body Sancta.Ctree.Distributed is
    -- Density_Map --
    -----------------
 
-   function Density_Map (This : Object) return Signal_Maps.Density_View is
+   function Quality_Map (This : Object) return Signal_Maps.Quality_View is
    begin
       return Signal_Maps.Create (From => This.Q_Map);
-   end Density_Map;
+   end Quality_Map;
 
 end Sancta.Ctree.Distributed;

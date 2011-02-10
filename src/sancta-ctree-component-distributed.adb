@@ -141,7 +141,7 @@ package body Sancta.Ctree.Component.Distributed is
 
       if This.Provided (Provides_Density_Draw) and then This.Timer_Density.Elapsed >= 1.0 then
          This.Output (Provides_Density_Draw,
-                      Wrap (This.Mover.Density_Map, "Density", This.Get_Id));
+                      Wrap (This.Mover.Quality_Map, "Quality", This.Get_Id));
          This.Timer_Density.Reset;
       end if;
 

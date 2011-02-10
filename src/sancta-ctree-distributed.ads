@@ -267,7 +267,7 @@ package Sancta.Ctree.Distributed is
    --  Always false for the Base node.
 
    not overriding
-   function Density_Map (This : Object) return Signal_Maps.Density_View;
+   function Quality_Map (This : Object) return Signal_Maps.Quality_View;
 
 private
 
