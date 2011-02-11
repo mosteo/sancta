@@ -2,7 +2,7 @@
 with Sancta.Distributed;
 with Sancta.Distributed.Datastore;
 with Sancta.Distributed.Types;
-with Sancta.Draw;
+-- with Sancta.Draw;
 with Sancta.Gui.Visor_Factory; pragma Elaborate_All (Sancta.Gui.Visor_Factory);
 with Sancta.Gui.Visor_Widget.Handlers_UR;
 

@@ -69,6 +69,7 @@ private
    type Pair_Sample is record
       Pair    : Location_Pair;
       Samples : Q_Lists.List;
+      Avg     : Signal_Q := 0.0;
    end record;
 
    type Pair_Sample_Access is access Pair_Sample;

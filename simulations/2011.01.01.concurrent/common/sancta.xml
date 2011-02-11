@@ -148,8 +148,14 @@
          <requires data="link"  as="link"/>
       </component>
 
-      <component name="gtk_canvas" title="Density at $id" enabled="true">
+      <component name="copy" enabled="true">
+          <requires data="x" as="density_draw"/>
+          <provides data="y" as="density_gui"/>
+      </component>
+
+      <component name="gtk_canvas" title="$id" enabled="true">
          <requires data="drawable"  as="density_draw"/>
+         <requires data="handler"   as="density_gui"/>
       </component>
 
    </group>

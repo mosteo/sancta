@@ -68,7 +68,8 @@ package body Sancta.Ctree.Signal_Maps is
                --  Easy, go ahead -- efficiently
                Sample := Element (I_1).Element (Loc_2);
             else
-               Sample := new Pair_Sample'(Pair (Loc_1, Loc_2), Q_Lists.Empty_List);
+               Sample :=
+                 new Pair_Sample'(Pair (Loc_1, Loc_2), Q_Lists.Empty_List, 0.0);
 
                --  Someone is missing, fill them both completely
                declare
@@ -110,6 +111,13 @@ package body Sancta.Ctree.Signal_Maps is
             pragma Assert (Sample /= null);
             --  At this point, it points to a valid sample list shared by both locs.
             pragma Assert (Sample.Pair = Pair (Loc_1, Loc_2));
+
+            --  Here, actual sample computation:
+            --  Cache avg for fast display:
+            Sample.Avg :=
+              Signal_Q
+                ((Float (Sample.Avg) * Float (Sample.Samples.Length) + Float (Q)) /
+                 (Float (Sample.Samples.Length) + 1.0));
 
             Sample.Samples.Append (Q);
             Most_Sampled_Pair := Natural'Max
@@ -180,10 +188,13 @@ package body Sancta.Ctree.Signal_Maps is
          package Scale is new Agpl.Scaling1d (Float);
          Gradient_Red : constant Scale.Object := Scale.Set_Equivalence
            (0.0, Float (Parent.Threshold),
-            32.0, 255.0);
+            16.0, 255.0);
          Gradient_Green : constant Scale.Object := Scale.Set_Equivalence
            (Float (Parent.Threshold), Float (Signal_Q'Last),
-            255.0, 32.0);
+            184.0, 0.0);
+
+         Base : constant Map.Qtree.Cell_Coords :=
+                    Map.Qtree.Location (Ref_Loc.Get).Coords;
 
          use Pair_Samples;
          procedure Draw (I : Cursor) is
@@ -191,15 +202,14 @@ package body Sancta.Ctree.Signal_Maps is
                        Map.Qtree.Location (Key (I)).Coords;
             Sample : constant Pair_Sample_Access := Element (I);
             Tint   : Unsigned_8;
-            Value  : constant Signal_Q := Sample.Samples.Last_Element;
-            --  This has to be changed to the average or so.
+            Value  : constant Signal_Q := Sample.Avg;
          begin
             if Value < Parent.Threshold then
                Tint := Unsigned_8 (Gradient_Red.Scale (Float (Value)));
-               Into.Set_Color ((Tint, 255, 255), Alpha_Opaque);
+               Into.Set_Color ((255, Tint, Tint), Alpha_Opaque);
             else
                Tint := Unsigned_8 (Gradient_Green.Scale (Float (Value)));
-               Into.Set_Color ((200, Tint, 200), Alpha_Opaque);
+               Into.Set_Color ((Tint, 200, Tint), Alpha_Opaque);
             end if;
             Into.Fill_Rectangle
               (Float (Cell.Xl), Float (Cell.Yb),
@@ -212,13 +222,15 @@ package body Sancta.Ctree.Signal_Maps is
 
       begin
          if Samples.Contains (Ref_Loc.Get) then
+            --  Draw rest
             Samples.Element (Ref_Loc.Get).Iterate (Draw'Access);
-         else
-            Into.Set_Color (Black, Alpha_Opaque);
-            Into.Draw_Rectangle (0.0, 0.0, 1.0, 1.0);
-            Into.Draw_Line (0.0, 0.0, 1.0, 1.0);
-            Into.Draw_Line (0.0, 1.0, 1.0, 0.0);
          end if;
+
+         --  Draw reference location
+         Into.Set_Color ((0, 200, 0), Alpha_Opaque);
+         Into.Fill_Rectangle
+           (Float (Base.Xl), Float (Base.Yb),
+            Float (Base.Xr), Float (Base.Yt));
       end Draw_Quality;
 
       -----------------
