@@ -69,7 +69,7 @@ package body Sancta.Ctree.Signal_Maps is
                Sample := Element (I_1).Element (Loc_2);
             else
                Sample :=
-                 new Pair_Sample'(Pair (Loc_1, Loc_2), Q_Lists.Empty_List, 0.0);
+                 new Pair_Sample'(Pair (Loc_1, Loc_2), Samples => <>);
 
                --  Someone is missing, fill them both completely
                declare
@@ -114,14 +114,10 @@ package body Sancta.Ctree.Signal_Maps is
 
             --  Here, actual sample computation:
             --  Cache avg for fast display:
-            Sample.Avg :=
-              Signal_Q
-                ((Float (Sample.Avg) * Float (Sample.Samples.Length) + Float (Q)) /
-                 (Float (Sample.Samples.Length) + 1.0));
+            Sample.Samples.Append (+Q);
 
-            Sample.Samples.Append (Q);
-            Most_Sampled_Pair := Natural'Max
-              (Most_Sampled_Pair, Natural (Sample.Samples.Length));
+            Most_Sampled_Pair :=
+              Natural'Max (Most_Sampled_Pair, Sample.Samples.Length);
 
          end Store;
 
@@ -202,7 +198,7 @@ package body Sancta.Ctree.Signal_Maps is
                        Map.Qtree.Location (Key (I)).Coords;
             Sample : constant Pair_Sample_Access := Element (I);
             Tint   : Unsigned_8;
-            Value  : constant Signal_Q := Sample.Avg;
+            Value  : constant Signal_Q := +Sample.Samples.Mean;
          begin
             if Value < Parent.Threshold then
                Tint := Unsigned_8 (Gradient_Red.Scale (Float (Value)));
@@ -231,6 +227,13 @@ package body Sancta.Ctree.Signal_Maps is
          Into.Fill_Rectangle
            (Float (Base.Xl), Float (Base.Yb),
             Float (Base.Xr), Float (Base.Yt));
+         Into.Set_Color (Black, Alpha_Opaque);
+         Into.Draw_Line
+           (Float (Base.Xl), Float (Base.Yb),
+            Float (Base.Xr), Float (Base.Yt));
+         Into.Draw_Line
+           (Float (Base.Xr), Float (Base.Yb),
+            Float (Base.Xl), Float (Base.Yt));
       end Draw_Quality;
 
       -----------------
@@ -352,5 +355,19 @@ package body Sancta.Ctree.Signal_Maps is
    begin
        Handler.Parent.Safe.Clicked ((+Click.Data_X, +Click.Data_Y));
    end Triggered;
+
+   ---------
+   -- "+" --
+   ---------
+
+   function "+" (Q : Signal_Q) return Float_Q is
+   begin
+      return Float_Q (Q);
+   end "+";
+
+   function "+" (F : Float_Q)  return Signal_Q is
+   begin
+      return Signal_Q (F);
+   end "+";
 
 end Sancta.Ctree.Signal_Maps;

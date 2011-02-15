@@ -4,6 +4,7 @@ private with Ada.Containers.Indefinite_Ordered_Sets;
 
 with Agpl.Drawing;
 with Agpl.Gui;
+with Agpl.Statistics.Series;
 
 with Sancta.Component;
 with Sancta.Map;
@@ -44,6 +45,14 @@ package Sancta.Ctree.Signal_Maps is
 
 private
 
+   type Float_Q is
+     new Float range Float (Signal_Q'First) .. Float (Signal_Q'Last);
+
+   function "+" (Q : Signal_Q) return Float_Q;  pragma Inline ("+");
+   function "+" (F : Float_Q)  return Signal_Q; pragma Inline ("+");
+
+   package Q_Series is new Agpl.Statistics.Series (Float_Q);
+
    procedure Draw (This :        Quality_View;
                    D    : in out Agpl.Drawing.Drawer'Class);
 
@@ -58,18 +67,14 @@ private
    pragma Postcondition (Natural (Pair'Result.Length) = 2);
    pragma Inline (Pair);
 
---     function "<" (L, R : Location_Pair) return Boolean;
---     pragma Inline ("<");
-
    package Location_Count_Maps is new Ada.Containers.Indefinite_Ordered_Maps
      (Map.Location'Class, Natural, Map.Less_Than);
 
    package Q_Lists is new Ada.Containers.Doubly_Linked_Lists (Signal_Q);
 
-   type Pair_Sample is record
+   type Pair_Sample is limited record
       Pair    : Location_Pair;
-      Samples : Q_Lists.List;
-      Avg     : Signal_Q := 0.0;
+      Samples : Q_Series.Serie;
    end record;
 
    type Pair_Sample_Access is access Pair_Sample;
