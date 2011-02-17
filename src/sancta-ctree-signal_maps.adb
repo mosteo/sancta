@@ -1,7 +1,9 @@
 with Ada.Numerics.Elementary_Functions;
 
 with Agpl.Constants;
+with Agpl.Drawing.Transformations;
 with Agpl.Scaling1D;
+with Agpl.Strings;
 with Agpl.Types;
 
 with Sancta.Map.Qtree;
@@ -164,6 +166,18 @@ package body Sancta.Ctree.Signal_Maps is
             Into.Draw_Rectangle
               (Float (Cell.Xl), Float (Cell.Yb),
                Float (Cell.Xr), Float (Cell.Yt));
+
+            declare
+               use Agpl.Strings;
+               Fit : Agpl.Drawing.Transformations.Transformer;
+            begin
+               Fit.Set_Color (Black, Alpha_Opaque);
+               Fit.Write (0.0, 0.0, To_String (Count));
+               Fit.Fit (Into,
+                        Float (Cell.Xl), Float (Cell.Xr),
+                        Float (Cell.Yb), Float (Cell.Yt),
+                        Square => True);
+            end;
          end Draw;
       begin
          Count.Iterate (Draw'Access);
@@ -214,6 +228,22 @@ package body Sancta.Ctree.Signal_Maps is
             Into.Draw_Rectangle
               (Float (Cell.Xl), Float (Cell.Yb),
                Float (Cell.Xr), Float (Cell.Yt));
+
+            --  Whiskers
+            declare
+               Fit : Agpl.Drawing.Transformations.Transformer;
+               Smp : constant Agpl.Drawing.Drawable'Class :=
+                       Sample.Samples.Drawable;
+            begin
+               Fit.Set_Color (Blue, Alpha_Opaque);
+               Fit.Draw_Line (0.0, Float (Signal_Q'First),
+                              0.0, Float (Signal_Q'Last));
+               Smp.Draw (Fit);
+               Fit.Fit (Into,
+                        Float (Cell.Xl), Float (Cell.Xr),
+                        Float (Cell.Yb), Float (Cell.Yt),
+                        Square => True);
+            end;
          end Draw;
 
       begin
