@@ -3,6 +3,7 @@ with Sancta.Component.Root; use Sancta.Component;
 with Sancta.Types;
 
 private with Ada.Calendar;
+private with Agpl.Chronos;
 private with Agpl.Tasking.Period;
 private with Sancta.Component.Environment;
 
@@ -29,6 +30,10 @@ package Sancta.Ctree.Component.Distributed is
    Provides_Finished      : constant Internal_Key := "finished";
    Provides_Node_Status   : constant Internal_Key := "node_status";
    --  Encapsulated info about the local node
+   Provides_Density_Draw  : constant Internal_Key := "density_draw";
+   --  Parceled drawable with density of samples per location
+   Provides_Quality_Draw  : constant Internal_Key := "quality_draw";
+   --  Parceled drawable with quality pairs
 
    Opt_Base_Id : constant Option_Attr := "base_id"; -- Id of base node
 
@@ -59,6 +64,8 @@ private
    type Object is new Root.Object with record
       Period : Agpl.Tasking.Period.Object :=
                  Agpl.Tasking.Period.Create (Def_Period);
+
+      Timer_Density : Agpl.Chronos.Object;
 
       Mover  : Inner_Access;
    end record;

@@ -53,6 +53,11 @@ package Sancta.Types is
       A    : Angle;
    end record;
 
+   function To_Point (P : Pose) return Point;
+   function "+"      (P : Pose) return Point renames To_Point;
+   pragma Inline (To_Point);
+   pragma Inline ("+");
+
    function Image (P : Pose; Decimals : Natural := 2) return String;
 
    type Local_Pose  is new Pose;

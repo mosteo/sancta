@@ -68,14 +68,18 @@ package body Sancta.Ctree.Distributed is
       This.Pred.Id := Sancta.No_Node;
       This.Succ.Id := Sancta.No_Node;
       This.Map     := Map;
+      This.Q_Map.Create (Map, Config.Signal_Threshold);
       This.Base_Id := Base;
       This.Base_Pose := Base_Pose;
 
-      This.Logger_Ctree.Set_File (Name => "ctree." & Image (This.Link.Id) &
+      This.Bot_Init (This.Base_Id);
+      This.Bot_Ptr  (This.Base_Id).Pose := This.Base_Pose;
+
+      This.Logger_Ctree.Set_File (Name => "ctree." & Image (This.Link.Id) & "." &
                             Datestamp (Separator => '.') & "." &
                                   Timestamp & ".log");
 
-      This.Logger_Signal.Set_File (Name => "signal." & Image (This.Link.Id) &
+      This.Logger_Signal.Set_File (Name => "signal." & Image (This.Link.Id) & "." &
                             Datestamp (Separator => '.') & "." &
                             Timestamp & ".log");
    end Create;
@@ -348,6 +352,17 @@ package body Sancta.Ctree.Distributed is
          Log (Sancta.Image (Key (I)) & ": " & To_String (Float (Element (I))),
               Debug, Det_Section);
       end Set_Links_Print;
+
+      procedure Store_Into_Map (I : Cursor) is
+         use Sancta.Types;
+         Id : constant Node_Id := Key (I);
+      begin
+         if This.Updates.Contains (Id) then -- True after few seconds...
+            This.Q_Map.Add_Observation
+              (+This.Pose, +This.Bot (Id).Pose, Element (I));
+         end if;
+      end Store_Into_Map;
+
    begin
       This.Qs := Q; -- Store full quality row
       This.Log_Signal;
@@ -360,6 +375,9 @@ package body Sancta.Ctree.Distributed is
          This.Succ.Q := Q.Element (This.Succ.Id);
             Log ("Setting Succ.Q to " & This.Succ.Q'Img, Debug, Log_Section);
       end if;
+
+      Q.Iterate (Store_Into_Map'Access);
+--        This.Q_Map.Print;
 
       Log ("Qs: " & Q.Length'Img, Debug, Det_Section);
       Q.Iterate (Set_Links_Print'Access);
@@ -855,6 +873,7 @@ package body Sancta.Ctree.Distributed is
 
       --  Send the global robot report
       --  Both messages pass by the own robot, bit of waste but we avoid checks.
+      --  Also this is now needed to have base info in all robots.
       This.Link.Send (New_Address (This.Link.Id, This.Channel),
         Msg_Robot_Global_Update'(Way  => To_Head,
                                  Id   => This.Link.Id,
@@ -1379,6 +1398,9 @@ package body Sancta.Ctree.Distributed is
       pragma Unreferenced (From);
       use Sancta.Network;
    begin
+      This.Bot_Init (Msg.Id); -- Ensure it exists
+      This.Bot_Ptr  (Msg.Id).Pose := Msg.Pose;
+
       if Msg.Way = To_Head and then not This.Is_Head and then This.Pred.Id /= No_Node then
          This.Link.Send (New_Address (This.Pred.Id, This.Channel), Msg);
       end if;
@@ -1517,7 +1539,13 @@ package body Sancta.Ctree.Distributed is
    is
       Found : Boolean := False;
    begin
+      This.Bot_Init (From.Sender);
+      This.Bot_Ptr (From.Sender).Pose := Msg.Pose;
+
       if This.Role = Base then
+         This.Bot_Init (This.Base_Id);
+         This.Bot_Ptr  (This.Base_Id).Pose := This.Base_Pose;
+
          for I in This.Setup_Info.First_Index .. This.Setup_Info.Last_Index loop
             if This.Setup_Info.Element (I).From = From.Sender then
                Found := True;
@@ -1903,5 +1931,47 @@ package body Sancta.Ctree.Distributed is
    begin
       return This.Map.Ref.Nearest_Location (This.Succ.Pose);
    end Succ_Loc;
+
+   ---------
+   -- Bot --
+   ---------
+
+   function Bot (This : Object; Id : Node_Id)
+                 return access constant Robot_Updates is
+   begin
+      return This.Updates.Element (Id);
+   end Bot;
+
+   ---------
+   -- Bot --
+   ---------
+
+   function Bot_Ptr (This : access Object; Id : Node_Id)
+                     return access Robot_Updates is
+   begin
+      return This.Updates.Element (Id);
+   end Bot_Ptr;
+
+   --------------
+   -- Bot_Init --
+   --------------
+
+   procedure Bot_Init (This : in out Object;
+                       Id   :        Node_Id)
+   is
+   begin
+      if not This.Updates.Contains (Id) then
+         This.Updates.Insert (Id, new Robot_Updates);
+      end if;
+   end Bot_Init;
+
+   -----------------
+   -- Density_Map --
+   -----------------
+
+   function Quality_Map (This : Object) return Signal_Maps.Quality_View is
+   begin
+      return Signal_Maps.Create (From => This.Q_Map);
+   end Quality_Map;
 
 end Sancta.Ctree.Distributed;

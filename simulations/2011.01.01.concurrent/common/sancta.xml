@@ -37,6 +37,7 @@
       <log section="sancta.ctree.utils"                         level="informative" />
       <log section="sancta.ctree.distributed"                   level="informative" />
       <log section="sancta.ctree.distributed.detail"            level="informative" />
+      <log section="sancta.ctree.signal_maps"                   level="informative" />
       <log section="sancta.comp.tree_ordered"                   level="informative" />
       <log section="sancta.component.player_client"             level="informative" />
       <log section="sancta.component.root"                      level="informative" />
@@ -147,6 +148,16 @@
          <requires data="link"  as="link"/>
       </component>
 
+      <component name="copy" enabled="true">
+          <requires data="x" as="density_draw"/>
+          <provides data="y" as="density_gui"/>
+      </component>
+
+      <component name="gtk_canvas" title="$id" enabled="true">
+         <requires data="drawable"  as="density_draw"/>
+         <requires data="handler"   as="density_gui"/>
+      </component>
+
    </group>
 
    <group id="ctree">
@@ -212,6 +223,7 @@
          <provides data="velo"          as="ctree_velo_goal" />
          <provides data="status_draw"   as="ctree_draw" /> <!-- Only used by zak -->
          <provides data="node_status"   as="ctree_node_status" />
+         <provides data="density_draw"  as="density_draw" />
       </component>
 
       <component name="redirect" destination="$gui_node" channel="console_local" trigger="periodic" period="$feed_period">
@@ -323,6 +335,12 @@
          <requires data="local_parcels"  as="local_parcels"  />
          <requires data="global_parcels" as="global_parcels" />
          <provides data="map_drawer"  as="drawer"/>
+         <provides data="tabs"        as="tabs"/>
+      </component>
+
+      <component name="copy" enabled="true">
+          <requires data="x" as="density_draw"/>
+          <provides data="y" as="tabs"/>
       </component>
 
       <component name="redirect_listener" channel="console_local" wrap="true">

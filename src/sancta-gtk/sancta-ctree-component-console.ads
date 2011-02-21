@@ -36,8 +36,10 @@ package Sancta.Ctree.Component.Console is
    Requires_Link          : constant Internal_Key := "link";
    Requires_Local_Parcels : constant Internal_Key := "local_parcels";
    --  Drawables/Widgets for the local node views. Wrapped in parcel.
-   Requires_Global_Parcels : constant Internal_Key := "global_parcels";
+   Requires_Global_Parcels: constant Internal_Key := "global_parcels";
    --  Drawables/Widgets for the map global view. Wrapped in parcel.
+   Requires_Tabs          : constant Internal_Key := "tabs";
+   --  Drawables/widgets for the notebook
 
    Provides_Map_Drawer  : constant Internal_Key := "map_drawer"; -- sctypes.drawer
                                                                  --  Drawer for the map area
@@ -88,6 +90,11 @@ private
        (Node_Id, Agpl.Gdk.Managed.Drawing_Area.Handle,
         "<", Agpl.Gdk.Managed.Drawing_Area."=");
 
+   package String_Area_Maps is new
+     Ada.Containers.Indefinite_Ordered_Maps
+       (String, Agpl.Gdk.Managed.Drawing_Area.Handle,
+        "<", Agpl.Gdk.Managed.Drawing_Area."=");
+
    package Label_Matrices is new Agpl.Containers.Ordered_Multidimensional_Maps
      (Two_D, Natural, Standard.Gtk.Label.Gtk_Label,
       "<", Standard.Gtk.Label."=");
@@ -135,6 +142,8 @@ private
       --  The vbox for each robot into which append custom widgets
       Local_Widgets         : Node_Widget_Maps.Map;
       --  The remote widgets for each node
+      Tabs                  : String_Area_Maps.Map;
+      --  The tabs in the notebook, as handles.
 
       Map_Drawer            : Agpl.Drawing.Multisource.Object_Access;
 

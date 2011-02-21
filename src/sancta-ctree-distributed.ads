@@ -2,8 +2,9 @@ with Agpl.Drawing.Multisource;
 with Agpl.Reflection.Booleans;
 with Agpl.Trace.File;
 with Sancta.Ctree.Connectivity_Matrix;
-with Sancta.Ctree.Tree_Navigator;
+with Sancta.Ctree.Signal_Maps;
 with Sancta.Ctree.Stats;
+with Sancta.Ctree.Tree_Navigator;
 with Sancta.Assignment;
 with Sancta.Component;
 with Sancta.Containers; use Sancta.Containers;
@@ -218,7 +219,7 @@ package Sancta.Ctree.Distributed is
          Pose : Sancta.Types.Pose;
       end record;
    --  This message propagates all the way to head and tail.
-   --  At present, needed only in simulation to compute fake signals
+   --  Nodes need the locations of others to build signal maps.
 
    overriding
    procedure Process (Msg  : Msg_Robot_Global_Update;
@@ -264,6 +265,9 @@ package Sancta.Ctree.Distributed is
    function Is_Commanding_Robot (This : Object) return Boolean;
    --  Says if the robot must be commanded.
    --  Always false for the Base node.
+
+   not overriding
+   function Quality_Map (This : Object) return Signal_Maps.Quality_View;
 
 private
 
@@ -376,6 +380,17 @@ private
       Parked : Boolean        := True; -- Means at starting point
    end record;
 
+   type Robot_Updates is limited record
+      Pose : Types.Pose;
+   end record;
+   --  Yet another robot status info record. This will hold the global data
+   --  all robots know about each other, propagated in the Msg_Robot_Global_Update
+
+   type Robot_Updates_Access is access Robot_Updates;
+
+   package Id_Updates_Maps is new Ada.Containers.Ordered_Maps
+     (Node_Id, Robot_Updates_Access);
+
    type Object_Access is access all Object;
 
    type Object is new Sancta.Netlistener.Object with record
@@ -387,6 +402,11 @@ private
       Setup_Last     : Id_Vectors.Vector;   -- last ordering received
       --  This, during execution, contains all the robot IDs from tail to head.
       --  NOTE: IT DOES NOT CONTAIN THE BASE ID.
+
+      Updates        : Id_Updates_Maps.Map;
+      --  Global info that every robot knows about the others, base included.
+      --  Look at the accessor functions in order not to manipulate this directly
+      --  Upon initialization complete, this should hold valid values and be usable.
 
       Role           : Roles;
       Map            : Sancta.Map.Smart.Object;
@@ -427,6 +447,9 @@ private
 
       Qs             : Id_Q_Maps.Map;
       --  Qualities as seen from this robot.
+
+      Q_Map          : Signal_Maps.Map_Family;
+      --  Mapping of signal environ.
 
       Operator_Msg   : Op_Msg_Handle.Object :=
                          Op_Msg_Handle.Set
@@ -469,6 +492,19 @@ private
       Logger_Ctree        : Agpl.Trace.File.Object;
       Logger_Signal       : Agpl.Trace.File.Object;
    end record;
+
+   not overriding
+   function Bot (This : Object; Id : Node_Id)
+                 return access constant Robot_Updates;
+
+   not overriding
+   function Bot_Ptr (This : access Object; Id : Node_Id)
+                     return access Robot_Updates;
+
+   not overriding
+   procedure Bot_Init (This : in out Object;
+                       Id   :        Node_Id);
+   --  Ensure that Updates info for this bot is present
 
    not overriding
    function Succ_Loc (This : Object) return Sancta.Map.Location'Class;
