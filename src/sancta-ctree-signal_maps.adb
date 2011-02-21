@@ -232,13 +232,11 @@ package body Sancta.Ctree.Signal_Maps is
             --  Whiskers
             declare
                Fit : Agpl.Drawing.Transformations.Transformer;
-               Smp : constant Agpl.Drawing.Drawable'Class :=
-                       Sample.Samples.Drawable;
             begin
-               Fit.Set_Color (Blue, Alpha_Opaque);
-               Fit.Draw_Line (0.0, Float (Signal_Q'First),
-                              0.0, Float (Signal_Q'Last));
-               Smp.Draw (Fit);
+               Fit.Set_Color (Red, Alpha_Opaque);
+               Fit.Draw_Line (-Float (Signal_Q'Last) / 2.0, Float (Parent.Threshold),
+                              +Float (Signal_Q'Last) / 2.0, Float (Parent.Threshold));
+               Sample.Samples.Drawable (Width => 0.2).Draw (Fit);
                Fit.Fit (Into,
                         Float (Cell.Xl), Float (Cell.Xr),
                         Float (Cell.Yb), Float (Cell.Yt),
