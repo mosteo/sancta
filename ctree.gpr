@@ -29,7 +29,9 @@ project Ctree is
 
       for Default_Switches ("C")   use ("-g", "-Wall", "-D_REENTRANT");
       for Default_Switches ("C++") use ("-g", "-Wall", "-D_REENTRANT");
-      for Default_Switches ("Ada") use ("-g", "-gnatf", "-gnat05", "-gnatwa", "-gnatVa", "-gnatyacehikn", "-gnatqQ");
+      for Default_Switches ("Ada") use ("-g", "-gnatf", "-gnat05", "-gnatwa",
+                                        "-gnatVa", "-gnatyacehikn", "-gnatqQ",
+                                        "-gnateE"); -- Better exception info
 
       case Build is
          when "Profile" =>

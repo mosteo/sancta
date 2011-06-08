@@ -27,8 +27,8 @@ private
 
    type Object;
 
-   type Listener_Type (Link   : access Network.Layer.Object'Class;
-                       Parent : access Object) is
+   type Listener_Type (Link   : not null access Network.Layer.Object'Class;
+                       Parent :          access Object) is
      new Netlistener.Object (Link) with null record;
 
    overriding
