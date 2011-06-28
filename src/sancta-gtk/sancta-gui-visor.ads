@@ -28,7 +28,7 @@ package Sancta.Gui.Visor is
 
    Log_Section : constant String := "sancta.gui.visor";
 
-   type Object (Link : access Network.Layer.Object'Class)
+   type Object (Link : not null access Network.Layer.Object'Class)
      is new Netlistener.Object with private;
    type Object_Access is access all Object'Class;
 
@@ -106,7 +106,7 @@ private
 
    use Ada.Calendar;
 
-   type Object (Link : access Network.Layer.Object'Class) is new Netlistener.Object (Link) with
+   type Object (Link : not null access Network.Layer.Object'Class) is new Netlistener.Object (Link) with
       record
          Self     : Object_Access;
 
