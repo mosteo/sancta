@@ -67,6 +67,7 @@ project Ctree is
         Sancta.Linker'Default_Switches ("Ada") &
         ("-g",
 	 "-rdynamic", -- needed by glade autoconnect
+         "-L/usr/lib/i386-linux-gnu", -- needed because new oddities in Ubuntu 11.04
 	 "-L/home/jano/local/lib", "/usr/lib/libgsl.a",
 
          "-Wl,-Bstatic",  -- Static libraries from here on
