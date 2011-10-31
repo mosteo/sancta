@@ -1,9 +1,9 @@
 with Agpl.Trace,
 
      Sancta.Ctree.Components,
-     Sancta.Ctree.Component.Console,
+--     Sancta.Ctree.Component.Console,
 --       Sancta.Component.Netstats,
-     Sancta.Component.Netstats2Gnetstats,
+--     Sancta.Component.Netstats2Gnetstats,
 --       Sancta.Component.Network_Rtwmp,
      Sancta.Component.Player_Include,
      Sancta.Component.Pose2Robot_Pose,
@@ -20,12 +20,13 @@ with Gnat.Os_Lib;
 with Ada.Command_Line; use Ada.Command_Line;
 
 procedure CTree_Node is
+
 begin
    Log (Command_Name & " starting...", Always);
 
-   Sancta.Ctree.Component.Console.Register;
+--   Sancta.Ctree.Component.Console.Register;
    Sancta.Ctree.Components.Register;
-   Sancta.Component.Netstats2Gnetstats.Caster.Register;
+--   Sancta.Component.Netstats2Gnetstats.Caster.Register;
 --     Sancta.Component.Network_Rtwmp.Register;
    Sancta.Component.Player_Include.Register;
    Sancta.Component.Pose2Robot_Pose.Caster.Register;
