@@ -1,1 +1,3 @@
 SANCTA: Simulated Annealing Constrained Task Allocation is a component-based library containing my research code for service networked robotics.
+
+It currently requires player-ada for compilation, downloadable separately from https://github.com/mosteo/player-ada

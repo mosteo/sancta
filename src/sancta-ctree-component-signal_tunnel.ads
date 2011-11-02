@@ -42,7 +42,7 @@ private
    use Sancta;
 
    type Listener_Type (Link   : not null access Network.Layer.Object'Class;
-                       Parent : access Object) is
+                       Parent :          access Object) is
      new Netlistener.Object (Link) with null record;
 
    overriding

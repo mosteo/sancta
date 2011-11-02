@@ -387,7 +387,7 @@ while [ "$1" != "" ]; do
 		run)
 			do_run
 		;;
-      tunnel)
+      		tunnel)
 			do_tunnels
 		;;
 		poweroff)

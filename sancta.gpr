@@ -1,7 +1,7 @@
 with "mbicp/mbicp";
 with "agpl/agpl";
 with "agpl/gtkada_conditional";
-with "player3-ada/player3_ada.gpr";
+with "player-ada/player3_ada.gpr";
 with "player3-ada/playerc30_jano";
 
 project Sancta is
