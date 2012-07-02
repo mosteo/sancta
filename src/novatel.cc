@@ -596,7 +596,7 @@ Novatel::ReadSentence(char* buf, size_t len)
   //printf("reading sentence\n");
   //fflush(stdout);
 
-  while(!(ptr = strchr((const char*)nmea_buf, NMEA_START_CHAR)))
+  while(!(ptr = strchr((char*)nmea_buf, NMEA_START_CHAR)))
   {
     nmea_buf_len=0;
     memset(nmea_buf,0,sizeof(nmea_buf));
@@ -610,7 +610,7 @@ Novatel::ReadSentence(char* buf, size_t len)
   //printf("found start char:[%s]:[%d]\n", nmea_buf,nmea_buf_len);
   //fflush(stdout);
 
-  while(!(ptr = strchr((const char*)nmea_buf, NMEA_END_CHAR)))
+  while(!(ptr = strchr((char*)nmea_buf, NMEA_END_CHAR)))
   {
     if(nmea_buf_len >= sizeof(nmea_buf) - 1)
     {
@@ -655,7 +655,7 @@ Novatel::ReadSentence(char* buf, size_t len)
 
   // verify the checksum, if present.  two hex digits are the XOR of all the
   // characters between the $ and *.
-  if((ptr2 = strchr((const char*)buf,NMEA_CHKSUM_CHAR)) && (strlen(ptr2) == 3))
+  if((ptr2 = strchr((char*)buf,NMEA_CHKSUM_CHAR)) && (strlen(ptr2) == 3))
   {
     ////printf("ptr2 %s\n", ptr2);
     ////fflush(stdout);
@@ -784,7 +784,7 @@ Novatel::GetNextField(char* field, size_t len, const char* ptr)
   char* end;
   size_t fieldlen;
 
-  if(strlen(ptr) < 2 || !(start = strchr(ptr, ',')))
+  if(strlen(ptr) < 2 || !(start = strchr((char*)ptr, ',')))
   {
     field[0]='\0';
     return(NULL);
