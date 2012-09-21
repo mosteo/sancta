@@ -250,10 +250,10 @@ package body Sancta.Map is
       return "";
    end Hash;
 
-   function Hash (This : Object'Class) return String is
-   begin
-      return This.Hash;
-   end Hash;
+--     function Hash (This : Object'Class) return String is
+--     begin
+--        return This.Hash;
+--     end Hash;
 
    ----------------------
    -- Get_Cost_Between --
@@ -392,7 +392,7 @@ package body Sancta.Map is
    function Nearest_Location (This : Object'Class;
                               P    : Types.Point) return Location'Class is
    begin
-      return This.Nearest_Location ((P.X, P.Y, 0.0));
+      return This.Nearest_Location (Pose => (P.X, P.Y, 0.0));
    end Nearest_Location;
 
    ------------------
@@ -445,7 +445,7 @@ package body Sancta.Map is
       if not Has_Element (I) then
          raise Constraint_Error with "Loc not in given route";
       elsif I = Last (Route) then
-         return Route.last_element;
+         return Route.Last_Element;
       else
          return Element (Next (I));
       end if;
@@ -591,8 +591,8 @@ package body Sancta.Map is
    -----------
 
    function Image (P : Path) return String is
-      use Agpl.Ustrings, Agpl.Ustrings.Asu;
-      R : Ustring;
+      use Agpl.Ustrings, Agpl.Ustrings.ASU;
+      R : UString;
       use Paths;
       procedure Image (I : Cursor) is
       begin

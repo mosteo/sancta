@@ -6,13 +6,11 @@ with "player3-ada/playerc30_jano";
 
 project Sancta is
 
-   type Boolean          is ("True",    "False");
-   type Enabled_Disabled is ("Enabled", "Disabled");
-   type Yes_No           is ("Yes",     "No");
+   type Boolean is ("True", "False");
 
    for Languages use ("Ada", "C", "C++");
 
-   for Source_Dirs use ();
+   for Source_Dirs use ("src", "src/main");
    for Object_Dir  use "obj";
    for Exec_Dir    use "obj";
 
@@ -24,14 +22,10 @@ project Sancta is
       when "Aria"   => for Source_Dirs use project'Source_Dirs & ("src/aria");
    end case;
 
-   --  type Platform_Type is ("Windows", "Linux");
-   --  Platform : Platform_Type := external ("Sancta_OS", "Linux");
-   --  Does nothing for now.
-
    Lib_Name    := "Sancta";
-   Lib_Version := "20070223";
+   Lib_Version := "20120921";
 
-   type Build_Type   is ("Debug", "Release", "Fastest", "No_Options", "Profile");
+   type Build_Type   is ("Debug");
    type Linking_Type is ("Dependencies", "Static_Library", "Dynamic_Library");
 
    Build : Build_Type   := external ("Sancta_Build", "Debug");
@@ -39,10 +33,7 @@ project Sancta is
 
    case Link is
       when "Dependencies" =>
-         for Main use ("sancta-main-sanctabot.adb",
-                       "sancta-main-log_plot.adb",
-                       "sancta-main-sm_plot.adb",
-                       "sancta-main-show_assignment.adb");
+         for Main use ("sanctabot.adb");
       when "Static_Library" =>
          for Library_Dir     use "libstatic";
          for Library_Name    use Lib_Name;
@@ -55,106 +46,126 @@ project Sancta is
          for Library_Version use Lib_Name & ".so." & Lib_Version;
    end case;
 
-   Include_Base  : Yes_No := External ("Sancta_Include_Base",  "Yes");
-   Include_Gtk   : Yes_No := External ("Sancta_Include_Gtk",   "Yes");
-   Include_Rtwmp : Yes_No := External ("Sancta_Include_Rtwmp", "Yes");
-   Include_Slam  : Yes_No := External ("Sancta_Include_Slam",  "No");
-   Include_Test  : Yes_No := External ("Sancta_Include_Test",  "Yes");
-
-   case Include_Base is
-      when "Yes" => for Source_Dirs use project'Source_Dirs & ("src");
-      when "No"  => null;
-   end case;
+   Include_Gtk   : Boolean := External ("Sancta_Include_Gtk",   "False");
+   Include_Rtwmp : Boolean := External ("Sancta_Include_Rtwmp", "False");
+   Include_Slam  : Boolean := External ("Sancta_Include_Slam",  "False");
+   Include_Test  : Boolean := External ("Sancta_Include_Test",  "False");
 
    case Include_Gtk is
-      when "Yes" => for Source_Dirs use project'Source_Dirs &
-                           ("src/sancta-gtk", "src/sancta-gtk/main", "src/sancta-gtk/visor/src", "src/test-gtk");
-      when "No"  => null;
+      when "True" =>
+         for Source_Dirs use project'Source_Dirs &
+         ("src/sancta-gtk",
+          "src/sancta-gtk/main",
+          "src/sancta-gtk/visor/src",
+          "src/test-gtk");
+         for Main use project'Main &
+           ("sancta-main-log_plot.adb",
+            "sancta-main-sm_plot.adb",
+            "sancta-main-show_assignment.adb");
+      when "False"  => null;
    end case;
 
    case Include_Rtwmp is
-      when "Yes" => for Source_Dirs use project'Source_Dirs & ("src/rtwmp", "src/rtwmp/current/src");
-      when "No"  => null;
+      when "True" => for Source_Dirs use project'Source_Dirs &
+         ("src/rtwmp",
+          "src/rtwmp/current/src");
+      when "False"  => null;
    end case;
 
    case Include_Slam is
-      when "Yes" => for Source_Dirs use project'Source_Dirs & ("src/slam-maite", "src/slam-maite/slam", "src/slam-maite/tools");
-      when "No"  => null;
+      when "True" => for Source_Dirs use project'Source_Dirs &
+         ("src/slam-maite",
+          "src/slam-maite/slam",
+          "src/slam-maite/tools");
+      when "False"  => null;
    end case;
 
    case Include_Test is
-      when "Yes" => for Source_Dirs use project'Source_Dirs & ("src/test");
-      when "No"  => null;
+      when "True" => for Source_Dirs use project'Source_Dirs & ("src/test");
+      when "False"  => null;
    end case;
 
    package Ide is
-      for Vcs_Kind use "Subversion";
+      for Vcs_Kind use "git";
    end Ide;
 
    package Compiler is
-      for Default_Switches ("C")   use ("-g", "-Wall", "-O2");
-      for Default_Switches ("C++") use ("-g", "-Wall", "-O2");
-      for Default_Switches ("Ada") use ("-g", "-gnatf", "-gnat05", "-gnatwa", "-gnatVa", "-gnatyacehikn", "-gnatqQ");
+
+      for Required_Switches ("Ada") use ("-gnat2012",
+                                         "-gnatwa",  -- optional warnings from gnat
+                                         "-Wall",    -- optional warnings from gcc
+                                         "-gnatwt",  -- detect dead code
+                                         "-gnatwjl", -- extra warnings
+                                         "-gnaty",   -- standard source code style
+                                         "");
+
+      for Required_Switches ("C")   use ("-Wall");
+      for Required_Switches ("C++") use ("-Wall");
 
       case Include_Slam is
-         when "Yes" =>
-            for Default_Switches ("c")   use Compiler'Default_Switches ("c")   & ("-I/home/jano/local/include/player-2.0");
-            for Default_Switches ("c++") use Compiler'Default_Switches ("c++") & ("-I/home/jano/local/include/player-2.0");
-         when "No" => null;
+         when "True" =>
+            for Default_Switches ("c")   use Compiler'Default_Switches ("c")   &
+            ("-I/home/jano/local/include/player-2.0");
+            for Default_Switches ("c++") use Compiler'Default_Switches ("c++") &
+            ("-I/home/jano/local/include/player-2.0");
+         when "False" => null;
       end case;
 
       case Build is
-         when "Profile" =>
-            for Default_Switches ("Ada") use Compiler'Default_Switches ("Ada") &
-              ("-O2", "-gnato", "-fstack-check", "-gnata", "-gnatpg");
          when "Debug" =>
-            for Default_Switches ("Ada") use Compiler'Default_Switches ("Ada") &
-              ("-O2", "-gnato", "-fstack-check", "-gnata");
-         when "Release" =>
-            for Default_Switches ("Ada") use ("-g", "-O3", "-gnatn", "-gnatp");
-            --  for Default_Switches ("Ada") use Compiler'Default_Switches ("Ada") & ("-O3", "-gnatn", "-gnatp");
-            for Default_Switches ("C")   use Compiler'Default_Switches ("C")   & ("-O3");
-            for Default_Switches ("C++") use Compiler'Default_Switches ("C++")   & ("-O3");
-         when "Fastest" =>
-            for Default_Switches ("Ada") use ("-g", "-O3", "-gnatn", "-gnatN", "-gnatp");
-            for Default_Switches ("C")   use Compiler'Default_Switches ("C")   & ("-O3");
-            for Default_Switches ("C++") use Compiler'Default_Switches ("C++") & ("-O3");
-         when "No_Options" =>
-            for Default_Switches ("Ada") use ("-gnat05");
-            --  Deliberately override default switches not to have any!
+            for Default_Switches ("Ada") use ("-g",
+                                              "-O2",
+                                              "-gnato", -- Standard Ada overflow
+                                              "-fstack-check",
+                                              "-gnata", -- All assertions
+                                              "-gnateE", -- Extra range check info in exceptions
+                                              "-gnatf", -- full errors
+                                              "-gnatqQ", -- compile as much as possible even with errors
+                                              "-gnatVa", -- all validity checks (expensive, use Vd for default)
+                                              "");
+            for Default_Switches ("C")   use ("-g", "-O2");
+            for Default_Switches ("C++") use ("-g", "-O2");
       end case;
    end Compiler;
 
    package Binder is
-      for Default_Switches ("Ada") use ("-E", "-g", "-static");
-      --  "-r" to list applicable restrictions to partition.
+      for Default_Switches ("Ada") use ("-E",      -- exception tracebacks
+                                        "-g",      -- keep debug symbols? (Unsure)
+                                        -- "-r",   -- restrictions that might be applied
+                                        "-static", -- static runtime
+                                        "");
    end Binder;
 
    package Linker is
-      for Default_Switches ("Ada") use ("-g", "/usr/lib/libgsl.a");
+      for Default_Switches ("Ada") use ("-g");
       for Default_Switches ("C")   use ("-g");
       for Default_Switches ("C++") use ("-g");
 
-      case Include_Rtwmp is
-         when "Yes" =>
-            --  This form works when the current open project is sancta.gpr
-            --  Should be explicitly appended by descendant projects
-           for Default_Switches ("Ada") use Linker'Default_Switches ("Ada") &
-             ("-Lsrc/rtwmp/lib",
+      for Linker_Options use ("-lgsl");
+      --  Linker.Linker_Options apply at the main project, not here.
+      --  Needed by something (although already in AGPL)
+
+      Rtwmp_Link := ("-Lsrc/rtwmp/lib",
 	      "-Wl,-Bstatic",  -- force static linking
 	      "-lrt-wmp",
 	      "-lrt",          --  rt is for system clock_gettime, used by rt-wmp
 	      "-Wl,-Bdynamic", -- restore default dynamic linking needed by other libs
               "");
 
+      case Include_Rtwmp is
+         when "True" =>
+            --  This form works when the current open project is sancta.gpr
+            --  Should be explicitly appended by descendant projects
+            for Default_Switches ("Ada") use Linker'Default_Switches ("Ada") &
+              Rtwmp_Link;
+
             --  This form works when the current open project is a descendant,
-            --  e.g. nerus.gpr
-	   for Linker_Options use Linker'Linker_Options &
-            ("-Lsrc/rtwmp/lib");
+            --  e.g. ctree.gpr
+	   for Linker_Options use Linker'Linker_Options & Rtwmp_Link;
             --  Needed since the Default_Switches uses the base path of the
             --  inheriting project and fails for relative paths.
             --  This however works, dunno exactly why. Bug?
-         when "No"  => null;
+         when "False"  => null;
       end case;
    end Linker;
 

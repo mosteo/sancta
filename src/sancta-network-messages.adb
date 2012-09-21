@@ -64,8 +64,8 @@ package body Sancta.Network.Messages is
 --        Log ("lp: " & Debug2.To_String (Msg.Laser_Pose), always);
 
       for J in 1 .. Msg.Last loop
-         Msg.Range_Scan (J).A := Scan.Scan.Ref.ranges (I).A;
-         Msg.Range_Scan (J).D := Scan.Scan.Ref.ranges (I).D;
+         Msg.Range_Scan (J).A := Scan.Scan.Ref.Ranges (I).A;
+         Msg.Range_Scan (J).D := Scan.Scan.Ref.Ranges (I).D;
          I := I + 1;
       end loop;
       return Msg;
@@ -85,7 +85,7 @@ package body Sancta.Network.Messages is
    begin
       return (Key => +Key,
               Val => +Val,
-              ACK => ACK);
+              Ack => ACK);
    end Redirect;
 
 end Sancta.Network.Messages;

@@ -2,10 +2,10 @@ with Agpl.Command_Line; use Agpl.Command_Line;
 with Agpl.Xml;
 with Agpl; use Agpl;
 
-with Gnat.Os_Lib;
+with GNAT.OS_Lib;
 
 with Sancta.Config;
-with Text_Io; use Text_Io;
+with Text_IO; use Text_IO;
 
 pragma Warnings (Off);
 with Agpl.Task_Termination;
@@ -21,11 +21,11 @@ package body Sancta.Starter is
    procedure Shutdown is
    begin
       delay 0.1;
-      Gnat.Os_Lib.Os_Exit (0);
+      GNAT.OS_Lib.OS_Exit (0);
    exception
       when E : others =>
          Log ("Shutting down: " & Report (E), Warning, Log_Section);
-         Gnat.Os_Lib.Os_Exit (-1);
+         GNAT.OS_Lib.OS_Exit (-1);
    end Shutdown;
 
    --------------------
@@ -35,11 +35,11 @@ package body Sancta.Starter is
    procedure Shutdown_Abort (Code : Integer) is
    begin
       delay 1.0;
-      Gnat.Os_Lib.Os_Exit (Code);
+      GNAT.OS_Lib.OS_Exit (Code);
    exception
       when E : others =>
          Log ("Sancta.Starter: Aborting: " & Report (E), Warning, Log_Section);
-         Gnat.Os_Lib.Os_Exit (-1);
+         GNAT.OS_Lib.OS_Exit (-1);
    end Shutdown_Abort;
 
    -----------
@@ -67,7 +67,7 @@ package body Sancta.Starter is
 
       --  Common configuration.
       Log ("Starting...", Always);
-      Config.Init (Value (Get_Option ("--id")), get_option ("--config"));
+      Config.Init (Value (Get_Option ("--id")), Get_Option ("--config"));
       Log ("Configuration parsed:", Always);
       Log (Xml.To_String (Config.Get_All_Options), Always);
 

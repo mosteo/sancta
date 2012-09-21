@@ -116,7 +116,7 @@ package Sancta.Map is
       Loc : not null access function (Map : Object'Class;
                                       Row : Rows; -- The ones in the PNG file
                                       Col : Columns) return Location'Class;
-      Obs : not null access function (Sample : Agpl.Types.Rgb_Triplet) return Observation'Class;
+      Obs : not null access function (Sample : Agpl.Types.Rgb_triplet) return Observation'Class;
    end record;
 
    procedure From_Png (This : in out Object;
@@ -202,8 +202,8 @@ package Sancta.Map is
    --  For caching. Default raises program error.
    --  Should be unique for each map configuration
 
-   function Hash (This : Object'Class) return String;
-   --  Dispatchs to internal one
+--     function Hash (This : Object'Class) return String;
+--     --  Dispatchs to internal one
 
    not overriding
    function Get_Cost_Between (This : Object;

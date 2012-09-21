@@ -1,4 +1,4 @@
-with Agpl.Smart_Access_Limited;
+with Agpl.Smart_access_Limited;
 
 package Sancta.Map.Smart is
 new Agpl.Smart_Access_Limited

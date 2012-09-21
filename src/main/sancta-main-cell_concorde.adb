@@ -1,7 +1,7 @@
 with Sancta.Tasks.Grid_Goal;
 
-with Sancta.Assigner.Mtsp_Concorde;
-use  Sancta.Assigner.Mtsp_Concorde;
+with Sancta.Assigner.MTSP_Concorde;
+use  Sancta.Assigner.MTSP_Concorde;
 --  Replace two above lines with the assigner of interest...
 
 with Sancta.Agent.Utils; use Sancta.Agent.Utils;
@@ -15,7 +15,7 @@ with Agpl.Trace;
 with Agpl; use Agpl;
 
 with Ada.Command_Line; use Ada.Command_Line;
-with Ada.Text_Io;      use Ada.Text_Io;
+with Ada.Text_IO;      use Ada.Text_IO;
 
 procedure Sancta.Main.Cell_Concorde is
 
@@ -43,7 +43,7 @@ procedure Sancta.Main.Cell_Concorde is
       Tasks.Grid_Goal.Parse_Ascii (Argument (1));
 
       declare
-         Asser : Object (False);
+         Asser : Assigner.MTSP_Concorde.Object (False);
          Costs : Sancta.Cost_Matrix.Object;
          use Cost_Matrix_Stores;
       begin
@@ -60,9 +60,11 @@ procedure Sancta.Main.Cell_Concorde is
             use Assignment_Stores;
          begin
             Put_Line ("Assignment completed.");
-            To_File (Assed,
-                     Filesystem.Replace_Extension
-                       (Argument (1), Object'External_Tag & ".ass"));
+            To_File
+              (Assed,
+               Filesystem.Replace_Extension
+                 (Argument (1),
+                  Sancta.Assignment.Object'External_Tag & ".ass"));
             Assed.Print_Assignment;
          end;
       end;

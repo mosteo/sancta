@@ -352,7 +352,7 @@ package body Sancta.Plan is
          declare
             Solution : Object := Copy_But_Tasks (This);
          begin
-            Add_Subplan (Solution, Plan_Node.Create (Plan_Node.OR_Node, Solutions));
+            Add_Subplan (Solution, Plan_Node.Create (Plan_Node.Or_Node, Solutions));
             pragma Assert (Plan_Node.Is_Sane (Solution.Get_Root));
             return Solution;
          end;
@@ -761,7 +761,7 @@ package body Sancta.Plan is
    procedure Print_Summary (This : in Object) is
       Tasks : constant Sancta.Tasks.Containers.Lists.List := Get_Tasks (This);
       use Sancta.Tasks.Containers.Lists;
-      I     : cursor := First (Tasks);
+      I     : Cursor := First (Tasks);
    begin
       Trace.Log ("Plan summary follows: ", Trace.Always);
       while I /= No_Element loop
@@ -861,7 +861,7 @@ package body Sancta.Plan is
    begin
       Stream.Create;
       Object'Output (Stream'Access, This);
-      return Stream.Available_Read;
+      return Stream.Available_read;
    end Size_In_Bytes;
 
    ------------
