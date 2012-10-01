@@ -7,6 +7,7 @@ with Agpl.Png;
 with Agpl.Trace; use Agpl.Trace;
 
 with Sancta.Map.Qtree;
+with Sancta.Map.Qtree.Builder;
 with Sancta.Map.Qtree.Show;
 with Sancta.Map.Utils;
 with Sancta.Types; use Sancta.Types;
@@ -32,14 +33,17 @@ begin
    P.Open (Argument (2));
    Max_Depth := 2 ** Natural'Value (Argument (1));
 
-   M.Set_Size      (0.0, X_Real (P.Width), 0.0, Y_Real (P.Height));
+--     M.Set_Size      (0.0, X_Real (P.Width), 0.0, Y_Real (P.Height));
 
-   M.Set_Cell_Size (X_Real (P.Width) / X_Real (Max_Depth),
-                    X_Real (P.Width),
-                    Y_Real (P.Height) / Y_Real (Max_Depth),
-                    Y_Real (P.Height));
+   M.Set_Cell_Size
+     (Real'Base'Min
+        (Real (P.Width) / Real (Max_Depth),
+         Real (P.Height) / Real (Max_Depth)),
+     Real'Base'Max (Real (P.Width), Real (P.Height)));
 
-   M.From_Png (Argument (2));
+   Sancta.Map.Qtree.Builder.From_Png (M, Argument (2),
+                                      0.0, X_Real (P.Width),
+                                      0.0, Y_Real (P.Height));
    Log ("Loading time: " & Load_Timer.Image, Always);
 
    --  Random path in map to test path-finding

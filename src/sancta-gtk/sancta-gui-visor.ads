@@ -28,7 +28,7 @@ package Sancta.Gui.Visor is
 
    Log_Section : constant String := "sancta.gui.visor";
 
-   type Object (Link : access Network.Layer.Object'Class)
+   type Object (Link : not null access Sancta.Network.Layer.Object'Class)
      is new Netlistener.Object with private;
    type Object_Access is access all Object'Class;
 

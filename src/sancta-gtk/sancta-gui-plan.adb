@@ -54,7 +54,7 @@ package body Sancta.Gui.Plan is
          case Get_Kind (X) is
             when Task_Node =>
                declare
-                  T : Sancta.Tasks.Object renames Get_Task (X).all;
+                  T : Sancta.Tasks.Object'Class renames Get_Task (X).all;
                begin
                   Append (Text,
                           "#" & Text & To_String (Integer (Sancta.Tasks.Get_Id (T))) &

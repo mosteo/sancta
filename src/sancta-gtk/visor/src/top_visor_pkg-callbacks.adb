@@ -3,12 +3,13 @@ with Glib; use Glib;
 with Gdk.Event; use Gdk.Event;
 with Gdk.Types; use Gdk.Types;
 with Gtk.Accel_Group; use Gtk.Accel_Group;
+with Gtk.Arguments; use Gtk.Arguments;
 with Gtk.Object; use Gtk.Object;
 with Gtk.Enums; use Gtk.Enums;
 with Gtk.Style; use Gtk.Style;
 with Gtk.Widget; use Gtk.Widget;
 
-with Expres.Gui.Callbacks;
+--  with Expres.Gui.Callbacks;
 
 package body Top_Visor_Pkg.Callbacks is
 
@@ -19,7 +20,7 @@ package body Top_Visor_Pkg.Callbacks is
    -----------------------
 
    procedure On_Salir_Activate
-     (Object : access Gtk_Image_Menu_Item_Record'Class)
+     (Object : access Gtk_Menu_Item_Record'Class)
    is
    begin
       null;

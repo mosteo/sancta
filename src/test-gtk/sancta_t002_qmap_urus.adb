@@ -8,6 +8,7 @@ with Agpl.Png;
 with Agpl.Trace; use Agpl.Trace;
 
 with Sancta.Map.Qtree;
+with Sancta.Map.Qtree.Builder;
 with Sancta.Map.Qtree.Show;
 with Sancta.Map.Utils;
 with Sancta.Types; use Sancta.Types;
@@ -63,14 +64,12 @@ begin
 
    P.Open (Argument (1));
 
-   M.Set_Size      (-0.1, 93.0, -0.1, 95.0);
+--     M.Set_Size      (-0.1, 93.0, -0.1, 95.0);
 
-   M.Set_Cell_Size (0.5,
-                    3.0,
-                    0.5,
-                    3.0);
+   M.Set_Cell_Size (0.5, 3.0);
 
-   M.From_Png (Argument (1));
+   Sancta.Map.Qtree.Builder.From_Png (M, Argument (1),
+                                     -0.1, 93.0, -0.1, 95.0);
    Log ("Loading time: " & Load_Timer.Image, Always);
 
    --  Random path in map to test path-finding

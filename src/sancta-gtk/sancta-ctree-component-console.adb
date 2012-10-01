@@ -587,7 +587,7 @@ package body Sancta.Ctree.Component.Console is
                      Name_Data.Get (V.Get_Child (Gint (J)), Name_In_Console)
                   then
                      Log ("MOVING CHILD" & J'Img & " TO" & I'Img, Never);
-                     V.Reorder_Child (V.Get_Child (Gint (J)), Guint (I));
+                     V.Reorder_Child (V.Get_Child (Gint (J)), Gint (I));
                      Log ("MOVED CHILD " & J'Img & " TO" & I'Img, Never);
                   end if;
                end loop;

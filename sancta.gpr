@@ -48,7 +48,7 @@ project Sancta is
 
    Include_Gtk   : Boolean := External ("Sancta_Include_Gtk",   "False");
    Include_Rtwmp : Boolean := External ("Sancta_Include_Rtwmp", "False");
-   Include_Slam  : Boolean := External ("Sancta_Include_Slam",  "False");
+--     Include_Slam  : Boolean := External ("Sancta_Include_Slam",  "False");
    Include_Test  : Boolean := External ("Sancta_Include_Test",  "False");
 
    case Include_Gtk is
@@ -72,13 +72,13 @@ project Sancta is
       when "False"  => null;
    end case;
 
-   case Include_Slam is
-      when "True" => for Source_Dirs use project'Source_Dirs &
-         ("src/slam-maite",
-          "src/slam-maite/slam",
-          "src/slam-maite/tools");
-      when "False"  => null;
-   end case;
+--     case Include_Slam is
+--        when "True" => for Source_Dirs use project'Source_Dirs &
+--           ("src/slam-maite",
+--            "src/slam-maite/slam",
+--            "src/slam-maite/tools");
+--        when "False"  => null;
+--     end case;
 
    case Include_Test is
       when "True" => for Source_Dirs use project'Source_Dirs & ("src/test");
@@ -102,14 +102,14 @@ project Sancta is
       for Required_Switches ("C")   use ("-Wall");
       for Required_Switches ("C++") use ("-Wall");
 
-      case Include_Slam is
-         when "True" =>
-            for Default_Switches ("c")   use Compiler'Default_Switches ("c")   &
-            ("-I/home/jano/local/include/player-2.0");
-            for Default_Switches ("c++") use Compiler'Default_Switches ("c++") &
-            ("-I/home/jano/local/include/player-2.0");
-         when "False" => null;
-      end case;
+--        case Include_Slam is
+--           when "True" =>
+--              for Default_Switches ("c")   use Compiler'Default_Switches ("c")   &
+--              ("-I/home/jano/local/include/player-2.0");
+--              for Default_Switches ("c++") use Compiler'Default_Switches ("c++") &
+--              ("-I/home/jano/local/include/player-2.0");
+--           when "False" => null;
+--        end case;
 
       case Build is
          when "Debug" =>

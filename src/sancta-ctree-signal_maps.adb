@@ -38,9 +38,9 @@ package body Sancta.Ctree.Signal_Maps is
          use Sancta.Map;
 
          Loc_1 : constant Map.Location'Class :=
-                   Nearest_Location (The_Map.Ref.all, Pos_1);
+                   Nearest_Location_To_Point (The_Map.Ref.all, Pos_1);
          Loc_2 : constant Map.Location'Class :=
-                   Nearest_Location (The_Map.Ref.all, Pos_2);
+                   Nearest_Location_To_Point (The_Map.Ref.all, Pos_2);
 
          procedure Increment (At_Loc : Map.Location'Class) is
          begin
@@ -285,7 +285,8 @@ package body Sancta.Ctree.Signal_Maps is
       begin
          declare
             use type Map.Location'Class;
-            Loc : constant Map.Location'Class := The_Map.Ref.Nearest_Location (P);
+            Loc : constant Map.Location'Class :=
+                    The_Map.Ref.Nearest_Location_To_Point (P);
          begin
             if Ref_Loc.Is_Valid and then Loc = Ref_Loc.Get then
                Ref_Loc.Clear;

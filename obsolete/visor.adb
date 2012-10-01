@@ -26,9 +26,9 @@ with Agpl; use Agpl;
 
 with Gtk.Main;
 
-with Gnat.Os_Lib;
+with GNAT.OS_Lib;
 with Ada.Calendar; use Ada.Calendar;
-with Ada.Text_Io; use Ada.Text_Io;
+with Ada.Text_IO; use Ada.Text_IO;
 
 procedure Visor is
 
@@ -39,7 +39,7 @@ procedure Visor is
    Cycle  : constant Duration := 0.010; -- 10ms cycle time
    Next   : Time := Clock;
 
-   Config : Sancta.Config.Object;
+   --  Config : Sancta.Config.Object;
 
    --------------
    -- Shutdown --
@@ -52,11 +52,11 @@ procedure Visor is
 
       --  Finally, forced shut down:
       delay 1.0;
-      Gnat.Os_Lib.Os_Exit (-1);
+      GNAT.OS_Lib.OS_Exit (-1);
    exception
       when E : others =>
          Log ("Shutting down: " & Report (E), Warning);
-         Gnat.Os_Lib.Os_Exit (-1);
+         GNAT.OS_Lib.OS_Exit (-1);
    end Shutdown;
 
    -----------
@@ -66,7 +66,7 @@ procedure Visor is
    procedure Usage is
    begin
       Put_Line ("Usage:");
-      Put_Line (Program_Name & " --id <node_id> --config <file> [OPTIONS]");
+      Put_Line (Program_name & " --id <node_id> --config <file> [OPTIONS]");
    end Usage;
 
    task Main is
@@ -81,7 +81,7 @@ procedure Visor is
    begin
       if not Exists ("--id") or else not Exists ("--config") then
          Usage;
-         Gnat.Os_Lib.Os_Exit (-1);
+         GNAT.OS_Lib.OS_Exit (-1);
       end if;
 
       --  Registrations
@@ -99,7 +99,7 @@ procedure Visor is
       Gtk.Main.Init;
 
       --  SANCTA startup: plug-in creation
-      Sancta.Starter.Launch (Config);
+      Sancta.Starter.Launch;
 
       Link :=
         Sancta.Component.Network.Object

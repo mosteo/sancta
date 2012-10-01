@@ -2,7 +2,7 @@
 
 with Sancta.Gui.Robot_Data;
 with Sancta.Gui.Robot_Data.Messages;
-with Sancta.Robot;
+--  with Sancta.Robot;
 
 with Gtk.Box;    use Gtk.Box;
 with Gtk.Label;  use Gtk.Label;

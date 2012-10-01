@@ -22,9 +22,9 @@ package Sancta.Draw_Mtsp is
    --  Agents from Agent_Proxy class.
    --  Tasks from positioned class.
 
-   procedure From_Poses (Poses : in Pose_Array;
-                         Tour  : in Normal_Tour;
-                         Title : in String := "");
+--     procedure From_Poses (Poses : in Pose_Array;
+--                           Tour  : in Normal_Tour;
+--                           Title : in String := "");
    --  Draw the tour given the poses and the solution.
    --  The cities and the Poses indexes must match.
 

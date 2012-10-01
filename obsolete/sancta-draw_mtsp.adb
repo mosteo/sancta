@@ -33,23 +33,23 @@ package body Sancta.Draw_Mtsp is
                       Poses    : in Pose_Array;
                       Tour     : in Normal_Tour);
 
-   type Draw_Solution (Last : Natural) is
-     new Agpl.Gdk.Managed.Drawing_Area.Draw_Code with
-      record
-         Poses : Pose_Array (1 .. Last);
-         Tour  : Normal_Tour; -- The solution to draw.
-      end record;
-
-   -------------
-   -- Execute --
-   -------------
-
-   procedure Execute (This : in out Draw_Solution) is
-   begin
-      Do_Draw (This.Drawable,
-               This.Poses,
-               This.Tour);
-   end Execute;
+--     type Draw_Solution (Last : Natural) is
+--       new Agpl.Gdk.Managed.Drawing_Area.Draw_Code with
+--        record
+--           Poses : Pose_Array (1 .. Last);
+--           Tour  : Normal_Tour; -- The solution to draw.
+--        end record;
+--
+--     -------------
+--     -- Execute --
+--     -------------
+--
+--     procedure Execute (This : in out Draw_Solution) is
+--     begin
+--        Do_Draw (This.Drawable,
+--                 This.Poses,
+--                 This.Tour);
+--     end Execute;
 
    -------------
    -- Do_Draw --
@@ -200,41 +200,41 @@ package body Sancta.Draw_Mtsp is
    -- From_Poses --
    ----------------
 
-   procedure From_Poses
-     (Poses : in Pose_Array;
-      Tour  : in Normal_Tour;
-      Title : in String := "")
-   is
-      --  package MDA renames Agpl.Gdk.Modal_Drawing_Area;
-
-      use type Types.Real;
-
-      --  Area : MDA.Object;
-
-      -------------------
-      -- Draw_Solution --
-      -------------------
-
---        procedure Draw_Solution (Drawable : in Gdk_Drawable)
---        is
+--     procedure From_Poses
+--       (Poses : in Pose_Array;
+--        Tour  : in Normal_Tour;
+--        Title : in String := "")
+--     is
+--        --  package MDA renames Agpl.Gdk.Modal_Drawing_Area;
+--
+--        use type Types.Real;
+--
+--        --  Area : MDA.Object;
+--
+--        -------------------
+--        -- Draw_Solution --
+--        -------------------
+--
+--  --        procedure Draw_Solution (Drawable : in Gdk_Drawable)
+--  --        is
+--  --        begin
+--  --           Do_Draw (Drawable, Poses, Tour);
+--  --        end Draw_Solution;
+--
+--     begin
+--        --  Use this for modal drawing
+--        --  Area.Show (Draw_Solution'Access);
+--
+--        --  Use this for non-modal drawing:
+--        declare
+--           Dr : Sancta.Draw_Mtsp.Draw_Solution (Last => Poses'Length);
 --        begin
---           Do_Draw (Drawable, Poses, Tour);
---        end Draw_Solution;
-
-   begin
-      --  Use this for modal drawing
-      --  Area.Show (Draw_Solution'Access);
-
-      --  Use this for non-modal drawing:
-      declare
-         Dr : Sancta.Draw_Mtsp.Draw_Solution (Last => Poses'Length);
-      begin
-         Dr.Poses := Poses;
-         Dr.Tour  := Tour;
-
-         Agpl.Gdk.Managed.Drawing_Area.Show (Dr, "Solution " & Title);
-      end;
-   end From_Poses;
+--           Dr.Poses := Poses;
+--           Dr.Tour  := Tour;
+--
+--           Agpl.Gdk.Managed.Drawing_Area.Show (Dr, "Solution " & Title);
+--        end;
+--     end From_Poses;
 
    ----------------
    -- From_Tasks --

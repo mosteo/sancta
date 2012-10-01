@@ -103,8 +103,8 @@ package Sancta.Map is
                               Pose : Types.Pose) return Location'Class;
    --  Default Program_Error
 
-   function Nearest_Location (This : Object'Class;
-                              P    : Types.Point) return Location'Class;
+   function Nearest_Location_To_Point (This : Object'Class;
+                                      P    : Types.Point) return Location'Class;
    --  Dispatches to the Pose version
 
    not overriding

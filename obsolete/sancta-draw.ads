@@ -12,10 +12,10 @@ package Sancta.Draw is
 
    --  Subprograms for drawing (non-modally) several EXPRES data
 
-   procedure Draw_Assignment
-     (This       : in Sancta.Assignment.Object;
-      Costs      : in Sancta.Cost_Cache.Object'Class := Sancta.Cost_Cache.Empty_Object;
-      Show_Costs : in Boolean := True);
+--     procedure Draw_Assignment
+--       (This       : in Sancta.Assignment.Object;
+--        Costs      : in Sancta.Cost_Cache.Object'Class := Sancta.Cost_Cache.Empty_Object;
+--        Show_Costs : in Boolean := True);
    --  Draw the tasks pertaining to each robot.
    --  Uses Agpl.Gdk.Managed facilities, that you should start/stop accordingly.
    --  If Costs are supplied, they're used. If not, the agents in the assignment

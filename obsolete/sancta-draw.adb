@@ -29,44 +29,44 @@ package body Sancta.Draw is
 
    use type Types.Real;
 
-   type Draw_Assignment_Code is new Agpl.Gdk.Managed.Drawing_Area.Draw_Code with
-      record
-         A     :         Sancta.Assignment.Object;
-         Pal   : aliased Agpl.Gdk.Palette.Object;
-         Costs :         Sancta.Cost_Cache.Handle.Object;
-         Show  :         Boolean := True;
-      end record;
-
-   -------------
-   -- Execute --
-   -------------
-
-   procedure Execute (This : in out Draw_Assignment_Code)
-   is
-      use Agpl.Gdk.Palette;
-      use Agpl.Gdk.Drawer;
-      use Agpl.Gdk.Drawer_Figures;
-      W : constant Gdk_Drawable := Drawable (This);
-      D : Agpl.Gdk.Drawer.Object;
-
-      White : constant String := "#ffffff";
-   begin
-      Set_Drawable (This.Pal, W);
-      D.Set_Drawable (W);
-      Draw_Begin (D);
-
-      Set_Background (W, Get_Color (This.Pal'Access, White));
-      Clear (W);
-
-      Draw_Assignment (This.A,
-                       D,
-                       This.Pal'Access,
-                       This.Widget,
-                       This.Costs.Ref.all,
-                       This.Show);
-
-      Draw_End (D);
-   end Execute;
+--     type Draw_Assignment_Code is new Agpl.Gdk.Managed.Drawing_Area.Draw_Code with
+--        record
+--           A     :         Sancta.Assignment.Object;
+--           Pal   : aliased Agpl.Gdk.Palette.Object;
+--           Costs :         Sancta.Cost_Cache.Handle.Object;
+--           Show  :         Boolean := True;
+--        end record;
+--
+--     -------------
+--     -- Execute --
+--     -------------
+--
+--     procedure Execute (This : in out Draw_Assignment_Code)
+--     is
+--        use Agpl.Gdk.Palette;
+--        use Agpl.Gdk.Drawer;
+--        use Agpl.Gdk.Drawer_Figures;
+--        W : constant Gdk_Drawable := Drawable (This);
+--        D : Agpl.Gdk.Drawer.Object;
+--
+--        White : constant String := "#ffffff";
+--     begin
+--        Set_Drawable (This.Pal, W);
+--        D.Set_Drawable (W);
+--        Draw_Begin (D);
+--
+--        Set_Background (W, Get_Color (This.Pal'Access, White));
+--        Clear (W);
+--
+--        Draw_Assignment (This.A,
+--                         D,
+--                         This.Pal'Access,
+--                         This.Widget,
+--                         This.Costs.Ref.all,
+--                         This.Show);
+--
+--        Draw_End (D);
+--     end Execute;
 
    ---------------------
    -- Draw_Assignment --
@@ -317,19 +317,19 @@ package body Sancta.Draw is
    -- Draw_Assignment --
    ---------------------
 
-   procedure Draw_Assignment
-     (This       : in Sancta.Assignment.Object;
-      Costs      : in Sancta.Cost_Cache.Object'Class := Sancta.Cost_Cache.Empty_Object;
-      Show_Costs : in Boolean := True)
-   is
-      Area : Draw_Assignment_Code;
-   begin
-      Area.A     := This;
-      Area.Costs.Set (Costs);
-      Area.Show  := Show_Costs;
-
-      Agpl.Gdk.Managed.Drawing_Area.Show (Area, "Assignment");
-   end Draw_Assignment;
+--     procedure Draw_Assignment
+--       (This       : in Sancta.Assignment.Object;
+--        Costs      : in Sancta.Cost_Cache.Object'Class := Sancta.Cost_Cache.Empty_Object;
+--        Show_Costs : in Boolean := True)
+--     is
+--        Area : Draw_Assignment_Code;
+--     begin
+--        Area.A     := This;
+--        Area.Costs.Set (Costs);
+--        Area.Show  := Show_Costs;
+--
+--        Agpl.Gdk.Managed.Drawing_Area.Show (Area, "Assignment");
+--     end Draw_Assignment;
 
    type Draw_Laser_Data is new Agpl.Gdk.Modal_Drawing_Area.Callback with
       record
