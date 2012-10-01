@@ -38,7 +38,7 @@ begin
    Tasks.Grid_Goal.Parse_Ascii (Argument (1));
 
    declare
-      Asser : Object;
+      Asser : Assigner.Greedy_Exhaustive.Object;
       Costs : Sancta.Cost_Matrix.Object;
       use Cost_Matrix_Stores;
    begin
@@ -57,7 +57,7 @@ begin
          Put_Line ("Assignment completed.");
          To_File (Assed,
                   Filesystem.Replace_Extension
-                    (Argument (1), Object'External_Tag & ".ass"));
+                    (Argument (1), Assignment.Object'External_Tag & ".ass"));
          Assed.Print_Assignment;
       end;
    end;

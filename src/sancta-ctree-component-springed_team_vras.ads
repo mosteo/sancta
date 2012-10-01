@@ -56,7 +56,7 @@ private
    end record;
 
    function Create (Config : Comp_Config)
-                    return   Component.Object_Access;
+                    return   Sancta.Component.Object_Access;
 
 --     overriding
 --     procedure Key_Stored (This  : in out Object;

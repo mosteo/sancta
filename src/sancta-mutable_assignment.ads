@@ -17,7 +17,7 @@ with Sancta.Plan;
 with Sancta.Tasks;
 with Sancta.Tasks.Containers;
 with Agpl.Optimization.Annealing;
-with Agpl.Smart_Access; pragma Elaborate_All (Agpl.Smart_Access);
+with Agpl.Smart_access; pragma Elaborate_All (Agpl.Smart_Access);
 with Agpl.Types.Ustrings; use Agpl.Types.Ustrings;
 with Agpl; use Agpl;
 
@@ -190,7 +190,7 @@ private
       Prob   : Optimization.Annealing.Probability;
    end record;
 
-   package Mutation_Vectors is new Dynamic_Vector (Mutation_Handler);
+   package Mutation_Vectors is new Containers.Naked_Vectors (Mutation_Handler);
 
    package Agent_Maps renames Sancta.Agent.Containers.Maps;
 
@@ -227,8 +227,11 @@ private
       Bag_Indexes : Index_Maps.Map;
       --  A table with all the indexes in bags this thing belongs to.
    end record;
-   type Solution_Context_Key is new Ustring;
+   type Solution_Context_Key is new UString;
    type Solution_Context_Ptr is access all Solution_Context'Class;
+
+   function Key (S : String) return Solution_Context_Key
+                 renames To_Unbounded_String;
 
    function Key (This : in Solution_Context)
                  return Solution_Context_Key is abstract;
@@ -243,7 +246,7 @@ private
         Solution_Context'Class);
 
    type Bag_Context is record
-      Key    : Ustring;       -- A bag_key
+      Key    : UString;       -- A bag_key
       Parent : Object_Access; -- Necessary to known the object this bag belongs.
    end record;
 
@@ -281,7 +284,7 @@ private
    -------------------
 
    type Agent_Context is new Solution_Context with record
-      Agent_Name : Ustring;
+      Agent_Name : UString;
    end record;
 
    function Key (This : in Agent_Context) return Solution_Context_Key;
@@ -306,7 +309,7 @@ private
 
    type Minimax_Key is record
       Cost  : Costs;
-      Agent : Ustring;
+      Agent : UString;
    end record;
    function "<" (L, R : Minimax_Key) return Boolean;
 
@@ -328,7 +331,7 @@ private
       Moved_One  : Sancta.Tasks.Task_Id;
       Was_After  : Sancta.Tasks.Task_Id := Sancta.Tasks.No_Task;
       Was_Before : Sancta.Tasks.Task_Id := Sancta.Tasks.No_Task;
-      Owner_Was  : Ustring;
+      Owner_Was  : UString;
       --  No id for the last task
 
       Minsum_Was : Costs;
@@ -340,7 +343,7 @@ private
    type Undo_Kinds is (Identity, From_Scratch, Move_Task, Switch_Or_Node);
 
    type Undo_Internal (Kind : Undo_Kinds) is record
-      Description : Ustring;
+      Description : UString;
 
       case Kind is
          when Identity =>
@@ -406,7 +409,7 @@ private
       Was_Valid          : Boolean            := False;
       --  Previous object state.
 
-      Last_Mutation      : Ustring; -- Cached copy
+      Last_Mutation      : UString; -- Cached copy
 
       Undo               : Undo_Info := (Handle => Undo_Handle.Null_Object);
       Undoer             : Mutation_Undoer;

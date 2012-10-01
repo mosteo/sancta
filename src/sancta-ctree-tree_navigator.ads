@@ -31,14 +31,15 @@ package Sancta.Ctree.Tree_Navigator is
 
    package Handle is new Agpl.Generic_Handle (Object'Class);
 
-   procedure Draw (This :        Object'Class;
-                   Dest : in out Agpl.Drawing.Drawer'Class);
+--     procedure Draw_ (This :        Object'Class;
+--                     Dest : in out Agpl.Drawing.Drawer'Class);
 
 private
 
    procedure Draw_Classwide
      (This :        Object'Class;
-      Dest : in out Agpl.Drawing.Drawer'Class) renames Draw;
+      Dest : in out Agpl.Drawing.Drawer'Class);
+--      renames Draw;
    --  For use in body without ambiguity
 
 end Sancta.Ctree.Tree_Navigator;

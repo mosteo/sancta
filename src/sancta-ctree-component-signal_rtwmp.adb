@@ -5,6 +5,7 @@ with Agpl.Ustrings; use Agpl.Ustrings;
 with Sancta.Ctree.Component.Nctypes;
 with Sancta.Component.Factory;
 with Sancta.Component.Network;
+with Sancta.Network.Layer;
 
 package body Sancta.Ctree.Component.Signal_Rtwmp is
 
@@ -26,15 +27,15 @@ package body Sancta.Ctree.Component.Signal_Rtwmp is
    function Create
      (Config : Comp_Config;
       Env    : Environment.Object)
-      return Component.Object_Access
+      return Sancta.Component.Object_Access
    is
       use Agpl.Calendar.Format;
 
       This : constant Object_Access := new Object (Name'Access, Config);
    begin
       This.Id := Env.Id;
-      This.Link := Sancta.Network.Layer.Object_Access
-        (Component.Network.Network (This.Input (Requires_Link)).Link);
+      This.Link :=
+        Sancta.Component.Network.Network (This.Input (Requires_Link)).Link;
 
       pragma Assert (This.Link.Num_Nodes >= 1);
       This.Avgs := new Avg_Array (0 .. Rtwmp_Address (This.Link.Num_Nodes - 1));
@@ -57,7 +58,7 @@ package body Sancta.Ctree.Component.Signal_Rtwmp is
                             Datestamp (Separator => '.') & "." &
                             Timestamp & ".log");
 
-      return Component.Object_Access (This);
+      return Sancta.Component.Object_Access (This);
    end Create;
 
    -------------

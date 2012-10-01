@@ -42,7 +42,7 @@ private
    end record;
 
    function Create (Config : in Agpl.Xml.Node)
-                    return      Component.Object_Access;
+                    return      Sancta.Component.Object_Access;
 
    overriding
    procedure Run (This : in out Object;

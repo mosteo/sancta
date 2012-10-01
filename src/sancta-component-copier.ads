@@ -1,6 +1,9 @@
 with Sancta.Component.Root;
 
-package Sancta.Component.Copy is
+--  ORIGINAL NAME WAS COPY: after 2012 it conflicts with a vector in
+--   Sancta.Component
+
+package Sancta.Component.Copier is
 
    --  Outputs one input with a new name.
    --  See also Merger, Generic_Mix, Y_or_else_X
@@ -36,4 +39,4 @@ private
                          Key   : in     Internal_Key;
                          Value : in     Data'Class);
 
-end Sancta.Component.Copy;
+end Sancta.Component.Copier;

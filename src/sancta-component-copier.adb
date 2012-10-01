@@ -1,6 +1,6 @@
 with Sancta.Component.Factory;
 
-package body Sancta.Component.Copy is
+package body Sancta.Component.Copier is
 
    --------------
    -- Register --
@@ -49,4 +49,4 @@ package body Sancta.Component.Copy is
       end if;
    end Key_Stored;
 
-end Sancta.Component.Copy;
+end Sancta.Component.Copier;

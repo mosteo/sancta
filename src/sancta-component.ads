@@ -54,12 +54,6 @@ package Sancta.Component is
    type Internal_Key_Array is
      array (Positive range <>) of access constant Internal_Key;
 
-   package Internal_Key_Vectors is new
-     Ada.Containers.Indefinite_Vectors (Positive, Internal_Key);
-   type Internal_Key_Vector is new Internal_Key_Vectors.Vector with null record;
-
-   function To_Vector (X : Internal_Key_Array) return Internal_Key_Vector;
-
    --  This should be an interface, but gap-2005 pukes elsewhere
    type Object (Name : access constant String)
      is abstract tagged limited null record;
@@ -82,5 +76,13 @@ package Sancta.Component is
    not overriding
    function Is_Master (This : Object) return Boolean;
    --  Related to on demand creation, not for client use.
+
+private
+
+   package Internal_Key_Vectors is new
+     Ada.Containers.Indefinite_Vectors (Positive, Internal_Key);
+   type Internal_Key_Vector is new Internal_Key_Vectors.Vector with null record;
+
+   function To_Vector (X : Internal_Key_Array) return Internal_Key_Vector;
 
 end Sancta.Component;

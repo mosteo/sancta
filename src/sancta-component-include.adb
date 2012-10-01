@@ -5,7 +5,7 @@ with Sancta.Component.Bidder_Flat;
 with Sancta.Component.Bitmap,
      Sancta.Component.Bitmap_Tasks,
      Sancta.Component.Coord_Transf;
-with Sancta.Component.Copy;
+with Sancta.Component.Copier;
 with Sancta.Component.Cost_Cache,
      Sancta.Component.Cost_Updater;
 with Sancta.Component.Draw,
@@ -61,7 +61,7 @@ package body Sancta.Component.Include is
       Bitmap.Register;
       Bitmap_Tasks.Register;
       Coord_Transf.Register;
-      Copy.Register;
+      Copier.Register;
       Cost_Cache.Register;
       Cost_Updater.Register;
       Draw.Register;

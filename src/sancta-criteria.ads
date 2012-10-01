@@ -31,13 +31,13 @@ package Sancta.Criteria is
    function Value (S : in String) return Assignment_Criteria;
    --  "minmax minsum minavg"
 
-   Criterion_Invalid       : constant Assignment_Criteria := (0.0, 0.0, 0.0);
-   Criterion_Minmax        : constant Assignment_Criteria := (1.0, 0.0, 0.0);
-   Criterion_Minsum        : constant Assignment_Criteria := (0.0, 1.0, 0.0);
-   Criterion_Minmix        : constant Assignment_Criteria := (1.0, 1.0, 0.0);
-   Criterion_Minall        : constant Assignment_Criteria := (1.0, 1.0, 1.0);
-   Criterion_Mintim        : constant Assignment_Criteria := (1.0, 0.00001, 0.0);
-   Criterion_Minavg        : constant Assignment_Criteria := (0.0, 0.0, 1.0);
+   Criterion_Invalid    : constant Assignment_Criteria := (0.0, 0.0, 0.0);
+   Criterion_Minmax     : constant Assignment_Criteria := (1.0, 0.0, 0.0);
+   Criterion_Minsum     : constant Assignment_Criteria := (0.0, 1.0, 0.0);
+   Criterion_Minmix     : constant Assignment_Criteria := (1.0, 1.0, 0.0);
+   Criterion_Minall     : constant Assignment_Criteria := (1.0, 1.0, 1.0);
+   Criterion_Mintim     : constant Assignment_Criteria := (1.0, 0.00001, 0.0);
+   Criterion_Minave     : constant Assignment_Criteria := (0.0, 0.0, 1.0);
 
    Criterion_Minimax       : Assignment_Criteria renames Criterion_Minmax;
    Criterion_Totalsum      : Assignment_Criteria renames Criterion_Minsum;

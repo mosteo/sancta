@@ -6,7 +6,7 @@ package body Sancta.Ctree.Tree_Navigator is
    -- Draw --
    ----------
 
-   procedure Draw
+   procedure Draw_Classwide
      (This :        Object'Class;
       Dest : in out Agpl.Drawing.Drawer'Class)
    is
@@ -17,7 +17,7 @@ package body Sancta.Ctree.Tree_Navigator is
       end Draw;
    begin
       This.Get_Tasks.Iterate (Draw'Access);
-   end Draw;
+   end Draw_Classwide;
 
    ----------
    -- Draw --

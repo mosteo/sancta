@@ -58,5 +58,6 @@ package body Sancta.Ctree.Data_Source.Integrated is
    end Receive_Goals;
 
 begin
-   Register (Sancta.Ctree.Integrated, Object'(Data_Source.Object with null record));
+   Register (Sancta.Ctree.Source_Integrated,
+             Object'(Data_Source.Object with null record));
 end Sancta.Ctree.Data_Source.Integrated;

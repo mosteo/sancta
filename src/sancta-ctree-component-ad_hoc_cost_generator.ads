@@ -29,6 +29,6 @@ private
      is new Root.Object (Name, Config) with null record;
 
    function Create (Config : in Agpl.Xml.Node)
-                    return      Component.Object_Access;
+                    return      Sancta.Component.Object_Access;
 
 end Sancta.Ctree.Component.Ad_Hoc_Cost_Generator;

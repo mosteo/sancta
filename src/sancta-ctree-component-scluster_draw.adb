@@ -34,7 +34,7 @@ package body Sancta.Ctree.Component.Scluster_Draw is
 
    procedure Run (Thix : in out Draw_Code) is
       use Ada.Calendar,
-          Component.Player_Graphics2d;
+          Player_Graphics2d;
       This : Object renames Thix.Parent.all;
    begin
       This.Output (Provides_Queue_Mesh,
@@ -83,7 +83,7 @@ package body Sancta.Ctree.Component.Scluster_Draw is
 
    function Create
      (Config : in Agpl.Xml.Node)
-      return Component.Object_Access
+      return Sancta.Component.Object_Access
    is
       This : constant Object_Access := new Object (Name'Access, Config);
    begin
@@ -91,7 +91,7 @@ package body Sancta.Ctree.Component.Scluster_Draw is
          This.Period := Duration'Value (This.Option (Option_Period));
       end if;
 
-      return Component.Object_Access (This);
+      return Sancta.Component.Object_Access (This);
    end Create;
 
    ---------

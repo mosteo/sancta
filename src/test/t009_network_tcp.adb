@@ -41,7 +41,7 @@ procedure T009_Network_Tcp is
    "   </agent>" &
    "</t007>";
 
-   Id  : constant Node_Id := Value ("ari");
+   Id  : constant Node_Id := Sancta.Value ("ari");
 
    Conf : constant Xml.Document := Xml.From_String (Xml_Config);
 

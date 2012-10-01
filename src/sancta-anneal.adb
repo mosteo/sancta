@@ -27,13 +27,15 @@ package body Sancta.Anneal is
          declare
             use Tasks.Explore_Directed_Segment;
          begin
-            return Tasks.Explore_Directed_Segment.Flip (Object (This));
+            return Tasks.Explore_Directed_Segment.Flip
+              (Tasks.Explore_Directed_Segment.Object (This));
          end;
       elsif This in Tasks.Explore_Directed_Edge.Object then
          declare
             use Tasks.Explore_Directed_Edge;
          begin
-            return Tasks.Explore_Directed_Edge.Flip (Object (This));
+            return Tasks.Explore_Directed_Edge.Flip
+              (Tasks.Explore_Directed_Edge.Object (This));
          end;
       elsif This in Tasks.Entry_Point.Object then
          return Tasks.Entry_Point.Flip (Tasks.Entry_Point.Object (This));

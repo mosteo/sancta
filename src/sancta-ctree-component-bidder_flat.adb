@@ -24,26 +24,27 @@ package body Sancta.Ctree.Component.Bidder_Flat is
 
    function Create
      (Config : in Agpl.Xml.Node)
-      return Component.Object_Access
+      return Sancta.Component.Object_Access
    is
       Help : constant Helper.Object := Helper.Create (Config);
       This : constant Object_Access :=
                new Object
                  (Name'Access,
                   Config,
-                  Component.Network.Network (Help.Input (Requires_Link)).Link,
+                  Sancta.Component.Network.Network
+                    (Help.Input (Requires_Link)).Link,
                   Sancta.Component.Cost_Cache.Cost_Cache
-                                            (Help.Input (Requires_Cost)).Ptr,
-                  Types.Agent               (Help.Input (Requires_Agent)).Agent);
+                    (Help.Input (Requires_Cost)).Ptr,
+                  Types.Agent
+                    (Help.Input (Requires_Agent)).Agent);
    begin
       This.Verify (Option_Criterion);
       This.Verify (Option_Channel);
-      This.Bdr.Create (Chan           =>
-                         Sancta.Network.Value (This.Option (Option_Channel, "")),
-                       Crit           =>
-                         Criteria.Value (This.Option (Option_Criterion, "")));
+      This.Bdr.Create
+        (Chan => Sancta.Network.Value (This.Option (Option_Channel, "")),
+         Crit => Criteria.Value (This.Option (Option_Criterion, "")));
 
-      return Component.Object_Access (This);
+      return Sancta.Component.Object_Access (This);
    end Create;
 
    ---------

@@ -63,7 +63,7 @@ private
 
    function Create (Config : Comp_Config;
                     Env    : Environment.Object)
-                    return   Component.Object_Access;
+                    return   Sancta.Component.Object_Access;
 
    overriding
    procedure Run (This : in out Object;

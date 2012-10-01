@@ -2,6 +2,8 @@ package Sancta.Assigner.Hungarian is
 
    pragma Preelaborate;
 
+   Log_Section : constant String := "sancta.assigner.hungarian";
+
    type Object is new Assigner.Object with null record;
 
    function Assign

@@ -70,6 +70,7 @@ package body Sancta.Component.Player_Localize is
 
       Hyps : Hyp_Array_Access;
 
+      procedure Safe (Iface : Player_Client.Iface_Access);
       procedure Safe (Iface : Player_Client.Iface_Access) is
          Loc : Player.Localize.Object renames
            Player.Localize.Object (Iface.all);

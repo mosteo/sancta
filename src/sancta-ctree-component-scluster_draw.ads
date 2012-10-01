@@ -10,9 +10,9 @@ package Sancta.Ctree.Component.Scluster_Draw is
 
    --  Draw everything
 
-   Name                 : aliased constant Component_Name := "scluster_draw";
+   Name            : aliased constant Component_Name := "scluster_draw";
 
-   Log_Section          : constant String := "Sancta.Ctree.Component.scluster_draw";
+   Log_Section     : constant String := "Sancta.Ctree.Component.scluster_draw";
 
    Option_Period        : constant Option_Attr := "period";
    Default_Period       : constant Duration    := 0.1;
@@ -38,7 +38,8 @@ package Sancta.Ctree.Component.Scluster_Draw is
 
 private
 
-   function Create (Config : in Agpl.Xml.Node) return Component.Object_Access;
+   function Create (Config : in Agpl.Xml.Node)
+                    return      Sancta.Component.Object_Access;
 
    type Object is new Root.Object with record
       Period         : Duration := Default_Period;

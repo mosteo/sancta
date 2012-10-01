@@ -22,7 +22,7 @@ package body Sancta.Ctree.Component.Ad_Hoc_Cost_Generator is
 
    function Create
      (Config : in Agpl.Xml.Node)
-      return Component.Object_Access
+      return Sancta.Component.Object_Access
    is
       Help : constant Helper.Object := Helper.Create (Config);
       This : constant Object_Access :=
@@ -35,7 +35,7 @@ package body Sancta.Ctree.Component.Ad_Hoc_Cost_Generator is
       This.Agent.Set_Cost_Generator
         (Sancta.Ctree.Ad_Hoc_Cost_Generator.Create (This.Agent.Get_Pose));
 
-      return Component.Object_Access (This);
+      return Sancta.Component.Object_Access (This);
    end Create;
 
 end Sancta.Ctree.Component.Ad_Hoc_Cost_Generator;

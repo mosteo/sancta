@@ -12,6 +12,8 @@ package Sancta.Cost_Proxy is
 
    --  pragma Preelaborate;
 
+   Log_Section : constant String := "sancta.cost_proxy";
+
    type Object is new Sancta.Cost_Cache.Object with private;
    --  This objects computes costs on demand, but additionally costs from
    --  No_Task can have a historic aditional component.

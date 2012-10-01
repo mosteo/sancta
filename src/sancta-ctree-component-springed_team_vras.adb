@@ -30,7 +30,7 @@ package body Sancta.Ctree.Component.Springed_Team_vRAS is
 
    function Create
      (Config : Comp_Config)
-      return Component.Object_Access
+      return Sancta.Component.Object_Access
    is
       This : constant Object_Access := new Object (Name'Access, Config);
    begin
@@ -58,7 +58,7 @@ package body Sancta.Ctree.Component.Springed_Team_vRAS is
          This.Period.Set_Period (Duration'Value (This.Option (Option_Period)));
       end if;
 
-      return Component.Object_Access (This);
+      return Sancta.Component.Object_Access (This);
    end Create;
 
    -------------

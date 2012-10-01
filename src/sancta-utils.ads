@@ -1,4 +1,3 @@
- 
 
 with Sancta.Criteria; use Sancta.Criteria;
 with Sancta.Tasks.Containers;
@@ -11,7 +10,7 @@ package Sancta.Utils is
       Minmix => Criterion_Minmix,
       Minsum => Criterion_Minsum,
       Minall => Criterion_Minall,
-      Minavg => Criterion_Minavg);
+      Minave => Criterion_Minave);
 
    function Create_Random_Goals
      (Num      : Natural;
