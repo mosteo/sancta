@@ -49,7 +49,7 @@ package body Sancta.Starter is
    procedure Usage is
    begin
       Put_Line ("Usage:");
-      Put_Line (Program_Name & " --id <node_id> --config <file> [OPTIONS]");
+      Put_Line (Program_name & " --id <node_id> --config <file> [OPTIONS]");
       Put_Line ("   No options defined for now.");
    end Usage;
 

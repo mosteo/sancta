@@ -1,6 +1,7 @@
 with "agpl/agpl_gtk";
+with "sancta";
 
-project Sancta_Gtk extends "sancta.gpr" is
+project Sancta_Gtk is
 
    for Object_Dir  use "obj/gtk";
 
@@ -14,9 +15,14 @@ project Sancta_Gtk extends "sancta.gpr" is
       "sancta-main-sm_plot.adb",
       "sancta-main-show_assignment.adb");
 
-   package Linker is
-      for Linker_Options use Sancta.Linker'Linker_Options;
-      --  This is never inherited through extension
-   end Linker;
+   package Compiler renames Sancta.Compiler;
+
+   package Binder renames Sancta.Binder;
+
+   package Linker renames Sancta.Linker;
+
+   package Pretty_Printer renames Sancta.Pretty_Printer;
+
+   package Naming renames Sancta.Naming;
 
 end Sancta_Gtk;

@@ -120,7 +120,7 @@ package body Sancta.Datastore is
    is
       pragma Unreferenced (Max); -- Used in spec precondition
       Str   : constant String := Dstring (Object (+Id).Get (+Key)).Str;
-      Count : Standard.Interfaces.C.Size_T;
+      Count : Standard.Interfaces.C.size_t;
    begin
       Standard.Interfaces.C.To_C (Str, Val, Count);
    end Get_String;
