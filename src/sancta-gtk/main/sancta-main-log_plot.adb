@@ -1,5 +1,5 @@
 with Sancta.Debug.Parse_Montesano; use Sancta.Debug;
-with Sancta.Draw;
+--  with Sancta.Draw;
 with Sancta.Types.Transformations; use Sancta.Types.Transformations;
 use  Sancta.Types.Transformations.Real_Transf;
 with Sancta.Types;   use Sancta.Types;
@@ -23,7 +23,8 @@ begin
                             Parse_Montesano (Argument (1),
                                              Natural'Value (Argument (2)));
    begin
-      Sancta.Draw.Draw_Laser (All_Scans, Max_Range);
+      --  Sancta.Draw.Draw_Laser (All_Scans, Max_Range);
+      Put_Line ("Laser drawing is unavailable because of bit rot");
    end;
 exception
    when E : others =>
