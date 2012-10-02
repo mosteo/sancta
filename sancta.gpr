@@ -1,8 +1,6 @@
 with "mbicp/mbicp";
 with "agpl/agpl";
-with "agpl/gtkada_conditional";
 with "player3-ada/player3_ada.gpr";
-with "player3-ada/playerc30_jano";
 
 project Sancta is
 
@@ -46,24 +44,9 @@ project Sancta is
          for Library_Version use Lib_Name & ".so." & Lib_Version;
    end case;
 
-   Include_Gtk   : Boolean := External ("Sancta_Include_Gtk",   "False");
    Include_Rtwmp : Boolean := External ("Sancta_Include_Rtwmp", "False");
 --     Include_Slam  : Boolean := External ("Sancta_Include_Slam",  "False");
    Include_Test  : Boolean := External ("Sancta_Include_Test",  "False");
-
-   case Include_Gtk is
-      when "True" =>
-         for Source_Dirs use project'Source_Dirs &
-         ("src/sancta-gtk",
-          "src/sancta-gtk/main",
-          "src/sancta-gtk/visor/src",
-          "src/test-gtk");
-         for Main use project'Main &
-           ("sancta-main-log_plot.adb",
-            "sancta-main-sm_plot.adb",
-            "sancta-main-show_assignment.adb");
-      when "False"  => null;
-   end case;
 
    case Include_Rtwmp is
       when "True" => for Source_Dirs use project'Source_Dirs &

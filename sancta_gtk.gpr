@@ -1,0 +1,22 @@
+with "agpl/agpl_gtk";
+
+project Sancta_Gtk extends "sancta.gpr" is
+
+   for Object_Dir  use "obj/gtk";
+
+   for Source_Dirs use
+     ("src/sancta-gtk",
+      "src/sancta-gtk/main",
+      "src/sancta-gtk/visor/src",
+      "src/test-gtk");
+   for Main use
+     ("sancta-main-log_plot.adb",
+      "sancta-main-sm_plot.adb",
+      "sancta-main-show_assignment.adb");
+
+   package Linker is
+      for Linker_Options use Sancta.Linker'Linker_Options;
+      --  This is never inherited through extension
+   end Linker;
+
+end Sancta_Gtk;
