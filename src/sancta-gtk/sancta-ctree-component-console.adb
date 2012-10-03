@@ -1,20 +1,20 @@
 with Agpl.Gdk.Custom_Widget;
 with Agpl.Gdk.Managed;
 with Agpl.Gdk.Palette;
-with Agpl.Gtk.User_Data;
+with Agpl.Gtk.User_Data;      pragma Elaborate_All (Agpl.Gtk.User_Data);
 with Agpl.Gtk.Widget_Factory; use Agpl.Gtk.Widget_Factory;
 with Agpl.Gui;
 with Agpl.Strings;
 
-with Glade.Xml;               use Glade.Xml;
 with Glib;
+with Glib.Error;
 with Glib.Properties;
 with Gtk.Button;              use Gtk.Button;
 with Gtk.Check_Button;        use Gtk.Check_Button;
 --  with Gtk.Drawing_Area;        use Gtk.Drawing_Area;
 with Gtk.Enums;               use Gtk.Enums;
 with Gtk.Frame;               use Gtk.Frame;
-with Gtk.Handlers;
+with Gtk.Handlers;            pragma Elaborate_All (Gtk.Handlers);
 with Gtk.Label;               use Gtk.Label;
 with Gtk.Notebook;            use Gtk.Notebook;
 with Gtk.Table;               use Gtk.Table;
@@ -237,15 +237,18 @@ package body Sancta.Ctree.Component.Console is
       ------------
 
       procedure Create is
-         X : Glade_Xml;
+         X : Gtkada_Builder;
+         E : Glib.Error.GError;
+         use type Glib.Gint;
       begin
-         Gtk_New (X, This.Option (Opt_Glade_Xml, Def_Glade_Xml));
-
-         if X = null then
-            raise Program_Error with "Interface definition not found";
+         Gtk_New (X);
+         E := X.Add_From_File (This.Option (Opt_Glade_Xml, Def_Glade_Xml));
+         if Glib.Error.Get_Code (E) /= 0 then
+            raise Program_Error with "Gtkbuilder error" &
+              Glib.Error.Get_Code (E)'Img;
          end if;
 
-         Agpl.Gdk.Managed.Glade_Autoconnect (X);
+         Agpl.Gdk.Managed.GtkBuilder_Connect_Void (X);
          User_Data.Set_Shared (X.Get_Widget ("console"), This);
          This.Gui := X;
 

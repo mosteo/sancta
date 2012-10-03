@@ -57,15 +57,11 @@ project Sancta is
 
    package Linker is
       for Default_Switches ("Ada") use Agpl.Linker'Default_Switches ("Ada");
-      for Default_Switches ("C")   use Agpl.Linker'Default_Switches ("C");
-      for Default_Switches ("C++") use Agpl.Linker'Default_Switches ("C++");
 
       Rtwmp_Link := ("-Lsrc/rtwmp/lib",
-	      "-Wl,-Bstatic",  -- force static linking
-	      "-lrt-wmp",
-	      "-lrt",          --  rt is for system clock_gettime, used by rt-wmp
-	      "-Wl,-Bdynamic", -- restore default dynamic linking needed by other libs
-              "");
+                     "-lrt-wmp",
+                     "-lrt", --  rt is for system clock_gettime, used by rt-wmp
+                     "");
 
       case Include_Rtwmp is
          when "True" =>

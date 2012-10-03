@@ -6,6 +6,7 @@ private with Ada.Containers.Indefinite_Ordered_Maps;
 private with Ada.Containers.Ordered_Maps;
 private with Agpl.Chronos;
 private with Agpl.Containers.Ordered_Multidimensional_Maps;
+pragma Elaborate_All (Agpl.Containers.Ordered_Multidimensional_Maps);
 private with Agpl.Containers.String_Vectors;
 private with Agpl.Drawing.Multisource;
 private with Agpl.Gdk.Managed.Drawing_Area;
@@ -13,7 +14,7 @@ private with Agpl.Gdk.Widget_Bundle;
 private with Agpl.Monitor;
 private with Agpl.Tasking.Period;
 private with Agpl.Ustrings;
-private with Glade.Xml;
+private with Gtkada.Builder;
 private with Gtk.Box;
 private with Gtk.Label;
 private with Sancta.Gtk.Link_History;
@@ -60,8 +61,9 @@ package Sancta.Ctree.Component.Console is
 
    Opt_Glade_Xml : constant Option_Attr := "glade_xml";
    Def_Glade_Xml : constant String :=
-     "/home/jano/prog/sancta/src/sancta-gtk/ctree_console_v2.glade";
+     "/home/jano/prog/sancta/src/sancta-gtk/ctree_console.xml";
    --  Supply here path to definition file
+   --  This is now a GtkBuilder file, no longer a glade file
 
    procedure Register;
 
@@ -69,6 +71,7 @@ private
 
    use Agpl;
    use Agpl.Ustrings;
+   use Gtkada.Builder;
    use Standard.Gtk.Box;
    use Sancta;
 
@@ -128,7 +131,7 @@ private
 
       Q_Threshold : Sancta.Network.Qualities.Quality;
 
-      Gui                   : Glade.XML.Glade_XML;
+      Gui                   : Gtkada_Builder;
       Instant_Signal_Labels : Label_Matrices.Map;
       --  Text matrix with signal qualities
 
