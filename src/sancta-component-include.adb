@@ -42,7 +42,7 @@ with Sancta.Component.Task_Completion_Checker,
      Sancta.Component.Task_Watchdog,
      Sancta.Component.Team,
      Sancta.Component.Team_Splitter,
-     Sancta.Component.Tsp,
+--     Sancta.Component.Tsp,
      Sancta.Component.Watchdog,
      Sancta.Component.Worst_Cost;
 
@@ -89,7 +89,7 @@ package body Sancta.Component.Include is
       Task_Watchdog.Register;
       Team.Register;
       Team_Splitter.Register;
-      Tsp.Register;
+--       Tsp.Register;
       Qmap.Register;
       Watchdog.Register;
       Worst_Cost.Register;

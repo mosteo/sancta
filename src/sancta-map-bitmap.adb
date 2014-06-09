@@ -1044,8 +1044,8 @@ package body Sancta.Map.Bitmap is
    ---------------
 
    function To_Vector (This : Object;
-                       Path : Map.Path) return Sancta.Types.Pose_Vector.Object is
-      V : Sancta.Types.Pose_Vector.Object (First => 1);
+                       Path : Map.Path) return Sancta.Types.Pose_Vector.Vector is
+      V : Sancta.Types.Pose_Vector.Vector;
 
       use Sancta.Map.Location_Lists;
 

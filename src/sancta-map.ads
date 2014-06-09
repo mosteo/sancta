@@ -14,8 +14,8 @@ with Agpl.Containers.Algorithms,
      Agpl.Generic_Handle,
      Agpl.Types;
 
-with Sancta.Containers,
-     Sancta.Types;
+with Sancta.Containers;
+with Sancta.Types;
 
 use Sancta.Types;
 
@@ -167,7 +167,7 @@ package Sancta.Map is
 
    function To_Poses (This : Object;
                       Path : Map.Path)
-                      return Sancta.Containers.Pose_Vectors.Object;
+                      return Sancta.Containers.Pose_Vectors.Vector;
 
    function Less_Than (L, R : Location'Class) return Boolean;
    --  For internal purposes...
@@ -202,8 +202,8 @@ package Sancta.Map is
    --  For caching. Default raises program error.
    --  Should be unique for each map configuration
 
---     function Hash (This : Object'Class) return String;
---     --  Dispatchs to internal one
+   function Hash (This : Object'Class) return String;
+   --  Dispatchs to internal one
 
    not overriding
    function Get_Cost_Between (This : Object;

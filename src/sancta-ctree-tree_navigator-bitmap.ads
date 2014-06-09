@@ -30,7 +30,7 @@ package Sancta.Ctree.Tree_Navigator.Bitmap is
    type Creators is (Shortest_Paths,
                      Closest_Branch,
                      Cheapest_Branch,
-                     Tsp,
+--                       Tsp,
                      Oca_A_Oca);
 
    type Creator_Function is access
@@ -54,10 +54,10 @@ package Sancta.Ctree.Tree_Navigator.Bitmap is
    --  Jobs are used as ORDERED
    --  From each goal to next using best path
 
-   function Create_With_TSP_Plan
-     (Base : Types.Pose;
-      Jobs : Tc.Lists.List;
-      M    : Map.Object'Class) return Object'Class;
+--     function Create_With_TSP_Plan
+--       (Base : Types.Pose;
+--        Jobs : Tc.Lists.List;
+--        M    : Map.Object'Class) return Object'Class;
    --  Here, jobs are considered UNORDERED
 
    function Create_With_Closest_Branch

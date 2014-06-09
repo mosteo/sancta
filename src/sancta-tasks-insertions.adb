@@ -1,5 +1,7 @@
+with Ada.Containers.Vectors;
+
 with Sancta.Agent.Utils; use Sancta.Agent.Utils;
-with Agpl.Containers.Naked_Vectors;
+-- with Agpl.Containers.Naked_Vectors;
 with Sancta.Tasks.Utils;
 with Agpl.Random;
 --  with Agpl.Text_Io; use Agpl.Text_Io;
@@ -12,8 +14,9 @@ package body Sancta.Tasks.Insertions is
    package Agent_Vectors renames Agent.Containers.Vectors;
    package Task_Lists renames Sancta.Tasks.Containers.Lists;
 
+   use type Sancta.Agent.Handle.Object;
    package Candidate_Vectors is
-     new Agpl.Containers.Naked_Vectors (Sancta.Agent.Handle.Object);
+     new Ada.Containers.Vectors (Positive, Sancta.Agent.Handle.Object);
 
    use type Sancta.Tasks.Task_Id;
 
@@ -308,7 +311,7 @@ package body Sancta.Tasks.Insertions is
    is
       Agents : constant Agent.Containers.Lists.List := Ass.Get_Agents;
 
-      Candids    : Candidate_Vectors.Object (First => 1);
+      Candids    : Candidate_Vectors.Vector;
 
       Best_Cost  : Sancta.Costs := Sancta.Infinite;
 
@@ -356,11 +359,11 @@ package body Sancta.Tasks.Insertions is
          Success := True;
          if Random then
             New_Ass.Set_Agent
-              (Candids.Vector
+              (Candids.Element
                  (Agpl.Random.Get_Integer
-                    (Candids.First, Candids.Last)).Get);
+                    (Candids.First_Index, Candids.Last_Index)).Get);
          else
-            New_Ass.Set_Agent (Candids.Vector (Candids.First).Get);
+            New_Ass.Set_Agent (Candids.Element (Candids.First_Index).Get);
          end if;
       else
          Success := False;

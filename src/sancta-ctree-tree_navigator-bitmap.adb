@@ -1,6 +1,6 @@
 with Sancta.Ctree.Robot,
      Sancta.Agent.Utils,
-     Sancta.Assigner.Mtsp_Concorde,
+--     Sancta.Assigner.Mtsp_Concorde,
      Sancta.Cost_Matrix,
      Sancta.Debug2,
      Sancta.Map.Utils,
@@ -116,20 +116,20 @@ package body Sancta.Ctree.Tree_Navigator.Bitmap is
    -- Create_With_TSP_Plan --
    --------------------------
 
-   function Create_With_TSP_Plan
-     (Base : Types.Pose;
-      Jobs : Tc.Lists.List;
-      M    : Map.Object'Class) return Object'Class
-   is
-      use Agent.Utils;
-      Bot  : constant Robot.Object'Class := Robot.Create ("tsp", Base);
-      Cm   : constant Cost_Matrix.Object :=
-               Cost_Matrix.Create_With_Start (+Bot, Jobs);
-      Opt  : constant Tc.Lists.List :=
-               Assigner.Mtsp_Concorde.Assign (+Bot, Jobs, Cm).Get_All_Tasks;
-   begin
-      return Create_With_Oca_A_Oca (Base, Opt, M);
-   end Create_With_Tsp_Plan;
+--     function Create_With_TSP_Plan
+--       (Base : Types.Pose;
+--        Jobs : Tc.Lists.List;
+--        M    : Map.Object'Class) return Object'Class
+--     is
+--        use Agent.Utils;
+--        Bot  : constant Robot.Object'Class := Robot.Create ("tsp", Base);
+--        Cm   : constant Cost_Matrix.Object :=
+--                 Cost_Matrix.Create_With_Start (+Bot, Jobs);
+--        Opt  : constant Tc.Lists.List :=
+--                 Assigner.Mtsp_Concorde.Assign (+Bot, Jobs, Cm).Get_All_Tasks;
+--     begin
+--        return Create_With_Oca_A_Oca (Base, Opt, M);
+--     end Create_With_Tsp_Plan;
 
    ---------------------------
    -- Create_With_Oca_A_Oca --
@@ -305,7 +305,7 @@ package body Sancta.Ctree.Tree_Navigator.Bitmap is
          when Shortest_Paths  => return Create_With_Shortest_Paths'Access;
          when Closest_Branch  => return Create_With_Closest_Branch'Access;
          when Cheapest_Branch => return Create_With_Cheapest_Branch'Access;
-         when Tsp             => return Create_With_Tsp_Plan'Access;
+--           when Tsp             => return Create_With_Tsp_Plan'Access;
          when Oca_A_Oca       => return Create_With_Oca_A_Oca'Access;
       end case;
    end Available_Creators;

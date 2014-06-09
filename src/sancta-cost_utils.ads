@@ -7,7 +7,7 @@ with Sancta.Agent.Containers,
 with Sancta.Cost_Matrix;
 with Sancta.Criteria; use Sancta.Criteria;
 with Sancta.Tasks.Containers;
-with Agpl.Optimization.Concorde;
+-- with Agpl.Optimization.Concorde;
 with Agpl; use Agpl;
 
 package Sancta.Cost_Utils is
@@ -30,10 +30,10 @@ package Sancta.Cost_Utils is
    procedure Set_Pose (This : in out Cost_Generator;
                        Pose :        Types.Pose) is abstract;
 
-   function Get_Concorde_Cost_Matrix
-     (Agents : in Sancta.Agent.Containers.Lists.List;
-      Tasks  : in Sancta.Tasks.Containers.Lists.List;
-      Costs  : in Sancta.Cost_Matrix.Object) return Optimization.Concorde.Cost_Matrix;
+--     function Get_Concorde_Cost_Matrix
+--       (Agents : in Sancta.Agent.Containers.Lists.List;
+--        Tasks  : in Sancta.Tasks.Containers.Lists.List;
+--        Costs  : in Sancta.Cost_Matrix.Object) return Optimization.Concorde.Cost_Matrix;
    --  Will properly populate a concorde cost_matrix with these agents/tasks.
    --  Pre: Tasks include the Sancta.Tasks.Starting_Pose necessary tasks.
    --  Pre: The starting tasks are the first ones in the task list, in agent order.
@@ -54,9 +54,9 @@ package Sancta.Cost_Utils is
    --  Agent_Proxy, Robot and whichever needs it.
    pragma Assumption ("Non-Holonomic robot");
 
-   function Get_Optimal_Cost
-     (Agents  : in Sancta.Agent.Containers.Lists.List;
-      Tasks   : in Sancta.Tasks.Containers.Lists.List) return Sancta.Costs;
+--     function Get_Optimal_Cost
+--       (Agents  : in Sancta.Agent.Containers.Lists.List;
+--        Tasks   : in Sancta.Tasks.Containers.Lists.List) return Sancta.Costs;
    --  Get the optimal cost, according to TSP solution.
 
    function Get_Trader_Cost

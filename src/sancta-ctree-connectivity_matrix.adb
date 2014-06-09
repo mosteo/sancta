@@ -135,7 +135,7 @@ package body Sancta.Ctree.Connectivity_Matrix is
    function Is_Weak (This : Object; Bots : Key) return Boolean is
    begin
       pragma Assert (This.Umbral > 0.0);
-      return This.Element (Bots) > Link_Qualities (This.Umbral);
+      return This.Element (Bots) > This.Umbral;
    end Is_Weak;
 
    -----------------------

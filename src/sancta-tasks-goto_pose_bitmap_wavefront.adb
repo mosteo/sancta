@@ -180,8 +180,8 @@ package body Sancta.Tasks.Goto_Pose_Bitmap_Wavefront is
    -- Get_Route --
    ---------------
 
-   function Get_Route (This : Object) return Containers.Pose_Vectors.Object is
-      V : Containers.Pose_Vectors.Object (First => 1);
+   function Get_Route (This : Object) return Containers.Pose_Vectors.Vector is
+      V : Containers.Pose_Vectors.Vector;
 
       use Sancta.Map.Location_Lists;
 

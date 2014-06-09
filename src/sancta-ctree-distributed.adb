@@ -1560,9 +1560,13 @@ package body Sancta.Ctree.Distributed is
          end loop;
 
          if not Found then
-            This.Setup_Info.Append ((From => From.Sender,
-                                     Pose => Msg.Pose,
-                                     others => <>));
+            declare
+               New_Info : Robot_Info;
+            begin
+               New_Info.From := From.Sender;
+               New_Info.Pose := Msg.Pose;
+               This.Setup_Info.Append (New_Info);
+            end;
          end if;
 
          Log ("Setup info incoming from " & (-From.Sender) & " New: " &

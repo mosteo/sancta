@@ -310,7 +310,7 @@ package Sancta.Map.Bitmap is
    function Contains (Path : Map.Path; Loc : Bit_Location) return Boolean;
 
    function To_Vector (This : Object;
-                       Path : Map.Path) return Sancta.Types.Pose_Vector.Object;
+                       Path : Map.Path) return Sancta.Types.Pose_Vector.Vector;
 
    function Image (Path : Map.Path) return String;
 

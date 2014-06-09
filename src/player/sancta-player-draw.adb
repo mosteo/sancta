@@ -108,15 +108,15 @@ package body Sancta.Player.Draw is
    is
       Prev,
       Curr  : Types.Pose;
-      Route : constant Sancta.Containers.Pose_Vectors.Object :=
+      Route : constant Sancta.Containers.Pose_Vectors.Vector :=
                 Map.To_Poses (Path);
    begin
       if not Path.Is_Empty then
-         Prev := Route.Vector (Route.First);
+         Prev := Route.First_Element;
          Drawer.Set_Color (Color);
 
-         for I in Route.First + 1 .. Route.Last loop
-            Curr := Route.Vector (I);
+         for I in Route.First_Index + 1 .. Route.Last_Index loop
+            Curr := Route.Element (I);
             declare
                Line : constant Pt.Point_2d_Array (1 .. 2) :=
                         ((+Curr.X, +Curr.Y),
@@ -142,7 +142,7 @@ package body Sancta.Player.Draw is
       T     : Navigate.Object renames Navigate.Object (Job);
       Prev  : Types.Pose := Bot.Get_Pose;
       Curr  : Types.Pose := T.To_Goto_Pose.Pose;
-      Route : constant Sancta.Containers.Pose_Vectors.Object :=
+      Route : constant Sancta.Containers.Pose_Vectors.Vector :=
                 T.Get_Map.Ref.all.To_Vector (T.Get_Route);
    begin
       declare
@@ -155,8 +155,8 @@ package body Sancta.Player.Draw is
          Prev := Curr;
       end;
 
-      for I in Route.First + 2 .. Route.Last loop
-         Curr := Route.Vector (I);
+      for I in Route.First_Index + 2 .. Route.Last_Index loop
+         Curr := Route.Element (I);
          declare
             Line : constant Pt.Point_2d_Array (1 .. 2) :=
                      ((+(Curr.X), +(Curr.Y)),

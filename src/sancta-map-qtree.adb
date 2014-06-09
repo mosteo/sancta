@@ -1,10 +1,11 @@
 with Ada.Containers.Indefinite_Ordered_Maps;
-with Ada.Unchecked_Conversion;
 
 with Agpl.Conversions;
 with Agpl.Constants;
 
 with Sancta.Types.Operations;
+
+with System;
 
 package body Sancta.Map.Qtree is
 
@@ -68,10 +69,10 @@ package body Sancta.Map.Qtree is
      (L, R : Location)
       return Boolean
    is
-      --  Since this is only used for storage, we take the quick way:
-      function Ptr is new Ada.Unchecked_Conversion (Cell_Access, Integer);
+   --  Since this is only for ordering, we indulge in comparing addresses
+   	use type System.Address;
    begin
-      return Ptr (L.Cell) < Ptr (R.Cell);
+      return L.Cell.all'Address < R.Cell.all'Address;
    end "<";
 
    -----------

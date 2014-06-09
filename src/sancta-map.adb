@@ -250,10 +250,10 @@ package body Sancta.Map is
       return "";
    end Hash;
 
---     function Hash (This : Object'Class) return String is
---     begin
---        return This.Hash;
---     end Hash;
+   function Hash (This : Object'Class) return String is
+   begin
+      return This.Hash;
+   end Hash;
 
    ----------------------
    -- Get_Cost_Between --
@@ -574,9 +574,9 @@ package body Sancta.Map is
 
    function To_Poses (This : Object;
                       Path : Map.Path)
-                      return Sancta.Containers.Pose_Vectors.Object
+                      return Sancta.Containers.Pose_Vectors.Vector
    is
-      P : Sancta.Containers.Pose_Vectors.Object (First => 1);
+      P : Sancta.Containers.Pose_Vectors.Vector;
       procedure To_Poses (I : Paths.Cursor) is
       begin
          P.Append (Object'Class (This).Nearest_Pose (Paths.Element (I)));

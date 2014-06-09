@@ -2,6 +2,12 @@ with Agpl.Strings;
 
 package body Sancta is
 
+   function "=" (L, R : in Node_Id) return Boolean is
+      use Ids;
+   begin
+      return Ids.Bounded_String (L) = Ids.Bounded_String (R);
+   end "=";
+
    ---------
    -- "<" --
    ---------

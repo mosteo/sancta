@@ -29,6 +29,7 @@ package Sancta is
 
    type Node_Id is private;
 
+   function "=" (L, R : in Node_Id) return Boolean; pragma Inline ("=");
    function "<" (L, R : in Node_Id) return Boolean; pragma Inline ("<");
 
    function Image (Id : in Node_Id) return String;  pragma Inline (Image);

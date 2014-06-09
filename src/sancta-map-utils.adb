@@ -82,15 +82,15 @@ package body Sancta.Map.Utils is
          return;
       end if;
       declare
-         Poses : constant Sancta.Containers.Pose_Vectors.Object (First => 1) :=
+         Poses : constant Sancta.Containers.Pose_Vectors.Vector :=
                    P.First_Element.Get_Map.To_Poses (P);
       begin
-         for I in Poses.First + 1 .. Poses.Last loop
+         for I in Poses.First_Index + 1 .. Poses.Last_Index loop
             D.Draw_Line
-              (Float (Poses.Vector (I - 1).X),
-               Float (Poses.Vector (I - 1).Y),
-               Float (Poses.Vector (I + 0).X),
-               Float (Poses.Vector (I + 0).Y));
+              (Float (Poses.Element (I - 1).X),
+               Float (Poses.Element (I - 1).Y),
+               Float (Poses.Element (I + 0).X),
+               Float (Poses.Element (I + 0).Y));
          end loop;
       end;
    end Draw_Path;

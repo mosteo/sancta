@@ -1,6 +1,6 @@
 with Sancta;
 with Agpl.Cv;
-with Agpl.Containers.Naked_Vectors;
+--  with Agpl.Containers.Naked_Vectors;
 with Agpl.Protected_Value,
      Agpl.Smart_Access;
 with Agpl.Types;
@@ -79,7 +79,7 @@ package Sancta.Types is
 
    type Pose_Array is array (Integer range <>) of Pose;
 
-   package Pose_Vector is new Agpl.Containers.Naked_Vectors (Pose);
+   package Pose_Vector is new Ada.Containers.Indefinite_Vectors (Positive, Pose);
 
    type Range_Reading is record
       A        : Types.Angle; -- Angle

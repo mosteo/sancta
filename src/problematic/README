@@ -1,0 +1,2 @@
+Files that cause gnat-4.6 to enter an infinite loop
+Or files that used concorde, which only had in 32bit closed code
