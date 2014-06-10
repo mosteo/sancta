@@ -202,8 +202,8 @@ package Sancta.Map is
    --  For caching. Default raises program error.
    --  Should be unique for each map configuration
 
-   function Hash (This : Object'Class) return String;
-   --  Dispatchs to internal one
+--     function Hash (This : Object'Class) return String;
+--     --  Dispatchs to internal one
 
    not overriding
    function Get_Cost_Between (This : Object;

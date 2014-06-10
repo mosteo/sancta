@@ -2,9 +2,9 @@
 --  consideration HTN related aspects like expansion, etc.
 
 with Sancta.Tasks;
-with Sancta.Tasks.Choose_Entry_Point;
-with Sancta.Tasks.Explore_Segment,
-     Sancta.Tasks.Explore_Directed_Segment;
+--  with Sancta.Tasks.Choose_Entry_Point;
+--  with Sancta.Tasks.Explore_Segment,
+--       Sancta.Tasks.Explore_Directed_Segment;
 with Sancta.Tasks.Goto_Pose;
 with Sancta.Tasks.Speed_Driving;
 with Sancta.Types;
@@ -35,7 +35,7 @@ package body Sancta.Mission_Tracker is
    -----------------------
 
    function Parse_Entry_Point (Job : in Xml.Node) return Sancta.Plan.Subplan is
-      Candidates : Types.Pose_Vector.Object (First => 1);
+      Candidates : Types.Pose_Vector.Vector;
       Children   : constant Xml.Node_Array := Xml.Get_All (Job, "entry_point");
    begin
       for I in Children'Range loop
@@ -43,13 +43,15 @@ package body Sancta.Mission_Tracker is
            (Convert.To_Pose (Xml.Get_Attribute (Children (I), "pose", "")));
       end loop;
       declare
-         Cand_Array : Types.Pose_Array (1 .. Candidates.Last);
+         Cand_Array : Types.Pose_Array (1 .. Candidates.Last_Index);
       begin
          for I in Cand_Array'Range loop
-            Cand_Array (I) := Candidates.Vector (I);
+            Cand_Array (I) := Candidates.Element (I);
          end loop;
-         return Sancta.Plan_Node.Create
-           (Tasks.Choose_Entry_Point.Create (Cand_Array));
+         raise Program_Error with "Bitrot victim";
+         return null;
+--           return Sancta.Plan_Node.Create
+--             (Tasks.Choose_Entry_Point.Create (Cand_Array));
       end;
    end Parse_Entry_Point;
 
@@ -59,10 +61,12 @@ package body Sancta.Mission_Tracker is
 
    function Parse_Explore_Segment (Job : in Xml.Node) return Sancta.Plan.Subplan is
    begin
-      return Sancta.Plan_Node.Create
-        (Tasks.Explore_Segment.Create
-           (Convert.To_Pose (Xml.Get_Attribute (Job, "ini", "")),
-            Convert.To_Pose (Xml.Get_Attribute (Job, "fin", ""))));
+      raise Program_Error with "Bitrot victim";
+      return null;
+--        return Sancta.Plan_Node.Create
+--          (Tasks.Explore_Segment.Create
+--             (Convert.To_Pose (Xml.Get_Attribute (Job, "ini", "")),
+--              Convert.To_Pose (Xml.Get_Attribute (Job, "fin", ""))));
    end Parse_Explore_Segment;
 
    ----------------------------
@@ -71,10 +75,12 @@ package body Sancta.Mission_Tracker is
 
    function Parse_Explore_directed (Job : in Xml.Node) return Sancta.Plan.Subplan is
    begin
-      return Sancta.Plan_Node.Create
-        (Tasks.Explore_Directed_Segment.Create
-           (Convert.To_Pose (Xml.Get_Attribute (Job, "ini", "")),
-            Convert.To_Pose (Xml.Get_Attribute (Job, "fin", ""))));
+      raise Program_Error with "Bitrot victim";
+      return null;
+--        return Sancta.Plan_Node.Create
+--          (Tasks.Explore_Directed_Segment.Create
+--             (Convert.To_Pose (Xml.Get_Attribute (Job, "ini", "")),
+--              Convert.To_Pose (Xml.Get_Attribute (Job, "fin", ""))));
    end Parse_Explore_directed;
 
    ---------------------

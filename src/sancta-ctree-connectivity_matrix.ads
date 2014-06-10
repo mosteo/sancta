@@ -111,7 +111,7 @@ private
       Umbral : Link_Qualities := 0.0;
    end record;
 
---     function Copy (This : Object) return Object is (This);
---     pragma Warning ("Not sure this is enough for it to work");
+   function Copy (This : Object) return Object is (This);
+   pragma Untested ("Not sure this is enough for it to work");
 
 end Sancta.Ctree.Connectivity_Matrix;

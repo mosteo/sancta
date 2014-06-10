@@ -250,10 +250,10 @@ package body Sancta.Map is
       return "";
    end Hash;
 
-   function Hash (This : Object'Class) return String is
-   begin
-      return This.Hash;
-   end Hash;
+--     function Hash (This : Object'Class) return String is
+--     begin
+--        return This.Hash;
+--     end Hash;
 
    ----------------------
    -- Get_Cost_Between --

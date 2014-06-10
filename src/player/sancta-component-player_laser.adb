@@ -66,7 +66,7 @@ package body Sancta.Component.Player_Laser is
       end;
 
       declare
-         Foo : Standard.Player.Double;
+         Foo, Bar, Bee : Standard.Player.Double;
          Baz : Boolean;
          procedure Get_Laser_Config (Iface : Player_Client.Iface_Access) is
             Laser : Standard.Player.Laser.Object renames
@@ -74,7 +74,7 @@ package body Sancta.Component.Player_Laser is
          begin
             Laser.Get_Config (Standard.Player.Double (This.Min_Angle),
                               Standard.Player.Double (This.Max_Angle),
-                              Foo, Foo, Baz, Foo);
+                              Foo, Bar, Baz, Bee);
          end Get_Laser_Config;
       begin
          This.Execute (Get_Laser_Config'Access);

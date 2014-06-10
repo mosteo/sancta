@@ -1,6 +1,5 @@
 with Agpl.Chronos;
 with Agpl.Tasking.Period;
-with Agpl.Ustrings; use Agpl.Ustrings;
 with Sancta.Component.Environment;
 with Sancta.Component.Root;
 

@@ -24,7 +24,7 @@ private
 
    type Object is new Sancta.Tasks.Compound.Object with
       record
-         Candidates : Sancta.Types.Pose_Vector.Object (First => 1);
+         Candidates : Sancta.Types.Pose_Vector.Vector;
       end record;
 
 end Sancta.Tasks.Choose_Entry_Point;

@@ -30,7 +30,7 @@ package body Sancta.Auctions is
 
    function Id (S : String) return Auction_Id is
    begin
-      return Auction_Id (Gnat.Md5.Digest (S));
+      return Auction_Id (Gnat.Md5.Message_Digest'(Gnat.Md5.Digest (S)));
    end Id;
 
    ---------
